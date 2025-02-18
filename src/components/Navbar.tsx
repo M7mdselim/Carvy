@@ -16,7 +16,7 @@ export default function Navbar() {
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const navigation = [
-    { name: 'Home', href: '/Carvy/' },
+    { name: 'Home', href: '/' },
     { name: 'Models', href: '/categories' },
     { name: 'Shops', href: '/shops' },
   ]
@@ -36,7 +36,7 @@ export default function Navbar() {
             <div className="flex h-20 justify-between">
               <div className="flex">
                 <div className="flex flex-shrink-0 items-center">
-                  <Link to="/Carvy/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+                  <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
                     Carvy
                   </Link>
                 </div>
@@ -59,7 +59,7 @@ export default function Navbar() {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                 <Link 
-                  to="/cart" 
+                  to="/cart/" 
                   className="group relative p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
                   <div className="relative">
@@ -85,7 +85,7 @@ export default function Navbar() {
                             <div className="mt-3 pt-3 border-t border-gray-100">
                               <div className="flex justify-between font-medium">
                                 <span>Total:</span>
-                                <span className="text-indigo-600">${total.toFixed(2)}</span>
+                                <span className="text-indigo-600">{total.toFixed(2)}</span>
                               </div>
                             </div>
                             <Link

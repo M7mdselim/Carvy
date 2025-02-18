@@ -61,7 +61,7 @@ export default function Checkout() {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>{product.name}</h3>
-                            <p className="ml-4">${(product.price * quantity).toFixed(2)}</p>
+                            <p className="ml-4">{(product.price * quantity).toFixed(2)}</p>
                           </div>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
@@ -76,16 +76,16 @@ export default function Checkout() {
               <div className="mt-6 space-y-4">
                 <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                   <div className="text-base font-medium text-gray-900">Subtotal</div>
-                  <div className="text-base font-medium text-gray-900">${total.toFixed(2)}</div>
+                  <div className="text-base font-medium text-gray-900">{total.toFixed(2)}</div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-base font-medium text-gray-900">Shipping</div>
-                  <div className="text-base font-medium text-gray-900">$70.00</div>
+                  <div className="text-base font-medium text-gray-900">70.00</div>
                 </div>
                 <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                   <div className="text-lg font-semibold text-gray-900">Total</div>
                   <div className="text-lg font-semibold text-gray-900">
-                    ${(total + 70.00).toFixed(2)}
+                    {(total + 70.00).toFixed(2)}  EGP
                   </div>
                 </div>
               </div>

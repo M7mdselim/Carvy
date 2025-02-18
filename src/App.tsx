@@ -22,25 +22,26 @@ export default function App() {
   }, [initialize])
 
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/Carvy/" element={<Home />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/:categoryId" element={<CategoryShops />} />
-            <Route path="/shops" element={<Shops />} />
-            <Route path="/shops/:shopId" element={<ShopDetails />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/search" element={<SearchResults />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <Router basename="/Carvy/">
+  <div className="min-h-screen flex flex-col bg-gray-50">
+    <Navbar />
+    <main className="flex-grow">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/:categoryId" element={<CategoryShops />} />
+        <Route path="/shops" element={<Shops />} />
+        <Route path="/shops/:shopId" element={<ShopDetails />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/search" element={<SearchResults />} />
+      </Routes>
+    </main>
+    <Footer />
+  </div>
+</Router>
+
   )
 }

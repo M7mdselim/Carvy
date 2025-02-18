@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <Link to="/Carvy/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+            <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
               Carvy
             </Link>
             <p className="text-gray-500 text-sm">
@@ -18,7 +18,7 @@ export default function Footer() {
             <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/Carvy/" className="text-gray-500 hover:text-gray-700 text-sm">Home</Link>
+                <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">Home</Link>
               </li>
               <li>
                 <Link to="/categories" className="text-gray-500 hover:text-gray-700 text-sm">Models</Link>

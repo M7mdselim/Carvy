@@ -85,7 +85,7 @@ export default function Home() {
                                 onClick={() => navigate(`/shops/${product.shopId}?product=${product.id}`)}
                               >
                                 <div className="font-medium">{product.name}</div>
-                                <div className="text-sm text-gray-500">${product.price.toFixed(2)}</div>
+                                <div className="text-sm text-gray-500">{product.price.toFixed(2)}</div>
                               </div>
                             ))}
                           </div>

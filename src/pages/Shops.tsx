@@ -18,7 +18,7 @@ export default function Shops() {
         <h1 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-0">All Shops</h1>
         <div className="flex items-center">
           <label htmlFor="category" className="mr-2 text-sm font-medium text-gray-700">
-            Filter by category:
+            Filter by Models:
           </label>
           <select
             id="category"
@@ -26,7 +26,7 @@ export default function Shops() {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="">All Categories</option>
+            <option value="">All Models</option>
             {categories.map((category) => (
               <option key={category.id} value={category.name}>
                 {category.name}
