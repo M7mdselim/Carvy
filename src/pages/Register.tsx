@@ -34,7 +34,11 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md  text-center">
+
+      <div className="text-8xl font-extrabold leading-tight py-1 bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+  Carvy
+</div>
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
           Create a new account
         </h2>
