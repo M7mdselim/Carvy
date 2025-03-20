@@ -19,15 +19,41 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080
   },
-  // Add optimizeDeps to ensure proper handling of dependencies
+  // Improved optimizeDeps configuration
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: [
+      'react', 
+      'react-dom', 
+      'react-router-dom',
+      'zustand',
+      '@supabase/supabase-js'
+    ],
+    esbuildOptions: {
+      target: 'es2020'
+    }
   },
-  // Add build options to ensure proper TS handling
+  // Enhanced build options to fix TypeScript issues
   build: {
     target: 'es2020',
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: true
+    sourcemap: true,
+    commonjsOptions: {
+      transformMixedEsModules: true
+    },
+    // Override tsconfig settings that might cause conflicts
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js']
+        }
+      }
+    }
+  },
+  // Add esbuild options to handle TypeScript properly
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+    target: 'es2020'
   }
 }))
