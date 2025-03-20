@@ -1,3 +1,4 @@
+
 import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
@@ -10,9 +11,18 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { items, addItem, removeItem, updateQuantity } = useCart()
   const cartItem = items.find(item => item.product.id === product.id)
 
+  const handleImageClick = () => {
+    if (product.stock > 0) {
+      addItem(product)
+    }
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="aspect-square w-full overflow-hidden bg-gray-200">
+      <div 
+        className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer"
+        onClick={handleImageClick}
+      >
         <img
           src={product.image}
           alt={product.name}

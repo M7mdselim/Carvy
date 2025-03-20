@@ -1,3 +1,4 @@
+
 import { Fragment } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
@@ -19,6 +20,7 @@ export default function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Models', href: '/categories' },
     { name: 'Shops', href: '/shops' },
+    { name: 'Contact Us', href: '/contact' }, // Added Contact Us link
   ]
 
   const isCurrentPath = (path: string) => {
@@ -121,7 +123,17 @@ export default function Navbar() {
                     >
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <Menu.Item>
-                        
+                          {({ active }) => (
+                            <Link
+                              to="/profile"
+                              className={classNames(
+                                active ? 'bg-gray-50' : '',
+                                'block px-4 py-2 text-sm text-gray-700'
+                              )}
+                            >
+                              Profile
+                            </Link>
+                          )}
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (

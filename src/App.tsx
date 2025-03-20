@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
@@ -11,6 +12,7 @@ import Cart from './pages/Cart'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import SearchResults from './pages/SearchResults'
+import Contact from './pages/Contact' // Import the new Contact page
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
 
@@ -37,11 +39,11 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/contact" element={<Contact />} /> {/* Add the new Contact route */}
       </Routes>
     </main>
     <Footer />
   </div>
 </Router>
-
   )
 }
