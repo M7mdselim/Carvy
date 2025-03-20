@@ -55,5 +55,9 @@ export default defineConfig(({ mode }) => ({
   esbuild: {
     logOverride: { 'this-is-undefined-in-esm': 'silent' },
     target: 'es2020'
+  },
+  // Specify a custom TypeScript configuration
+  typescript: {
+    tsconfig: './vite-tsconfig.json'
   }
 }))
