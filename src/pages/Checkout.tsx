@@ -48,7 +48,7 @@ export default function Checkout() {
         lastName: userProfile.lastName || '',
       }))
     }
-  }, [user, userProfile, navigate]) // Added proper dependency array to prevent infinite loop
+  }, [user, userProfile, navigate])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -88,8 +88,7 @@ export default function Checkout() {
           address: formData.address,
           city: formData.city,
           postal_code: formData.postalCode,
-          total_amount: totalWithShipping,
-          status: 'pending'
+          total_amount: totalWithShipping
         })
         .select()
         .single()
@@ -194,6 +193,7 @@ export default function Checkout() {
               </div>
             </div>
           </div>
+
 
           {/* Checkout Form */}
           <div className="lg:col-span-3">
