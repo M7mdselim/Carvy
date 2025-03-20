@@ -21,13 +21,18 @@
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@paypal/react-paypal-js": "^8.8.2",
+    "@radix-ui/react-label": "^2.1.2",
     "@supabase/supabase-js": "^2.49.1",
     "axios": "^1.8.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "lovable-tagger": "^1.1.7",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",
+    "sonner": "^2.0.1",
+    "tailwind-merge": "^3.0.2",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
