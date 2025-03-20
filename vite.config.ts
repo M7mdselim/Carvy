@@ -18,5 +18,16 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080
+  },
+  // Add optimizeDeps to ensure proper handling of dependencies
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  },
+  // Add build options to ensure proper TS handling
+  build: {
+    target: 'es2020',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true
   }
 }))
