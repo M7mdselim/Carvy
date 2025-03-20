@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080
   },
-  // Improved optimizeDeps configuration
   optimizeDeps: {
     include: [
       'react', 
@@ -27,21 +26,11 @@ export default defineConfig(({ mode }) => ({
       'react-router-dom',
       'zustand',
       '@supabase/supabase-js'
-    ],
-    esbuildOptions: {
-      target: 'es2020'
-    }
+    ]
   },
-  // Enhanced build options to fix TypeScript issues
   build: {
-    target: 'es2020',
     outDir: 'dist',
-    assetsDir: 'assets',
     sourcemap: true,
-    commonjsOptions: {
-      transformMixedEsModules: true
-    },
-    // Override tsconfig settings that might cause conflicts
     rollupOptions: {
       output: {
         manualChunks: {
@@ -50,14 +39,5 @@ export default defineConfig(({ mode }) => ({
         }
       }
     }
-  },
-  // Add esbuild options to handle TypeScript properly
-  esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-    target: 'es2020'
-  },
-  // Specify a custom TypeScript configuration
-  typescript: {
-    tsconfig: './vite-tsconfig.json'
   }
 }))
