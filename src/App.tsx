@@ -1,8 +1,10 @@
+
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
+import Index from './pages/Index'
 import Categories from './pages/Categories'
 import CategoryShops from './pages/CategoryShops'
 import Shops from './pages/Shops'
@@ -26,24 +28,21 @@ export default function App() {
   return (
     <Router basename="/Carvy">
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/:categoryId" element={<CategoryShops />} />
-            <Route path="/shops" element={<Shops />} />
-            <Route path="/shops/:shopId" element={<ShopDetails />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/profile" element={<Profile />} />
-          </Routes>
-        </main>
-        <Footer />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/index" element={<Index />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/categories/:categoryId" element={<CategoryShops />} />
+          <Route path="/shops" element={<Shops />} />
+          <Route path="/shops/:shopId" element={<ShopDetails />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
       </div>
     </Router>
   )
