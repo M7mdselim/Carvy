@@ -29,7 +29,7 @@ export default function App() {
         <Navbar />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/Carvy" element={<Home />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/categories/:categoryId" element={<CategoryShops />} />
             <Route path="/shops" element={<Shops />} />
