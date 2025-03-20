@@ -29,7 +29,7 @@ export default function App() {
     <Router basename="/Carvy">
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/Carvy" element={<Home />} />
           <Route path="/index" element={<Index />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/:categoryId" element={<CategoryShops />} />
