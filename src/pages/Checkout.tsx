@@ -1,14 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
+import { useAuth } from '../hooks/useAuth'
 import { CreditCard, Shield } from 'lucide-react'
 
 export default function Checkout() {
   const { items, total } = useCart()
   const navigate = useNavigate()
+  const { user, getUserProfile } = useAuth()
+  const userProfile = getUserProfile()
+  
   const [formData, setFormData] = useState({
     email: '',
-    phone: '', // Added this line
+    phone: '',
     firstName: '',
     lastName: '',
     address: '',
@@ -20,6 +24,24 @@ export default function Checkout() {
     cvv: ''
   })
   
+  useEffect(() => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      navigate('/login?redirect=checkout')
+      return
+    }
+    
+    // Pre-fill form with user data if available
+    if (user && userProfile) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || '',
+        phone: userProfile.phoneNumber || '',
+        firstName: userProfile.firstName || '',
+        lastName: userProfile.lastName || '',
+      }))
+    }
+  }, [user, userProfile, navigate])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -38,12 +60,13 @@ export default function Checkout() {
   }
 
   return (
+    // ... keep existing code (order summary and form UI)
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-x-8 gap-y-8 lg:grid-cols-5">
 
- {/* Order Summary */}
- <div className="lg:col-span-2">
+          {/* Order Summary */}
+          <div className="lg:col-span-2">
             <div className="bg-white p-8 rounded-lg shadow sticky top-8">
               <h2 className="text-2xl font-semibold mb-6">Order Summary</h2>
               <div className="flow-root">
@@ -281,8 +304,6 @@ export default function Checkout() {
               </button>
             </form>
           </div>
-
-         
         </div>
       </div>
     </div>

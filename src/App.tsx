@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
@@ -13,6 +12,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import SearchResults from './pages/SearchResults'
 import Contact from './pages/Contact'
+import Profile from './pages/Profile'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
 
@@ -40,6 +40,7 @@ export default function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
         <Footer />

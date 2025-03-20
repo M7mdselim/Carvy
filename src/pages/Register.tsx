@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Register() {
+
+
+
+  
   const navigate = useNavigate()
   const { signUp } = useAuth()
   const [formData, setFormData] = useState({
@@ -28,7 +32,13 @@ export default function Register() {
     setLoading(true)
 
     try {
-      await signUp(formData.email, formData.password)
+      await signUp(formData.email, formData.password, {
+        data: {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          phone_number: formData.phoneNumber
+        }
+      })
       navigate('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account')
