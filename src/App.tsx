@@ -12,7 +12,7 @@ import Cart from './pages/Cart'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import SearchResults from './pages/SearchResults'
-import Contact from './pages/Contact' // Import the new Contact page
+import Contact from './pages/Contact'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
 
@@ -24,26 +24,26 @@ export default function App() {
   }, [initialize])
 
   return (
-    <Router basename="/Carvy/">
-  <div className="min-h-screen flex flex-col bg-gray-50">
-    <Navbar />
-    <main className="flex-grow">
-      <Routes>
-        <Route path="/Carvy/" element={<Home />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/categories/:categoryId" element={<CategoryShops />} />
-        <Route path="/shops" element={<Shops />} />
-        <Route path="/shops/:shopId" element={<ShopDetails />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/contact" element={<Contact />} /> {/* Add the new Contact route */}
-      </Routes>
-    </main>
-    <Footer />
-  </div>
-</Router>
+    <Router basename="/Carvy">
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/:categoryId" element={<CategoryShops />} />
+            <Route path="/shops" element={<Shops />} />
+            <Route path="/shops/:shopId" element={<ShopDetails />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   )
 }
