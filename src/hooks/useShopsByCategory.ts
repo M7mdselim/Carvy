@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Shop, Category } from '../types'
@@ -10,6 +11,11 @@ type ShopData = {
   logo: string | null
   rating: number | null
   review_count: number | null
+}
+
+// Define the shape of the response from the shop_categories query
+interface ShopCategoryResponse {
+  shops: ShopData
 }
 
 export function useShopsByCategory(categoryId: string) {
@@ -54,10 +60,14 @@ export function useShopsByCategory(categoryId: string) {
         if (shopsError) throw shopsError
 
         // Transform and deduplicate shops data
+        // First cast the response to the correct type
+        const typedShopsData = shopsData as ShopCategoryResponse[];
+        
+        // Now transform the data
         const uniqueShops = Array.from(
           new Map(
-            (shopsData as { shops: ShopData[] }[])
-              .flatMap(item => item.shops) // Flatten nested arrays
+            typedShopsData
+              .map(item => item.shops) // Extract the shops data
               .filter((shop): shop is ShopData => shop !== null)
               .map(shop => [
                 shop.id,
