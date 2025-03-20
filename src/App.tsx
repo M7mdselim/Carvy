@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -28,8 +28,9 @@ export default function App() {
   return (
     <Router basename="/Carvy">
       <div className="min-h-screen flex flex-col bg-gray-50">
+        <Navbar />
         <Routes>
-          <Route path="/Carvy/" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/index" element={<Index />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/:categoryId" element={<CategoryShops />} />
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
+        <Footer />
       </div>
     </Router>
   )
