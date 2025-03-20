@@ -1,3 +1,4 @@
+
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Product } from '../types'
@@ -14,7 +15,7 @@ interface CartStore {
   updateQuantity: (productId: string, quantity: number) => void
   clearCart: () => void
   total: number
-  calculateTotal: (items: CartItem[]) => number // Added this line
+  calculateTotal: (items: CartItem[]) => number
 }
 
 export const useCart = create<CartStore>()(

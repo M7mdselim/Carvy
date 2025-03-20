@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
@@ -15,6 +16,7 @@ import Contact from './pages/Contact'
 import Profile from './pages/Profile'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
+import { Toaster } from 'sonner'
 
 export default function App() {
   const { initialize } = useAuth()
@@ -44,6 +46,7 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+        <Toaster position="top-right" />
       </div>
     </Router>
   )
