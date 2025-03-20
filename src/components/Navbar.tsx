@@ -10,7 +10,12 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Navbar() {
+// Define NavbarProps interface
+export interface NavbarProps {
+  transparent?: boolean;
+}
+
+export default function Navbar({ transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
   const { items, total } = useCart()
   const location = useLocation()
@@ -30,8 +35,13 @@ export default function Navbar() {
     return location.pathname.startsWith(path)
   }
 
+  // Apply different background styles based on the transparent prop
+  const navbarBgClass = transparent
+    ? 'bg-transparent backdrop-blur-0 bg-opacity-0'
+    : 'bg-white shadow-lg backdrop-blur-md bg-opacity-80'
+
   return (
-    <Disclosure as="nav" className="bg-white shadow-lg backdrop-blur-md bg-opacity-80 sticky top-0 z-50">
+    <Disclosure as="nav" className={`${navbarBgClass} sticky top-0 z-50 transition-colors duration-300`}>
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
