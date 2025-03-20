@@ -8,7 +8,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
-
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
@@ -24,6 +23,7 @@
     "@paypal/react-paypal-js": "^8.8.2",
     "@supabase/supabase-js": "^2.49.1",
     "axios": "^1.8.2",
+    "lovable-tagger": "^1.1.7",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
