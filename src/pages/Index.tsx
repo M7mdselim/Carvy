@@ -19,7 +19,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar transparent={true} />
-      <main>
+      <main className="mt-20">
         <Hero />
         <Features />
         <ProductShowcase />

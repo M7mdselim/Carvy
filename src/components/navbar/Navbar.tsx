@@ -39,7 +39,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
     : 'bg-white shadow-lg backdrop-blur-md bg-opacity-80'
 
   return (
-    <Disclosure as="nav" className={`${navbarBgClass} sticky top-0 z-50 transition-colors duration-300`}>
+    <Disclosure as="nav" className={`${navbarBgClass} fixed top-0 left-0 right-0 z-50 transition-colors duration-300`}>
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
