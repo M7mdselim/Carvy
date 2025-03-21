@@ -9,21 +9,23 @@ import { useCategories } from '../hooks/useCategories'
 import { useShops } from '../hooks/useShops'
 import { useProducts } from '../hooks/useProducts'
 import { useSearch } from '../hooks/useSearch'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Home() {
-  const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
-  const { products: searchProducts, shops: searchShops, loading: searchLoading } = useSearch(searchQuery)
-  const { categories, loading: loadingCategories } = useCategories()
-  const { shops, loading: loadingShops } = useShops()
-  const { products, loading: loadingProducts } = useProducts()
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { products: searchProducts, shops: searchShops, loading: searchLoading } = useSearch(searchQuery);
+  const { categories, loading: loadingCategories } = useCategories();
+  const { shops, loading: loadingShops } = useShops();
+  const { products, loading: loadingProducts } = useProducts();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -36,10 +38,10 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 py-24 sm:py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Find the Perfect Parts for Your Car in Egypt
+              {t('findPerfectParts')}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
-              Browse thousands of auto parts from trusted sellers worldwide
+              {t('browseThousands')}
             </p>
           </div>
         </div>
@@ -57,20 +59,20 @@ export default function Home() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for parts, shops, brands, or car models..."
+              placeholder={t('searchPlaceholder')}
               className="w-full rounded-full border-2 border-indigo-200 pl-12 pr-4 py-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-lg text-lg"
             />
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-indigo-400" />
             {searchQuery && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl overflow-hidden z-10">
                 {searchLoading ? (
-                  <div className="p-4 text-center text-gray-500">Searching...</div>
+                  <div className="p-4 text-center text-gray-500">{t('searching')}</div>
                 ) : (
                   <>
                     {searchShops.length > 0 && (
                       <div className="border-b">
                         <div className="p-2 bg-gray-50 text-sm font-medium text-gray-700">
-                          Shops
+                          {t('shops')}
                         </div>
                         {searchShops.slice(0, 3).map(shop => (
                           <div
@@ -87,7 +89,7 @@ export default function Home() {
                     {searchProducts.length > 0 && (
                       <div>
                         <div className="p-2 bg-gray-50 text-sm font-medium text-gray-700">
-                          Products
+                          {t('products')}
                         </div>
                         {searchProducts.slice(0, 3).map(product => (
                           <div
@@ -106,12 +108,12 @@ export default function Home() {
                         onClick={handleSearch}
                         className="w-full p-3 text-center text-sm text-indigo-600 hover:bg-gray-50"
                       >
-                        View all results
+                        {t('viewAllResults')}
                       </button>
                     )}
                     {searchQuery && !searchProducts.length && !searchShops.length && (
                       <div className="p-4 text-center text-gray-500">
-                        No results found
+                        {t('noResults')} "{searchQuery}"
                       </div>
                     )}
                   </>
@@ -121,10 +123,10 @@ export default function Home() {
           </form>
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Models</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('browseModels')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {loadingCategories ? (
-            <div className="col-span-full text-center py-12">Loading models...</div>
+            <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
           ) : (
             categories.map((category) => (
               <CategoryCard key={category.id} category={category} />
@@ -136,10 +138,10 @@ export default function Home() {
       {/* Featured Shops Section */}
       <div className="bg-white py-16 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Shops</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('featuredShops')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loadingShops ? (
-              <div className="col-span-full text-center py-12">Loading shops...</div>
+              <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
             ) : (
               shops.slice(0, 6).map((shop) => (
                 <ShopCard key={shop.id} shop={shop} />
@@ -151,10 +153,10 @@ export default function Home() {
 
       {/* Featured Products Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Products</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('featuredProducts')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {loadingProducts ? (
-            <div className="col-span-full text-center py-12">Loading products...</div>
+            <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
           ) : (
             products.map((product) => (
               <ProductCard key={product.id} product={product} />

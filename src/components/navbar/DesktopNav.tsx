@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { NavigationItem } from './types'
 import { classNames } from './utils'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface DesktopNavProps {
   navigation: NavigationItem[];
@@ -9,8 +10,11 @@ interface DesktopNavProps {
 }
 
 export default function DesktopNav({ navigation, isCurrentPath }: DesktopNavProps) {
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+  
   return (
-    <div className="hidden sm:ml-10 sm:flex sm:space-x-8">
+    <div className={`hidden sm:ml-10 sm:flex ${isRTL ? 'sm:space-x-reverse' : ''} sm:space-x-8`}>
       {navigation.map((item) => (
         <Link
           key={item.name}

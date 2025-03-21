@@ -1,14 +1,13 @@
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Register() {
-
-
-
-  
-  const navigate = useNavigate()
-  const { signUp } = useAuth()
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -16,20 +15,20 @@ export default function Register() {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-  })
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError('Passwords do not match');
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       await signUp(formData.email, formData.password, {
@@ -38,12 +37,12 @@ export default function Register() {
           last_name: formData.lastName,
           phone_number: formData.phoneNumber
         }
-      })
-      navigate('/')
+      });
+      navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create account')
+      setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -51,15 +50,15 @@ export default function Register() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="text-8xl font-extrabold leading-tight py-1 bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-          Carvy
+          {t('brandName')}
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-          Create a new account
+          {t('createAccount')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
+          {t('or')}{' '}
           <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            sign in to your existing account
+            {t('signInToExisting')}
           </Link>
         </p>
       </div>
@@ -76,7 +75,7 @@ export default function Register() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  First Name
+                  {t('firstName')}
                 </label>
                 <input
                   id="firstName"
@@ -91,7 +90,7 @@ export default function Register() {
 
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Last Name
+                  {t('lastName')}
                 </label>
                 <input
                   id="lastName"
@@ -107,7 +106,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                {t('emailAddress')}
               </label>
               <input
                 id="email"
@@ -123,7 +122,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                Phone Number
+                {t('phoneNumber')}
               </label>
               <input
                 id="phoneNumber"
@@ -139,7 +138,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                {t('password')}
               </label>
               <input
                 id="password"
@@ -155,7 +154,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm password
+                {t('confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -175,7 +174,7 @@ export default function Register() {
                 disabled={loading}
                 className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creating account...' : 'Create account'}
+                {loading ? t('creatingAccount') : t('register')}
               </button>
             </div>
           </form>

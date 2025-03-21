@@ -1,41 +1,44 @@
+
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { UserIcon, ShoppingBagIcon, CreditCardIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Profile() {
-  const navigate = useNavigate()
-  const { user, getUserProfile, signOut } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  const { user, getUserProfile, signOut } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Check if user is authenticated
     if (!user && !isLoading) {
-      navigate('/login')
+      navigate('/login');
     }
     
-    const timer = setTimeout(() => setIsLoading(false), 500)
-    return () => clearTimeout(timer)
-  }, [user, navigate, isLoading])
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [user, navigate, isLoading]);
   
-  const userProfile = getUserProfile()
+  const userProfile = getUserProfile();
   
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
-    )
+    );
   }
   
   if (!user) {
-    return null // Will redirect in useEffect
+    return null; // Will redirect in useEffect
   }
 
   const handleLogout = async () => {
-    await signOut()
-    navigate('/login')
-  }
+    await signOut();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -60,31 +63,31 @@ export default function Profile() {
           {/* Profile Sections */}
           <div className="p-6 divide-y divide-gray-200">
             <div className="py-4">
-              <h2 className="text-lg font-medium text-gray-900">Personal Information</h2>
+              <h2 className="text-lg font-medium text-gray-900">{t('personalInformation')}</h2>
               <div className="mt-4 space-y-3">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">First name</p>
-                    <p className="mt-1 text-md text-gray-900">{userProfile?.firstName || 'Not provided'}</p>
+                    <p className="text-sm font-medium text-gray-500">{t('firstName')}</p>
+                    <p className="mt-1 text-md text-gray-900">{userProfile?.firstName || t('notProvided')}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Last name</p>
-                    <p className="mt-1 text-md text-gray-900">{userProfile?.lastName || 'Not provided'}</p>
+                    <p className="text-sm font-medium text-gray-500">{t('lastName')}</p>
+                    <p className="mt-1 text-md text-gray-900">{userProfile?.lastName || t('notProvided')}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Email address</p>
+                  <p className="text-sm font-medium text-gray-500">{t('emailAddress')}</p>
                   <p className="mt-1 text-md text-gray-900">{user.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Phone number</p>
-                  <p className="mt-1 text-md text-gray-900">{userProfile?.phoneNumber || 'Not provided'}</p>
+                  <p className="text-sm font-medium text-gray-500">{t('phoneNumber')}</p>
+                  <p className="mt-1 text-md text-gray-900">{userProfile?.phoneNumber || t('notProvided')}</p>
                 </div>
               </div>
             </div>
 
             <div className="py-4">
-              <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
+              <h2 className="text-lg font-medium text-gray-900">{t('quickActions')}</h2>
               <div className="mt-4 space-y-2">
                 <button 
                   onClick={() => navigate('/cart')}
@@ -92,7 +95,7 @@ export default function Profile() {
                 >
                   <div className="flex items-center">
                     <ShoppingBagIcon className="h-5 w-5 text-gray-500" />
-                    <span className="ml-3 text-gray-900">My Cart</span>
+                    <span className="ml-3 text-gray-900">{t('myCart')}</span>
                   </div>
                   <ArrowRightIcon className="h-4 w-4 text-gray-400" />
                 </button>
@@ -103,7 +106,7 @@ export default function Profile() {
                 >
                   <div className="flex items-center">
                     <CreditCardIcon className="h-5 w-5 text-gray-500" />
-                    <span className="ml-3 text-gray-900">Checkout</span>
+                    <span className="ml-3 text-gray-900">{t('checkout')}</span>
                   </div>
                   <ArrowRightIcon className="h-4 w-4 text-gray-400" />
                 </button>
@@ -115,12 +118,12 @@ export default function Profile() {
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
               >
-                Logout
+                {t('logout')}
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

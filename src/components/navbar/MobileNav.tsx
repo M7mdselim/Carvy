@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { NavigationItem } from './types'
 import { classNames } from './utils'
 import type { User } from '@supabase/supabase-js'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface MobileNavProps {
   navigation: NavigationItem[];
@@ -13,6 +14,9 @@ interface MobileNavProps {
 }
 
 export default function MobileNav({ navigation, isCurrentPath, user, signOut }: MobileNavProps) {
+  const { language } = useLanguage();
+  const isRTL = language === 'ar';
+  
   return (
     <Disclosure.Panel className="sm:hidden">
       <div className="space-y-1 pb-3 pt-2">
@@ -25,7 +29,10 @@ export default function MobileNav({ navigation, isCurrentPath, user, signOut }: 
               isCurrentPath(item.href)
                 ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
                 : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700',
-              'block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200'
+              isRTL 
+                ? 'pr-3 pl-4 py-2 border-r-4' 
+                : 'pl-3 pr-4 py-2 border-l-4',
+              'block text-base font-medium transition-colors duration-200'
             )}
           >
             {item.name}
@@ -34,7 +41,7 @@ export default function MobileNav({ navigation, isCurrentPath, user, signOut }: 
       </div>
       {user ? (
         <div className="border-t border-gray-200 pb-3 pt-4">
-          <div className="flex items-center px-4">
+          <div className={`flex items-center px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="flex-shrink-0">
               <img
                 className="h-10 w-10 rounded-full"
@@ -42,7 +49,7 @@ export default function MobileNav({ navigation, isCurrentPath, user, signOut }: 
                 alt=""
               />
             </div>
-            <div className="ml-3">
+            <div className={isRTL ? 'mr-3' : 'ml-3'}>
               <div className="text-base font-medium text-gray-800">{user.email}</div>
             </div>
           </div>
