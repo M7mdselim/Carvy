@@ -12,18 +12,21 @@ import MobileNav from './MobileNav'
 import CartButton from './CartButton'
 import UserMenu from './UserMenu'
 import AuthButtons from './AuthButtons'
+import { LanguageSwitcher } from '../LanguageSwitcher'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 export function Navbar({ transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
   const { items, total } = useCart()
   const location = useLocation()
+  const { t } = useLanguage()
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Models', href: '/categories' },
-    { name: 'Shops', href: '/shops' },
-    { name: 'Contact Us', href: '/contact' },
+    { name: t('home'), href: '/' },
+    { name: t('models'), href: '/categories' },
+    { name: t('shops'), href: '/shops' },
+    { name: t('contactUs'), href: '/contact' },
   ]
 
   const isCurrentPath = (path: string) => {
@@ -49,6 +52,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                 <DesktopNav navigation={navigation} isCurrentPath={isCurrentPath} />
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                <LanguageSwitcher />
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} />
                 {user ? (
                   <UserMenu user={user} signOut={signOut} />
@@ -57,6 +61,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
                 )}
               </div>
               <div className="flex items-center sm:hidden space-x-4">
+                <LanguageSwitcher className="mr-2" />
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} isMobile={true} />
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <span className="sr-only">Open main menu</span>
@@ -81,4 +86,3 @@ export function Navbar({ transparent = false }: NavbarProps) {
     </Disclosure>
   )
 }
-

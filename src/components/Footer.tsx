@@ -1,8 +1,16 @@
+
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Footer() {
+  const { t, language } = useLanguage()
+  const currentYear = new Date().getFullYear()
+
+  // Apply RTL-specific classes for Arabic
+  const rtlClass = language === 'ar' ? 'rtl text-right' : ''
+
   return (
-    <footer className="bg-white border-t">
+    <footer className={`bg-white border-t ${rtlClass}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -10,42 +18,44 @@ export default function Footer() {
               Carvy
             </Link>
             <p className="text-gray-500 text-sm">
-              Your one-stop shop for quality auto parts and accessories in Egypt.
+              {language === 'ar' 
+                ? 'متجرك الشامل لقطع غيار السيارات وملحقاتها في مصر.' 
+                : 'Your one-stop shop for quality auto parts and accessories in Egypt.'}
             </p>
           </div>
           
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">Home</Link>
+                <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">{t('home')}</Link>
               </li>
               <li>
-                <Link to="/categories" className="text-gray-500 hover:text-gray-700 text-sm">Models</Link>
+                <Link to="/categories" className="text-gray-500 hover:text-gray-700 text-sm">{t('models')}</Link>
               </li>
               <li>
-                <Link to="/shops" className="text-gray-500 hover:text-gray-700 text-sm">Shops</Link>
+                <Link to="/shops" className="text-gray-500 hover:text-gray-700 text-sm">{t('shops')}</Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Customer Service</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('customerService')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/contact" className="text-gray-500 hover:text-gray-700 text-sm">Contact Us</Link>
+                <Link to="/contact" className="text-gray-500 hover:text-gray-700 text-sm">{t('contactUs')}</Link>
               </li>
               <li>
-                <Link to="/faq" className="text-gray-500 hover:text-gray-700 text-sm">FAQ</Link>
+                <Link to="/faq" className="text-gray-500 hover:text-gray-700 text-sm">{t('faq')}</Link>
               </li>
               <li>
-                <Link to="/shipping" className="text-gray-500 hover:text-gray-700 text-sm">Shipping Information</Link>
+                <Link to="/shipping" className="text-gray-500 hover:text-gray-700 text-sm">{t('shippingInformation')}</Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Connect With Us</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">{t('connectWithUs')}</h3>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-gray-500">
                 <span className="sr-only">Facebook</span>
@@ -71,7 +81,7 @@ export default function Footer() {
         
         <div className="mt-8 pt-8 border-t border-gray-100">
           <p className="text-gray-400 text-sm text-center">
-            © {new Date().getFullYear()} Carvy. All rights reserved.
+            © {currentYear} Carvy. {t('allRightsReserved')}.
           </p>
         </div>
       </div>

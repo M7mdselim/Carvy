@@ -17,6 +17,8 @@ import Contact from './pages/Contact'
 import Profile from './pages/Profile'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
+import { LanguageProvider } from './contexts/LanguageContext'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   const { initialize } = useAuth()
@@ -26,26 +28,29 @@ export default function App() {
   }, [initialize])
 
   return (
-    <Router basename="/Carvy/">
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/index" element={<Index />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/categories/:categoryId" element={<CategoryShops />} />
-          <Route path="/shops" element={<Shops />} />
-          <Route path="/shops/:shopId" element={<ShopDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <LanguageProvider>
+      <Router basename="/Carvy/">
+        <div className="min-h-screen flex flex-col bg-gray-50">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/index" element={<Index />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/:categoryId" element={<CategoryShops />} />
+            <Route path="/shops" element={<Shops />} />
+            <Route path="/shops/:shopId" element={<ShopDetails />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
+    </LanguageProvider>
   )
 }
