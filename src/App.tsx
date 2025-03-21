@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
