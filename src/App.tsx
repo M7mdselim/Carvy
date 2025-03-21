@@ -26,7 +26,7 @@ export default function App() {
   }, [initialize])
 
   return (
-    <Router>
+    <Router basename="/Carvy/">
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
         <Routes>
