@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-              Carvyyyyyyyyyyyyyyyyy
+              Carvy
             </Link>
             <p className="text-gray-500 text-sm">
               Your one-stop shop for quality auto parts and accessories in Egypt.
