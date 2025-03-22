@@ -1,29 +1,49 @@
 
-import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, MinusIcon, EyeIcon } from 'lucide-react'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 
-interface ProductCardProps {
+interface ShopProductCardProps {
   product: Product
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export function ShopProductCard({ product }: ShopProductCardProps) {
   const { items, addItem, removeItem, updateQuantity } = useCart()
   const { t, language } = useLanguage()
   const cartItem = items.find(item => item.product.id === product.id)
+  const navigate = useNavigate()
+  const [shopName, setShopName] = useState<string>('')
   const isRtl = language === 'ar'
 
-  const handleImageClick = () => {
-    if (product.stock > 0) {
-      addItem(product)
+  useEffect(() => {
+    // Fetch shop name
+    const fetchShopName = async () => {
+      const { data, error } = await supabase
+        .from('shops')
+        .select('name')
+        .eq('id', product.shopId)
+        .single()
+
+      if (!error && data) {
+        setShopName(data.name)
+      }
     }
+
+    fetchShopName()
+  }, [product.shopId])
+
+  const handleImageClick = () => {
+    navigate(`/shops/${product.shopId}?product=${product.id}`)
   }
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div 
-        className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer"
+        className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer relative"
         onClick={handleImageClick}
       >
         <img
@@ -31,9 +51,20 @@ export default function ProductCard({ product }: ProductCardProps) {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        <button 
+          className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+          onClick={(e) => {
+            e.stopPropagation()
+            handleImageClick()
+          }}
+        >
+          <EyeIcon className="h-4 w-4 text-gray-700" />
+        </button>
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+          {product.name} {shopName && <span className="text-gray-600">({shopName})</span>}
+        </h3>
         <p className="mt-1 text-sm text-gray-500 line-clamp-2">{product.description}</p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900">{product.price.toFixed(2)} EGP</span>

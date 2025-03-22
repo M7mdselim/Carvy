@@ -5,6 +5,23 @@
   text-align: right;
 }
 
+/* Keep navbar LTR even in RTL mode */
+.rtl .navbar-container {
+  direction: ltr;
+}
+
+/* But allow text inside navbar to be in Arabic */
+.rtl .navbar-container .navbar-text {
+  font-family: inherit;
+  text-align: left;
+}
+
+/* Cart styling in RTL mode */
+.rtl .cart-dropdown {
+  text-align: right;
+  direction: rtl;
+}
+
 /* Reverse margins and paddings for RTL */
 .rtl .mr-1 {
   margin-right: 0;
@@ -51,41 +68,99 @@
   margin-right: 1.5rem;
 }
 
-/* Apply space-x in reverse for RTL */
-.rtl .space-x-1 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
+/* Flip icons for RTL */
+.rtl svg:not(.no-flip) {
+  transform: scaleX(-1);
 }
 
-.rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-
-.rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-
-.rtl .space-x-4 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-
-.rtl .space-x-8 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-
-/* Fix flexbox direction for RTL */
-.rtl .flex-row {
+/* Fix flexbox direction for RTL - but not for navbar */
+.rtl .flex-row:not(.navbar-container) {
   flex-direction: row-reverse;
 }
 
-/* Fix social media icons and other elements that shouldn't be flipped */
-.rtl .no-flip,
-.rtl .social-icon svg {
-  transform: scaleX(1);
-  direction: ltr;
-}
-
 /* Keep some elements from flipping */
-.rtl .no-rtl {
+.rtl .no-flip {
   direction: ltr;
   text-align: left;
+}
+
+/* Contact page RTL styling */
+.rtl .contact-form {
+  text-align: right;
+  direction: rtl;
+}
+
+.rtl .contact-form label {
+  text-align: right;
+}
+
+.rtl .contact-info {
+  text-align: right;
+}
+
+/* Products page RTL styling */
+.rtl .product-card {
+  text-align: right;
+}
+
+.rtl .pagination {
+  flex-direction: row-reverse;
+}
+
+/* Fix input fields for RTL */
+.rtl input,
+.rtl textarea,
+.rtl select {
+  text-align: right;
+}
+
+/* Fix auth buttons in RTL */
+.rtl .space-x-4 > * + * {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+
+/* Fix RTL space for reversed spacing */
+.rtl .space-x-reverse > * + * {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+/* Fix buttons with icons in RTL */
+.rtl button svg:not(.no-flip),
+.rtl a svg:not(.no-flip) {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Fix icon positioning in buttons for RTL */
+.rtl .w-full .ml-2 {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Fix auth buttons in navbar */
+.rtl .rtl\:space-x-4 {
+  margin-right: 0;
+}
+
+.rtl .rtl\:space-x-4 > * + * {
+  margin-right: 1rem;
+  margin-left: 0;
+}
+
+.rtl .rtl\:space-x-reverse > * + * {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+/* Fix footer icons in RTL mode */
+.rtl .space-x-4 {
+  gap: 1rem;
+}
+
+/* Fix sign in and create account buttons in RTL */
+.rtl .mr-4 {
+  margin-right: 0;
+  margin-left: 1rem;
 }

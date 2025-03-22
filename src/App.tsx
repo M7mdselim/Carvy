@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -15,12 +15,25 @@ import Register from './pages/Register'
 import SearchResults from './pages/SearchResults'
 import Contact from './pages/Contact'
 import Profile from './pages/Profile'
+import Orders from './pages/Orders'
+import Products from './pages/Products'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
 import { LanguageProvider } from './contexts/LanguageContext'
 import NotFound from './pages/NotFound'
 
-export default function App() {
+// ScrollToTop component to handle scrolling to top on route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
+
+function App() {
   const { initialize } = useAuth()
 
   useEffect(() => {
@@ -32,6 +45,7 @@ export default function App() {
       <Router basename="/Carvy/">
         <div className="min-h-screen flex flex-col bg-gray-50">
           <Navbar />
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/index" element={<Index />} />
@@ -39,6 +53,7 @@ export default function App() {
             <Route path="/categories/:categoryId" element={<CategoryShops />} />
             <Route path="/shops" element={<Shops />} />
             <Route path="/shops/:shopId" element={<ShopDetails />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -46,6 +61,7 @@ export default function App() {
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
@@ -54,3 +70,5 @@ export default function App() {
     </LanguageProvider>
   )
 }
+
+export default App

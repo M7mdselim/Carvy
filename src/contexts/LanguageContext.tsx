@@ -1,196 +1,340 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-// Define the available languages
-export type Language = 'en' | 'ar';
-
-// Define the structure of our translations
-type Translations = {
-  [key: string]: {
-    [key in Language]: string;
-  };
-};
-
-// Our actual translations
-const translations: Translations = {
-  // Brand
-  'brandName': { en: 'Carvy', ar: 'كارڤي' },
-  
-  // Navbar
-  'home': { en: 'Home', ar: 'الرئيسية' },
-  'models': { en: 'Models', ar: 'الموديلات' },
-  'shops': { en: 'Shops', ar: 'المتاجر' },
-  'contactUs': { en: 'Contact Us', ar: 'اتصل بنا' },
-  'profile': { en: 'Profile', ar: 'الملف الشخصي' },
-  'logout': { en: 'Logout', ar: 'تسجيل الخروج' },
-  'login': { en: 'Login', ar: 'تسجيل الدخول' },
-  'register': { en: 'Register', ar: 'إنشاء حساب' },
-  
-  // Footer
-  'quickLinks': { en: 'Quick Links', ar: 'روابط سريعة' },
-  'customerService': { en: 'Customer Service', ar: 'خدمة العملاء' },
-  'connectWithUs': { en: 'Connect With Us', ar: 'تواصل معنا' },
-  'shippingInformation': { en: 'Shipping Information', ar: 'معلومات الشحن' },
-  'faq': { en: 'FAQ', ar: 'الأسئلة الشائعة' },
-  'allRightsReserved': { en: 'All rights reserved', ar: 'جميع الحقوق محفوظة' },
-  
-  // Home page
-  'findPerfectParts': { en: 'Find the Perfect Parts for Your Car in Egypt', ar: 'اعثر على قطع الغيار المثالية لسيارتك في مصر' },
-  'browseThousands': { en: 'Browse thousands of auto parts from trusted sellers worldwide', ar: 'تصفح آلاف قطع غيار السيارات من البائعين الموثوقين في جميع أنحاء العالم' },
-  'browseModels': { en: 'Browse Models', ar: 'تصفح الموديلات' },
-  'featuredShops': { en: 'Featured Shops', ar: 'المتاجر المميزة' },
-  'featuredProducts': { en: 'Featured Products', ar: 'المنتجات المميزة' },
-  'searchPlaceholder': { en: 'Search for parts, shops, brands, or car models...', ar: 'ابحث عن قطع غيار، متاجر، علامات تجارية، أو موديلات سيارات...' },
-  'searchButton': { en: 'Search', ar: 'بحث' },
-  'onestopShop': { en: 'Your one-stop shop for quality auto parts and accessories in Egypt.', ar: 'متجرك الشامل لقطع غيار السيارات وملحقاتها في مصر.' },
-  
-  // Cart
-  'cart': { en: 'Cart', ar: 'عربة التسوق' },
-  'shoppingCart': { en: 'Shopping Cart', ar: 'عربة التسوق' },
-  'emptyCart': { en: 'Your cart is empty', ar: 'عربة التسوق فارغة' },
-  'startShopping': { en: 'Start shopping to add items to your cart', ar: 'ابدأ التسوق لإضافة منتجات إلى عربة التسوق' },
-  'continueShopping': { en: 'Continue Shopping', ar: 'مواصلة التسوق' },
-  'subtotal': { en: 'Subtotal', ar: 'المجموع الفرعي' },
-  'shippingTaxes': { en: 'Shipping and taxes calculated at checkout', ar: 'يتم احتساب الشحن والضرائب عند الدفع' },
-  'checkout': { en: 'Checkout', ar: 'إتمام الشراء' },
-  'each': { en: 'each', ar: 'لكل' },
-  
-  // Categories
-  'allCategories': { en: 'All Categories', ar: 'جميع الفئات' },
-  'allModels': { en: 'All Models', ar: 'جميع الموديلات' },
-  'filterByModels': { en: 'Filter by Models:', ar: 'تصفية حسب الموديلات:' },
-  
-  // Shops
-  'allShops': { en: 'All Shops', ar: 'جميع المتاجر' },
-  'findBestShops': { en: 'Find the best shops for', ar: 'ابحث عن أفضل المتاجر لـ' },
-  'noShopsFound': { en: 'No shops found for this category', ar: 'لا توجد متاجر لهذه الفئة' },
-  'products': { en: 'Products', ar: 'المنتجات' },
-  'searchProducts': { en: 'Search products in this shop...', ar: 'البحث عن منتجات في هذا المتجر...' },
-  'noProductsAvailable': { en: 'No products available in this shop', ar: 'لا توجد منتجات متاحة في هذا المتجر' },
-  'noProductsMatching': { en: 'No products found matching', ar: 'لا توجد منتجات تطابق' },
-  'inThisShop': { en: 'in this shop', ar: 'في هذا المتجر' },
-  'loadingShops': { en: 'Loading shops...', ar: 'جاري تحميل المتاجر...' },
-  
-  // Search
-  'searchResults': { en: 'Search Results for', ar: 'نتائج البحث عن' },
-  'noResults': { en: 'No results found for', ar: 'لا توجد نتائج لـ' },
-  'searching': { en: 'Searching...', ar: 'جاري البحث...' },
-  'viewAllResults': { en: 'View all results', ar: 'عرض كل النتائج' },
-
-  // Contact
-  'getInTouch': { en: 'Get In Touch', ar: 'تواصل معنا' },
-  'email': { en: 'Email', ar: 'البريد الإلكتروني' },
-  'phone': { en: 'Phone', ar: 'الهاتف' },
-  'address': { en: 'Address', ar: 'العنوان' },
-  'followUs': { en: 'Follow Us', ar: 'تابعنا' },
-  'sendMessage': { en: 'Send us a Message', ar: 'أرسل لنا رسالة' },
-  'yourName': { en: 'Your Name', ar: 'اسمك' },
-  'yourEmail': { en: 'Your Email', ar: 'بريدك الإلكتروني' },
-  'subject': { en: 'Subject', ar: 'الموضوع' },
-  'message': { en: 'Message', ar: 'الرسالة' },
-  'sending': { en: 'Sending...', ar: 'جاري الإرسال...' },
-  
-  // Auth
-  'signIn': { en: 'Sign in to your account', ar: 'تسجيل الدخول إلى حسابك' },
-  'createAccount': { en: 'Create a new account', ar: 'إنشاء حساب جديد' },
-  'signInToExisting': { en: 'sign in to your existing account', ar: 'تسجيل الدخول إلى حسابك الحالي' },
-  'or': { en: 'Or', ar: 'أو' },
-  'emailAddress': { en: 'Email address', ar: 'البريد الإلكتروني' },
-  'password': { en: 'Password', ar: 'كلمة المرور' },
-  'confirmPassword': { en: 'Confirm password', ar: 'تأكيد كلمة المرور' },
-  'signingIn': { en: 'Signing in...', ar: 'جاري تسجيل الدخول...' },
-  'creatingAccount': { en: 'Creating account...', ar: 'جاري إنشاء الحساب...' },
-  'firstName': { en: 'First Name', ar: 'الاسم الأول' },
-  'lastName': { en: 'Last Name', ar: 'اسم العائلة' },
-  'phoneNumber': { en: 'Phone Number', ar: 'رقم الهاتف' },
-
-  // Profile
-  'personalInformation': { en: 'Personal Information', ar: 'المعلومات الشخصية' },
-  'notProvided': { en: 'Not provided', ar: 'غير متوفر' },
-  'quickActions': { en: 'Quick Actions', ar: 'إجراءات سريعة' },
-  'myCart': { en: 'My Cart', ar: 'عربة التسوق الخاصة بي' },
-  
-  // 404
-  'pageNotFound': { en: 'This page has driven off the map', ar: 'هذه الصفحة غير موجودة' },
-  'pageDoesntExist': { en: 'The page you\'re looking for doesn\'t exist or has been moved.', ar: 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.' },
-  'returnHome': { en: 'Return Home', ar: 'العودة للصفحة الرئيسية' },
-  
-  // Checkout
-  'orderSummary': { en: 'Order Summary', ar: 'ملخص الطلب' },
-  'shippingInfo': { en: 'Shipping Information', ar: 'معلومات الشحن' },
-  'paymentInfo': { en: 'Payment Information', ar: 'معلومات الدفع' },
-  'contactInfo': { en: 'Contact Information', ar: 'معلومات الاتصال' },
-  'shipping': { en: 'Shipping', ar: 'الشحن' },
-  'total': { en: 'Total', ar: 'المجموع' },
-  'completeOrder': { en: 'Complete Order', ar: 'إتمام الطلب' },
-  'processing': { en: 'Processing...', ar: 'جاري المعالجة...' },
-  'qty': { en: 'Qty', ar: 'الكمية' },
-  'secureCheckout': { en: 'Secure checkout with SSL encryption', ar: 'دفع آمن مع تشفير SSL' },
-  'creditCardsAccepted': { en: 'All major credit cards accepted', ar: 'جميع بطاقات الائتمان الرئيسية مقبولة' },
-  'cardNumber': { en: 'Card number', ar: 'رقم البطاقة' },
-  'expiryDate': { en: 'Expiry date', ar: 'تاريخ الانتهاء' },
-  'cvv': { en: 'CVV', ar: 'رمز التحقق' },
-  'city': { en: 'City', ar: 'المدينة' },
-  'postalCode': { en: 'Postal code', ar: 'الرمز البريدي' },
-};
-
-// Define the structure of our context
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+interface LanguageContextProps {
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
-  dir: () => 'ltr' | 'rtl';
 }
 
-// Create the context with a default value
-const LanguageContext = createContext<LanguageContextType>({
-  language: 'en',
-  setLanguage: () => {},
-  t: () => '',
-  dir: () => 'ltr',
-});
+const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
 
-// Create a provider component
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    // Try to get the language from localStorage
-    const savedLanguage = localStorage.getItem('language');
-    return (savedLanguage === 'ar' ? 'ar' : 'en') as Language;
-  });
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
-  // Function to translate text
-  const t = (key: string): string => {
-    if (!translations[key]) {
-      console.warn(`Translation '${key}' not found.`);
-      return key;
-    }
-    return translations[key][language] || key;
-  };
-
-  // Function to return the correct text direction
-  const dir = (): 'ltr' | 'rtl' => {
-    return language === 'ar' ? 'rtl' : 'ltr';
-  };
-
-  // Save language to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('language', language);
-    // Set the dir attribute on the html element
-    document.documentElement.dir = dir();
-    // Set a css class on the body for additional styling
-    if (language === 'ar') {
-      document.body.classList.add('rtl');
-    } else {
+    document.body.classList.toggle('rtl', language === 'ar');
+    return () => {
       document.body.classList.remove('rtl');
-    }
+    };
   }, [language]);
 
+  const translations = {
+    en: {
+      brandName: 'Carvy',
+      home: 'Home',
+      shops: 'Shops',
+      cart: 'Cart',
+      login: 'Login',
+      register: 'Register',
+      profile: 'Profile',
+      orders: 'Orders',
+      logout: 'Logout',
+      categories: 'Categories',
+      contact: 'Contact',
+      models: 'Models',
+      contactUs: 'Contact Us',
+      searchPlaceholder: 'Search for parts or shops...',
+      searching: 'Searching...',
+      viewAllResults: 'View All Results',
+      noResults: 'No results found for',
+      browseModels: 'Browse Models',
+      featuredShops: 'Featured Shops',
+      featuredProducts: 'Featured Products',
+      allShops: 'All Shops',
+      filterByModels: 'Filter by Models',
+      allModels: 'All Models',
+      loadingShops: 'Loading shops...',
+      noShopsFound: 'No shops found',
+      emptyCart: 'Your cart is empty',
+      startShopping: 'Start shopping now!',
+      continueShopping: 'Continue Shopping',
+      shoppingCart: 'Shopping Cart',
+      subtotal: 'Subtotal',
+      each: 'each',
+      shippingTaxes: 'Shipping & taxes calculated at checkout',
+      checkout: 'Checkout',
+      or: 'Or',
+      myOrders: 'My Orders',
+      orderNumber: 'Order #',
+      pending: 'Pending',
+      processing: 'Processing',
+      shipped: 'Shipped',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled',
+      returnHome: 'Return to Home',
+      noOrders: 'No orders yet',
+      selectOrderToViewDetails: 'Select an order to view details',
+      orderItems: 'Order Items',
+      reorder: 'Reorder',
+      findPerfectParts: 'Find the Perfect Parts for Your Car',
+      browseThousands: 'Browse thousands of auto parts from trusted shops.',
+      searchShops: 'Search shops',
+      searchProducts: 'Search products',
+      viewAll: 'View all',
+      loadingProducts: 'Loading products...',
+      noProductsFound: 'No products found',
+      reorderSuccess: 'All items from your previous order have been added to cart',
+      reorderPartial: 'Some items from your order were added to cart. Others are out of stock.',
+      reorderNoProducts: 'Sorry, none of the items from your order are currently available',
+      reorderError: 'There was an error reordering. Please try again.',
+      loadMore: 'Load More',
+      personalInformation: 'Personal Information',
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      emailAddress: 'Email Address',
+      phoneNumber: 'Phone Number',
+      notProvided: 'Not provided',
+      quickActions: 'Quick Actions',
+      myCart: 'My Cart',
+      editProfile: 'Edit Profile',
+      saveChanges: 'Save Changes',
+      updatePhoneNumber: 'Update Phone Number',
+      phoneUpdated: 'Phone number updated successfully',
+      phoneUpdateError: 'Failed to update phone number',
+      enterCouponCode: 'Enter coupon code',
+      apply: 'Apply',
+      applying: 'Applying...',
+      discount: 'Discount',
+      errorApplyingCoupon: 'Error applying coupon',
+      cartEmpty: 'Your cart is empty',
+      loginRequired: 'You must be logged in to checkout',
+      orderError: 'Failed to place order. Please try again.',
+      completeOrder: 'Complete Order',
+      shipping: 'Shipping',
+      total: 'Total',
+      contactInformation: 'Contact Information',
+      shippingInformation: 'Shipping Information',
+      paymentInformation: 'Payment Information',
+      address: 'Address',
+      city: 'City',
+      postalCode: 'Postal Code',
+      cardNumber: 'Card Number',
+      expiryDate: 'Expiry Date',
+      save: 'Save',
+      edit: 'Edit',
+      
+      // Professional text strings
+      welcomeBack: 'Welcome Back',
+      signIn: 'Sign In',
+      authenticating: 'Authenticating...',
+      noAccount: "Don't have an account?",
+      createAccountNow: 'Create an account now',
+      joinOurCommunity: 'Join Our Community',
+      createAccount: 'Create Account',
+      creatingYourAccount: 'Creating your account...',
+      alreadyHaveAccount: 'Already have an account?',
+      signInToYourAccount: 'Sign in to your account',
+      confirmPassword: 'Confirm Password',
+      
+      // Added for products page
+      products: 'Products',
+      allCategories: 'All Categories',
+      inStock: 'in stock',
+      outOfStock: 'Out of stock',
+      addToCart: 'Add to Cart',
+      remove: 'Remove',
+      for: 'for',
+      
+      // Added for contact page
+      getInTouch: 'Get in touch with our team',
+      sendMessage: 'Send Message',
+      yourName: 'Your Name',
+      yourEmail: 'Your Email',
+      subject: 'Subject',
+      message: 'Message',
+      sending: 'Sending...',
+      messageSent: 'Your message has been sent! We will get back to you soon.',
+      email: 'Email',
+      phone: 'Phone',
+      followUs: 'Follow Us',
+      
+      // Added for footer
+      carDescription: 'Your one-stop shop for quality auto parts and accessories in Egypt.',
+      quickLinks: 'Quick Links',
+      customerService: 'Customer Service',
+      connectWithUs: 'Connect With Us',
+      allRightsReserved: 'All Rights Reserved',
+      faq: 'FAQ',
+      
+      // Added for payment method
+      paymentMethod: 'Payment Method',
+      creditCard: 'Credit Card',
+      cashOnDelivery: 'Cash on Delivery',
+      selectCity: 'Select City',
+      cairo: 'Cairo',
+      giza: 'Giza',
+      orderSuccess: 'Order placed successfully!',
+    },
+    ar: {
+      brandName: 'كارڤي',
+      home: 'الرئيسية',
+      shops: 'المتاجر',
+      cart: 'السلة',
+      login: 'تسجيل الدخول',
+      register: 'تسجيل',
+      profile: 'الملف الشخصي',
+      orders: 'الطلبات',
+      logout: 'تسجيل الخروج',
+      categories: 'الأقسام',
+      contact: 'اتصل بنا',
+      models: 'الموديلات',
+      contactUs: 'اتصل بنا',
+      searchPlaceholder: 'ابحث عن قطع الغيار أو المتاجر...',
+      searching: 'جاري البحث...',
+      viewAllResults: 'عرض جميع النتائج',
+      noResults: 'لم يتم العثور على نتائج لـ',
+      browseModels: 'تصفح الموديلات',
+      featuredShops: 'المتاجر المميزة',
+      featuredProducts: 'المنتجات المميزة',
+      allShops: 'جميع المتاجر',
+      filterByModels: 'فلتر حسب الموديل',
+      allModels: 'جميع الموديلات',
+      loadingShops: 'جاري تحميل المتاجر...',
+      noShopsFound: 'لم يتم العثور على متاجر',
+      emptyCart: 'سلتك فارغة',
+      startShopping: 'ابدأ التسوق الآن!',
+      continueShopping: 'متابعة التسوق',
+      shoppingCart: 'سلة التسوق',
+      subtotal: 'المجموع الجزئي',
+      each: 'للحبة',
+      shippingTaxes: 'سيتم حساب الشحن والضرائب عند الدفع',
+      checkout: 'الدفع',
+      or: 'أو',
+      myOrders: 'طلباتي',
+      orderNumber: 'طلب #',
+      pending: 'قيد الانتظار',
+      processing: 'جاري المعالجة',
+      shipped: 'تم الشحن',
+      delivered: 'تم التوصيل',
+      cancelled: 'تم الإلغاء',
+      returnHome: 'العودة إلى الرئيسية',
+      noOrders: 'لا يوجد طلبات حتى الآن',
+      selectOrderToViewDetails: 'حدد طلبًا لعرض التفاصيل',
+      orderItems: 'عناصر الطلب',
+      reorder: 'إعادة الطلب',
+      findPerfectParts: 'اعثر على القطع المثالية لسيارتك',
+      browseThousands: 'تصفح آلاف قطع غيار السيارات من متاجر موثوقة.',
+      searchShops: 'البحث عن متاجر',
+      searchProducts: 'البحث عن منتجات',
+      viewAll: 'عرض الكل',
+      loadingProducts: 'جاري تحميل المنتجات...',
+      noProductsFound: 'لم يتم العثور على منتجات',
+      reorderSuccess: 'تمت إضافة جميع العناصر من طلبك السابق إلى سلة التسوق',
+      reorderPartial: 'تمت إضافة بعض العناصر من طلبك إلى سلة التسوق. البعض الآخر غير متوفر حاليًا.',
+      reorderNoProducts: 'عذرًا، لا تتوفر أي من العناصر من طلبك حاليًا',
+      reorderError: 'حدث خطأ في إعادة الطلب. يرجى المحاولة مرة أخرى.',
+      loadMore: 'تحميل المزيد',
+      personalInformation: 'المعلومات الشخصية',
+      firstName: 'الاسم الأول',
+      lastName: 'اسم العائلة',
+      emailAddress: 'البريد الإلكتروني',
+      phoneNumber: 'رقم الهاتف',
+      notProvided: 'غير متوفر',
+      quickActions: 'إجراءات سريعة',
+      myCart: 'سلة التسوق',
+      editProfile: 'تعديل الملف الشخصي',
+      saveChanges: 'حفظ التغييرات',
+      updatePhoneNumber: 'تحديث رقم الهاتف',
+      phoneUpdated: 'تم تحديث رقم الهاتف بنجاح',
+      phoneUpdateError: 'فشل تحديث رقم الهاتف',
+      enterCouponCode: 'أدخل رمز الكوبون',
+      apply: 'تطبيق',
+      applying: 'جاري التطبيق...',
+      discount: 'خصم',
+      errorApplyingCoupon: 'خطأ في تطبيق الكوبون',
+      cartEmpty: 'سلة التسوق فارغة',
+      loginRequired: 'يجب تسجيل الدخول لإتمام الطلب',
+      orderError: 'فشل في تقديم الطلب. يرجى المحاولة مرة أخرى.',
+      completeOrder: 'إتمام الطلب',
+      shipping: 'الشحن',
+      total: 'المجموع',
+      contactInformation: 'معلومات الاتصال',
+      shippingInformation: 'معلومات الشحن',
+      paymentInformation: 'معلومات الدفع',
+      address: 'العنوان',
+      city: 'المدينة',
+      postalCode: 'الرمز البريدي',
+      cardNumber: 'رقم البطاقة',
+      expiryDate: 'تاريخ الانتهاء',
+      save: 'حفظ',
+      edit: 'تعديل',
+      
+      // Professional text strings in Arabic
+      welcomeBack: 'مرحباً بعودتك',
+      signIn: 'تسجيل الدخول',
+      authenticating: 'جاري التحقق...',
+      noAccount: "ليس لديك حساب؟",
+      createAccountNow: 'أنشئ حساب الآن',
+      joinOurCommunity: 'انضم إلى مجتمعنا',
+      createAccount: 'إنشاء حساب',
+      creatingYourAccount: 'جاري إنشاء حسابك...',
+      alreadyHaveAccount: 'لديك حساب بالفعل؟',
+      signInToYourAccount: 'سجل دخول إلى حسابك',
+      confirmPassword: 'تأكيد كلمة المرور',
+      
+      // Added for products page in Arabic
+      products: 'المنتجات',
+      allCategories: 'جميع الفئات',
+      inStock: 'متوفر',
+      outOfStock: 'غير متوفر',
+      addToCart: 'أضف إلى السلة',
+      remove: 'إزالة',
+      for: 'لـ',
+      
+      // Added for contact page in Arabic
+      getInTouch: 'تواصل مع فريقنا',
+      sendMessage: 'إرسال رسالة',
+      yourName: 'اسمك',
+      yourEmail: 'بريدك الإلكتروني',
+      subject: 'الموضوع',
+      message: 'الرسالة',
+      sending: 'جاري الإرسال...',
+      messageSent: 'تم إرسال رسالتك! سنعود إليك قريبًا.',
+      email: 'البريد الإلكتروني',
+      phone: 'الهاتف',
+      followUs: 'تابعنا',
+      
+      // Added for footer
+      carDescription: 'متجرك الشامل لقطع غيار السيارات وملحقاتها في مصر.',
+      quickLinks: 'روابط سريعة',
+      customerService: 'خدمة العملاء',
+      connectWithUs: 'تواصل معنا',
+      allRightsReserved: 'جميع الحقوق محفوظة',
+      faq: 'الأسئلة الشائعة',
+      
+      // Added for payment method in Arabic
+      paymentMethod: 'طريقة الدفع',
+      creditCard: 'بطاقة ائتمان',
+      cashOnDelivery: 'الدفع عند الاستلام',
+      selectCity: 'اختر المدينة',
+      cairo: 'القاهرة',
+      giza: 'الجيزة',
+      orderSuccess: 'تم تقديم الطلب بنجاح!',
+    }
+  };
+
+  const t = (key: string) => {
+    return translations[language as keyof typeof translations]?.[key as keyof typeof translations[keyof typeof translations]] || key;
+  };
+
+  const value: LanguageContextProps = {
+    language,
+    setLanguage,
+    t,
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
-// Create a hook to use the language context
-export const useLanguage = () => useContext(LanguageContext);
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};

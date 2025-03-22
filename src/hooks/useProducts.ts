@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Product } from '../types'
@@ -35,7 +36,6 @@ export function useProducts() {
           `)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(6)
 
         if (productsError) throw productsError
 

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguage } from '../contexts/LanguageContext'
+import { Button } from '@/components/ui/button'
 
 export default function Login() {
   const { t } = useLanguage();
@@ -35,12 +36,12 @@ export default function Login() {
           {t('brandName')}
         </div>
         <h2 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-          {t('signIn')}
+          {t('welcomeBack')}
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          {t('or')}{' '}
+          {t('noAccount')}{' '}
           <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            {t('createAccount')}
+            {t('createAccountNow')}
           </Link>
         </p>
       </div>
@@ -91,13 +92,13 @@ export default function Login() {
             </div>
 
             <div>
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? t('signingIn') : t('login')}
-              </button>
+                {loading ? t('authenticating') : t('signIn')}
+              </Button>
             </div>
           </form>
         </div>

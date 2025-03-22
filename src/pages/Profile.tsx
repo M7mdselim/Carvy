@@ -2,14 +2,20 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { UserIcon, ShoppingBagIcon, CreditCardIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
+import { Input } from '../components/ui/input'
+import { UserIcon, ShoppingBagIcon, CreditCardIcon, ArrowRightIcon, PhoneIcon } from '@heroicons/react/24/outline'
 import { useLanguage } from '../contexts/LanguageContext'
+import { toast } from 'sonner'
+import { supabase } from '../lib/supabase'
 
 export default function Profile() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, getUserProfile, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
     // Check if user is authenticated
@@ -20,6 +26,15 @@ export default function Profile() {
     const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, [user, navigate, isLoading]);
+  
+  useEffect(() => {
+    if (user) {
+      const profile = getUserProfile();
+      if (profile) {
+        setPhoneNumber(profile.phoneNumber || '');
+      }
+    }
+  }, [user, getUserProfile]);
   
   const userProfile = getUserProfile();
   
@@ -38,6 +53,28 @@ export default function Profile() {
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const handleUpdatePhoneNumber = async () => {
+    if (!user) return;
+    
+    try {
+      setIsSubmitting(true);
+      
+      const { error } = await supabase.auth.updateUser({
+        data: { phone_number: phoneNumber }
+      });
+      
+      if (error) throw error;
+      
+      toast.success(t('phoneUpdated'));
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating phone number:', error);
+      toast.error(t('phoneUpdateError'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,7 +118,48 @@ export default function Profile() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">{t('phoneNumber')}</p>
-                  <p className="mt-1 text-md text-gray-900">{userProfile?.phoneNumber || t('notProvided')}</p>
+                  {isEditing ? (
+                    <div className="mt-2 flex items-end gap-2">
+                      <div className="flex-1">
+                        <Input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="01XXXXXXXXX"
+                        />
+                      </div>
+                      <button
+                        onClick={handleUpdatePhoneNumber}
+                        disabled={isSubmitting}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                      >
+                        {isSubmitting ? '...' : t('saveChanges')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditing(false);
+                          const profile = getUserProfile();
+                          if (profile) {
+                            setPhoneNumber(profile.phoneNumber || '');
+                          }
+                        }}
+                        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                      >
+                        {t('cancel')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-1 flex items-center justify-between">
+                      <p className="text-md text-gray-900">{userProfile?.phoneNumber || t('notProvided')}</p>
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center"
+                      >
+                        <PhoneIcon className="h-4 w-4 mr-1" />
+                        {t('updatePhoneNumber')}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

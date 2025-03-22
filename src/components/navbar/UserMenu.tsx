@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import { classNames } from './utils'
 import type { User } from '@supabase/supabase-js'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface UserMenuProps {
   user: User;
@@ -11,6 +12,8 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ user, signOut }: UserMenuProps) {
+  const { t } = useLanguage();
+  
   return (
     <Menu as="div" className="relative ml-3">
       <Menu.Button className="flex rounded-full bg-white ring-2 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -39,7 +42,7 @@ export default function UserMenu({ user, signOut }: UserMenuProps) {
                   'block px-4 py-2 text-sm text-gray-700'
                 )}
               >
-                Profile
+                {t('profile')}
               </Link>
             )}
           </Menu.Item>
@@ -52,7 +55,7 @@ export default function UserMenu({ user, signOut }: UserMenuProps) {
                   'block px-4 py-2 text-sm text-gray-700'
                 )}
               >
-                Orders
+                {t('orders')}
               </Link>
             )}
           </Menu.Item>
@@ -65,7 +68,7 @@ export default function UserMenu({ user, signOut }: UserMenuProps) {
                   'block w-full text-left px-4 py-2 text-sm text-gray-700'
                 )}
               >
-                Sign out
+                {t('logout')}
               </button>
             )}
           </Menu.Item>

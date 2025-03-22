@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguage } from '../contexts/LanguageContext'
+import { Button } from '@/components/ui/button'
 
 export default function Register() {
   const { t } = useLanguage();
@@ -53,12 +54,12 @@ export default function Register() {
           {t('brandName')}
         </div>
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-          {t('createAccount')}
+          {t('joinOurCommunity')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          {t('or')}{' '}
+          {t('alreadyHaveAccount')}{' '}
           <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            {t('signInToExisting')}
+            {t('signInToYourAccount')}
           </Link>
         </p>
       </div>
@@ -169,13 +170,13 @@ export default function Register() {
             </div>
 
             <div>
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? t('creatingAccount') : t('register')}
-              </button>
+                {loading ? t('creatingYourAccount') : t('createAccount')}
+              </Button>
             </div>
           </form>
         </div>

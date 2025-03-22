@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 import CategoryCard from '../components/CategoryCard'
 import ShopCard from '../components/ShopCard'
 import ProductCard from '../components/ProductCard'
@@ -10,6 +10,8 @@ import { useShops } from '../hooks/useShops'
 import { useProducts } from '../hooks/useProducts'
 import { useSearch } from '../hooks/useSearch'
 import { useLanguage } from '../contexts/LanguageContext'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination'
+import { Input } from '../components/ui/input'
 
 export default function Home() {
   const { t } = useLanguage();
@@ -19,6 +21,16 @@ export default function Home() {
   const { categories, loading: loadingCategories } = useCategories();
   const { shops, loading: loadingShops } = useShops();
   const { products, loading: loadingProducts } = useProducts();
+  
+  // Added states for product filtering and pagination
+  const [productFilter, setProductFilter] = useState('');
+  const [currentProductPage, setCurrentProductPage] = useState(1);
+  const productsPerPage = 6;
+  
+  // Added states for shop filtering and pagination
+  const [shopFilter, setShopFilter] = useState('');
+  const [currentShopPage, setCurrentShopPage] = useState(1);
+  const shopsPerPage = 6;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +38,30 @@ export default function Home() {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+  
+  // Filter and paginate products
+  const filteredProducts = productFilter
+    ? products.filter(product => 
+        product.name.toLowerCase().includes(productFilter.toLowerCase()) ||
+        product.description.toLowerCase().includes(productFilter.toLowerCase()))
+    : products;
+    
+  const indexOfLastProduct = currentProductPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalProductPages = Math.ceil(filteredProducts.length / productsPerPage);
+  
+  // Filter and paginate shops
+  const filteredShops = shopFilter
+    ? shops.filter(shop => 
+        shop.name.toLowerCase().includes(shopFilter.toLowerCase()) ||
+        shop.description.toLowerCase().includes(shopFilter.toLowerCase()))
+    : shops;
+    
+  const indexOfLastShop = currentShopPage * shopsPerPage;
+  const indexOfFirstShop = indexOfLastShop - shopsPerPage;
+  const currentShops = filteredShops.slice(indexOfFirstShop, indexOfLastShop);
+  const totalShopPages = Math.ceil(filteredShops.length / shopsPerPage);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
@@ -138,31 +174,161 @@ export default function Home() {
       {/* Featured Shops Section */}
       <div className="bg-white py-16 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('featuredShops')}</h2>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">{t('featuredShops')}</h2>
+            <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder={t('searchShops')}
+                  value={shopFilter}
+                  onChange={(e) => setShopFilter(e.target.value)}
+                  className="pl-10 pr-4 py-2"
+                />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+              <button
+                onClick={() => navigate('/shops')}
+                className="flex items-center text-indigo-600 hover:text-indigo-800"
+              >
+                {t('viewAll')}
+                <ArrowRightIcon className="ml-1 h-4 w-4" />
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loadingShops ? (
               <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
-            ) : (
-              shops.slice(0, 6).map((shop) => (
+            ) : currentShops.length > 0 ? (
+              currentShops.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} />
               ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                {t('noShopsFound')}
+              </div>
             )}
           </div>
+          
+          {filteredShops.length > shopsPerPage && (
+            <div className="mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentShopPage(prev => Math.max(prev - 1, 1))}
+                      className={`cursor-pointer ${currentShopPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: Math.min(totalShopPages, 5) }).map((_, index) => {
+                    const pageNumber = currentShopPage > 3 ? 
+                      currentShopPage - 3 + index + 1 : 
+                      index + 1;
+                      
+                    return pageNumber <= totalShopPages ? (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink 
+                          isActive={currentShopPage === pageNumber}
+                          onClick={() => setCurrentShopPage(pageNumber)}
+                          className="cursor-pointer"
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ) : null;
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentShopPage(prev => Math.min(prev + 1, totalShopPages))}
+                      className={`cursor-pointer ${currentShopPage === totalShopPages ? 'pointer-events-none opacity-50' : ''}`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Featured Products Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8">{t('featuredProducts')}</h2>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">{t('featuredProducts')}</h2>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder={t('searchProducts')}
+                value={productFilter}
+                onChange={(e) => setProductFilter(e.target.value)}
+                className="pl-10 pr-4 py-2"
+              />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            </div>
+            <button
+              onClick={() => navigate('/products')}
+              className="flex items-center text-indigo-600 hover:text-indigo-800"
+            >
+              {t('viewAll')}
+              <ArrowRightIcon className="ml-1 h-4 w-4" />
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {loadingProducts ? (
-            <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
-          ) : (
-            products.map((product) => (
+            <div className="col-span-full text-center py-12">{t('loadingProducts')}</div>
+          ) : currentProducts.length > 0 ? (
+            currentProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))
+          ) : (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              {t('noProductsFound')}
+            </div>
           )}
         </div>
+        
+        {filteredProducts.length > productsPerPage && (
+          <div className="mt-8">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentProductPage(prev => Math.max(prev - 1, 1))}
+                    className={`cursor-pointer ${currentProductPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: Math.min(totalProductPages, 5) }).map((_, index) => {
+                  const pageNumber = currentProductPage > 3 ? 
+                    currentProductPage - 3 + index + 1 : 
+                    index + 1;
+                    
+                  return pageNumber <= totalProductPages ? (
+                    <PaginationItem key={pageNumber}>
+                      <PaginationLink 
+                        isActive={currentProductPage === pageNumber}
+                        onClick={() => setCurrentProductPage(pageNumber)}
+                        className="cursor-pointer"
+                      >
+                        {pageNumber}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ) : null;
+                })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentProductPage(prev => Math.min(prev + 1, totalProductPages))}
+                    className={`cursor-pointer ${currentProductPage === totalProductPages ? 'pointer-events-none opacity-50' : ''}`}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </div>
   )

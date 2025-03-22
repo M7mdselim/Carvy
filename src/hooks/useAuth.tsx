@@ -1,3 +1,4 @@
+
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
@@ -17,9 +18,8 @@ interface AuthState {
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   getUserProfile: () => { firstName: string; lastName: string; phoneNumber: string } | null;
-  cleanup?: () => void; // ✅ Add this line
+  cleanup?: () => void;
 }
-
 
 export const useAuth = create<AuthState>((set, get) => ({
   user: null,
@@ -67,9 +67,7 @@ export const useAuth = create<AuthState>((set, get) => ({
     } finally {
       set({ loading: false })
     }
-  }
-  
-  ,
+  },
   getUserProfile: () => {
     const user = get().user
     if (!user?.user_metadata) return null

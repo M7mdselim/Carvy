@@ -16,13 +16,11 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
   return (
     <button
       onClick={toggleLanguage}
-      className={`flex items-center text-gray-500 hover:text-gray-700 transition ${className}`}
+      className={`navbar-text flex items-center text-gray-500 hover:text-gray-700 transition ${className}`}
       aria-label={language === 'en' ? 'Switch to Arabic' : 'Switch to English'}
     >
-      <GlobeIcon className="w-5 h-5 no-flip" />
-      <span className={`text-sm font-medium ${language === 'ar' ? 'mr-1' : 'ml-1'}`}>
-        {language === 'en' ? 'العربية' : 'English'}
-      </span>
+      <GlobeIcon className="w-5 h-5 mr-1 no-flip" />
+      <span className="text-sm font-medium">{language === 'en' ? 'العربية' : 'English'}</span>
     </button>
   );
 };

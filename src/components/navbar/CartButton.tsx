@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { ShoppingCartIcon } from '@heroicons/react/24/outline'
 import type { Product } from '../../types'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface CartItem {
   product: Product;
@@ -16,6 +17,8 @@ interface CartButtonProps {
 }
 
 export default function CartButton({ cartItemCount, items, total, isMobile = false }: CartButtonProps) {
+  const { t } = useLanguage();
+
   // If it's mobile, we don't need the dropdown
   if (isMobile) {
     return (
@@ -46,9 +49,9 @@ export default function CartButton({ cartItemCount, items, total, isMobile = fal
               {cartItemCount}
             </span>
             <div className="hidden group-hover:block absolute top-full right-0 w-64 mt-3">
-              <div className="bg-white rounded-lg shadow-xl py-4 px-4 border border-gray-100">
+              <div className="bg-white rounded-lg shadow-xl py-4 px-4 border border-gray-100 cart-dropdown">
                 <div className="text-sm font-medium text-gray-900 mb-2">
-                  Cart Summary
+                  {t('shoppingCart')}
                 </div>
                 <div className="space-y-2">
                   {items.map(item => (
@@ -60,7 +63,7 @@ export default function CartButton({ cartItemCount, items, total, isMobile = fal
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-100">
                   <div className="flex justify-between font-medium">
-                    <span>Total:</span>
+                    <span>{t('subtotal')}:</span>
                     <span className="text-indigo-600">{total.toFixed(2)}</span>
                   </div>
                 </div>
@@ -68,7 +71,7 @@ export default function CartButton({ cartItemCount, items, total, isMobile = fal
                   to="/cart"
                   className="mt-3 block w-full text-center bg-indigo-600 text-white text-sm font-medium py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-200"
                 >
-                  View Cart
+                  {t('cart')}
                 </Link>
               </div>
             </div>

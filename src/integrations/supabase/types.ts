@@ -57,6 +57,81 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_usage: {
+        Row: {
+          coupon_id: string
+          id: string
+          order_id: string | null
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          id?: string
+          order_id?: string | null
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          id?: string
+          order_id?: string | null
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_usage_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_amount: number | null
+          discount_percentage: number
+          id: string
+          owner_id: string | null
+          times_used: number
+          usage_limit: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_amount?: number | null
+          discount_percentage: number
+          id?: string
+          owner_id?: string | null
+          times_used?: number
+          usage_limit?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_amount?: number | null
+          discount_percentage?: number
+          id?: string
+          owner_id?: string | null
+          times_used?: number
+          usage_limit?: number
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -106,11 +181,14 @@ export type Database = {
         Row: {
           address: string
           city: string
+          coupon_code: string | null
           created_at: string
+          discount_amount: number | null
           email: string
           first_name: string
           id: string
           last_name: string
+          payment_method: string | null
           phone: string
           postal_code: string
           status: string
@@ -120,11 +198,14 @@ export type Database = {
         Insert: {
           address: string
           city: string
+          coupon_code?: string | null
           created_at?: string
+          discount_amount?: number | null
           email: string
           first_name: string
           id?: string
           last_name: string
+          payment_method?: string | null
           phone: string
           postal_code: string
           status?: string
@@ -134,11 +215,14 @@ export type Database = {
         Update: {
           address?: string
           city?: string
+          coupon_code?: string | null
           created_at?: string
+          discount_amount?: number | null
           email?: string
           first_name?: string
           id?: string
           last_name?: string
+          payment_method?: string | null
           phone?: string
           postal_code?: string
           status?: string
@@ -364,6 +448,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_coupon: {
+        Args: {
+          coupon_code: string
+          order_id: string
+        }
+        Returns: Json
+      }
       grant_admin_access: {
         Args: Record<PropertyKey, never>
         Returns: boolean

@@ -19,8 +19,7 @@ export function Navbar({ transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
   const { items, total } = useCart()
   const location = useLocation()
-  const { t, language } = useLanguage()
-  const isRTL = language === 'ar'
+  const { t } = useLanguage()
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const navigation = [
@@ -43,16 +42,16 @@ export function Navbar({ transparent = false }: NavbarProps) {
     : 'bg-white shadow-lg backdrop-blur-md bg-opacity-80'
 
   return (
-    <Disclosure as="nav" className={`${navbarBgClass} sticky top-0 left-0 right-0 z-50 transition-colors duration-300`}>
+    <Disclosure as="nav" className={`${navbarBgClass} sticky top-0 left-0 right-0 z-50 transition-colors duration-300 navbar-container`}>
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-20 justify-between">
+            <div className="flex h-20 justify-between navbar-container">
               <div className="flex">
                 <NavbarLogo />
                 <DesktopNav navigation={navigation} isCurrentPath={isCurrentPath} />
               </div>
-              <div className={`hidden sm:ml-6 sm:flex sm:items-center ${isRTL ? 'sm:space-x-reverse' : ''} sm:space-x-4`}>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                 <LanguageSwitcher />
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} />
                 {user ? (
@@ -61,8 +60,8 @@ export function Navbar({ transparent = false }: NavbarProps) {
                   <AuthButtons />
                 )}
               </div>
-              <div className={`flex items-center sm:hidden ${isRTL ? 'space-x-reverse' : ''} space-x-4`}>
-                <LanguageSwitcher className={isRTL ? 'ml-2' : 'mr-2'} />
+              <div className="flex items-center sm:hidden space-x-4">
+                <LanguageSwitcher className="mr-2" />
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} isMobile={true} />
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <span className="sr-only">Open main menu</span>
