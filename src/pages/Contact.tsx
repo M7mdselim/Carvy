@@ -79,7 +79,7 @@ export default function Contact() {
                 </div>
                 <div className={`${isRtl ? 'mr-4' : 'ml-4'}`}>
                   <h3 className="text-base font-medium text-gray-900">{t('phone')}</h3>
-                  <p className="mt-1 text-gray-600">+20 101 234 5678</p>
+                  <p className="mt-1 text-gray-600">+20 115 500 3537</p>
                 </div>
               </div>
               
@@ -90,7 +90,7 @@ export default function Contact() {
                 <div className={`${isRtl ? 'mr-4' : 'ml-4'}`}>
                   <h3 className="text-base font-medium text-gray-900">{t('address')}</h3>
                   <p className="mt-1 text-gray-600">
-                    123 Smart Village<br />
+                    Tagamoa Elkhames<br />
                     Cairo, Egypt
                   </p>
                 </div>
