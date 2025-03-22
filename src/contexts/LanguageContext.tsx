@@ -21,7 +21,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const translations = {
     en: {
-      brandName: 'Carvy',
+      brandName: 'Zabtt',
       home: 'Home',
       shops: 'Shops',
       cart: 'Cart',
@@ -167,7 +167,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       orderSuccess: 'Order placed successfully!',
     },
     ar: {
-      brandName: 'كارڤي',
+      brandName: 'ظبط',
       home: 'الرئيسية',
       shops: 'المتاجر',
       cart: 'السلة',

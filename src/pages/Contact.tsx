@@ -69,7 +69,7 @@ export default function Contact() {
                 </div>
                 <div className={`${isRtl ? 'mr-4' : 'ml-4'}`}>
                   <h3 className="text-base font-medium text-gray-900">{t('email')}</h3>
-                  <p className="mt-1 text-gray-600">support@carvy.com</p>
+                  <p className="mt-1 text-gray-600">support@Zabtt.com</p>
                 </div>
               </div>
               
