@@ -1,74 +1,49 @@
 
-import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
-import Navbar from './components/navbar'
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import Index from './pages/Index'
-import Categories from './pages/Categories'
-import CategoryShops from './pages/CategoryShops'
-import Shops from './pages/Shops'
-import ShopDetails from './pages/ShopDetails'
-import Cart from './pages/Cart'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import SearchResults from './pages/SearchResults'
-import Contact from './pages/Contact'
-import Profile from './pages/Profile'
-import Orders from './pages/Orders'
-import Products from './pages/Products'
-import { useAuth } from './hooks/useAuth'
-import Checkout from './pages/Checkout'
-import { LanguageProvider } from './contexts/LanguageContext'
-import NotFound from './pages/NotFound'
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
-// ScrollToTop component to handle scrolling to top on route changes
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-}
+const queryClient = new QueryClient();
 
-function App() {
-  const { initialize } = useAuth()
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              
+              {/* Protected admin routes */}
+              <Route element={<ProtectedRoute requireAdmin={true} />}>
+                <Route path="/admin" element={<Admin />} />
+              </Route>
+              
+              {/* Protected owner routes */}
+              <Route element={<ProtectedRoute requireOwner={false} />}>
+                <Route path="/dashboard" element={<Admin />} />
+              </Route>
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
-  useEffect(() => {
-    initialize()
-  }, [initialize])
-
-  return (
-    <LanguageProvider>
-      <Router basename="/Carvy/">
-        <div className="min-h-screen flex flex-col bg-gray-50">
-          <Navbar />
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/index" element={<Index />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/:categoryId" element={<CategoryShops />} />
-            <Route path="/shops" element={<Shops />} />
-            <Route path="/shops/:shopId" element={<ShopDetails />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/search" element={<SearchResults />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Footer />
-        </div>
-      </Router>
-    </LanguageProvider>
-  )
-}
-
-export default App
+export default App;
