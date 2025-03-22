@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import { componentTagger } from "lovable-tagger"
+import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   base: "/Carvy/",
@@ -12,8 +12,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 8080,
-    host: "::"
+    host: "::",
+    port: 8080
   },
   plugins: [
     react(),
