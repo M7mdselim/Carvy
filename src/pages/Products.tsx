@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import { useProducts } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useSearchParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination'
-import { Search, Filter } from 'lucide-react'
+import { Search, Filter, X } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { ShopProductCard } from '../components/ShopProductCard'
+import { Badge } from '../components/ui/badge'
 
 export default function Products() {
   const { t, language } = useLanguage();
@@ -18,6 +20,22 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
   const [isRtl, setIsRtl] = useState(language === 'ar');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get make and model from URL params
+  const makeParam = searchParams.get('make');
+  const modelParam = searchParams.get('model');
+  const [activeFilters, setActiveFilters] = useState<{make?: string, model?: string}>({});
+
+  useEffect(() => {
+    // Set active filters from URL params
+    if (makeParam || modelParam) {
+      setActiveFilters({
+        make: makeParam || undefined,
+        model: modelParam || undefined
+      });
+    }
+  }, [makeParam, modelParam]);
 
   useEffect(() => {
     setIsRtl(language === 'ar');
@@ -27,14 +45,31 @@ export default function Products() {
     };
   }, [language]);
 
-  // Filter products based on category and search query
+  // Filter products based on category, search query, and make/model
   const filteredProducts = products
     .filter(product => !selectedCategory || product.category === selectedCategory)
     .filter(product => 
       !searchQuery || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    )
+    .filter(product => {
+      if (!activeFilters.make && !activeFilters.model) return true;
+      
+      // Check if the product is compatible with the specified make and model
+      return product.compatibility.some(compatStr => {
+        // Simple string check - not the most robust solution but works for demo
+        if (activeFilters.make && activeFilters.model) {
+          return compatStr.toLowerCase().includes(activeFilters.make.toLowerCase()) && 
+                 compatStr.toLowerCase().includes(activeFilters.model.toLowerCase());
+        } else if (activeFilters.make) {
+          return compatStr.toLowerCase().includes(activeFilters.make.toLowerCase());
+        } else if (activeFilters.model) {
+          return compatStr.toLowerCase().includes(activeFilters.model.toLowerCase());
+        }
+        return true;
+      });
+    });
 
   // Paginate products
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -42,11 +77,22 @@ export default function Products() {
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery, activeFilters]);
+
   // Load more products
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
+  };
+  
+  // Clear model filter
+  const clearModelFilter = () => {
+    setActiveFilters({});
+    setSearchParams({});
   };
 
   return (
@@ -82,6 +128,19 @@ export default function Products() {
           </div>
         </div>
       </div>
+      
+      {/* Show active model filters if any */}
+      {(activeFilters.make || activeFilters.model) && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">{t('activeFilters')}:</span>
+          <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+            {activeFilters.make && `${activeFilters.make}`} {activeFilters.model && `${activeFilters.model}`}
+            <button onClick={clearModelFilter} className="ml-1">
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        </div>
+      )}
 
       {loadingProducts || loadingCategories ? (
         <div className="text-center py-12">
@@ -94,7 +153,17 @@ export default function Products() {
           <h3 className="text-xl font-medium text-gray-700 mb-2">{t('noProductsFound')}</h3>
           <p className="text-gray-500">
             {selectedCategory && `${t('for')} ${selectedCategory}`}
+            {(activeFilters.make || activeFilters.model) && ` ${t('matching')} ${activeFilters.make || ''} ${activeFilters.model || ''}`}
           </p>
+          {(activeFilters.make || activeFilters.model) && (
+            <Button 
+              onClick={clearModelFilter}
+              variant="outline" 
+              className="mt-4"
+            >
+              {t('clearFilters')}
+            </Button>
+          )}
         </div>
       ) : (
         <>

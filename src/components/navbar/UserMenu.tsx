@@ -5,6 +5,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { classNames } from './utils'
 import type { User } from '@supabase/supabase-js'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { Heart } from 'lucide-react'
 
 interface UserMenuProps {
   user: User;
@@ -43,6 +44,19 @@ export default function UserMenu({ user, signOut }: UserMenuProps) {
                 )}
               >
                 {t('profile')}
+              </Link>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <Link
+                to="/wishlist"
+                className={classNames(
+                  active ? 'bg-gray-50' : '',
+                  'block px-4 py-2 text-sm text-gray-700'
+                )}
+              >
+                {t('wishlist')}
               </Link>
             )}
           </Menu.Item>

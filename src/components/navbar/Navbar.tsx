@@ -1,6 +1,6 @@
 
 import { Fragment } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../hooks/useAuth'
@@ -14,6 +14,7 @@ import UserMenu from './UserMenu'
 import AuthButtons from './AuthButtons'
 import { LanguageSwitcher } from '../LanguageSwitcher'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { Heart } from 'lucide-react'
 
 export function Navbar({ transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
@@ -53,6 +54,12 @@ export function Navbar({ transparent = false }: NavbarProps) {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
                 <LanguageSwitcher />
+                {user && (
+                  <Link to="/wishlist" className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <Heart className="h-4 w-4 mr-1" />
+                    {t('wishlist')}
+                  </Link>
+                )}
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} />
                 {user ? (
                   <UserMenu user={user} signOut={signOut} />
@@ -62,6 +69,11 @@ export function Navbar({ transparent = false }: NavbarProps) {
               </div>
               <div className="flex items-center sm:hidden space-x-4">
                 <LanguageSwitcher className="mr-2" />
+                {user && (
+                  <Link to="/wishlist" className="p-2 text-indigo-600">
+                    <Heart className="h-5 w-5" />
+                  </Link>
+                )}
                 <CartButton cartItemCount={cartItemCount} items={items} total={total} isMobile={true} />
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <span className="sr-only">Open main menu</span>

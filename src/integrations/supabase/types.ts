@@ -9,6 +9,92 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          apartment: string | null
+          area: string | null
+          building: string
+          city: string
+          created_at: string
+          district: string
+          floor: string | null
+          id: string
+          is_default: boolean | null
+          latitude: number | null
+          longitude: number | null
+          phone: string
+          postal_code: string | null
+          recipient_name: string
+          street: string
+          user_id: string
+        }
+        Insert: {
+          apartment?: string | null
+          area?: string | null
+          building: string
+          city: string
+          created_at?: string
+          district: string
+          floor?: string | null
+          id?: string
+          is_default?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          phone: string
+          postal_code?: string | null
+          recipient_name: string
+          street: string
+          user_id: string
+        }
+        Update: {
+          apartment?: string | null
+          area?: string | null
+          building?: string
+          city?: string
+          created_at?: string
+          district?: string
+          floor?: string | null
+          id?: string
+          is_default?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string
+          postal_code?: string | null
+          recipient_name?: string
+          street?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      areas: {
+        Row: {
+          city_id: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "areas_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_models: {
         Row: {
           created_at: string | null
@@ -52,6 +138,24 @@ export type Database = {
         Update: {
           created_at?: string | null
           icon?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      cities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
           id?: string
           name?: string
         }
@@ -296,6 +400,38 @@ export type Database = {
           },
         ]
       }
+      product_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_primary: boolean | null
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_primary?: boolean | null
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_primary?: boolean | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string | null
@@ -442,6 +578,35 @@ export type Database = {
           review_count?: number | null
         }
         Relationships: []
+      }
+      wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlists_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

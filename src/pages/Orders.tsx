@@ -1,291 +1,232 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useOrders, Order, OrderItem } from '../hooks/useOrders';
-import { useAuth } from '../hooks/useAuth';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ShoppingBagIcon, TruckIcon, CheckCircleIcon, XCircleIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { supabase } from '../lib/supabase';
-import { useCart } from '../hooks/useCart';
-import { toast } from 'sonner';
-import { Product } from '../types';
+import { useState } from 'react'
+import { useOrders, Order } from '../hooks/useOrders'
+import { useLanguage } from '../contexts/LanguageContext'
+import { Button } from '../components/ui/button'
+import { Clock, CheckCircle, TruckIcon, PackageCheck, XCircle, AlertTriangle } from 'lucide-react'
+import { format, formatDistanceToNow, isBefore, addMinutes } from 'date-fns'
+import { Badge } from '../components/ui/badge'
+import { toast } from 'sonner'
+import { supabase } from '../lib/supabase'
 
 export default function Orders() {
-  const { t } = useLanguage();
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { orders, loading, error } = useOrders();
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const { addItem, clearCart } = useCart();
-  const [reordering, setReordering] = useState(false);
+  const { orders, loading, error, refetch } = useOrders()
+  const { t, language } = useLanguage()
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
+  const isRtl = language === 'ar'
 
-  if (!user) {
-    navigate('/login?redirect=orders');
-    return null;
+  const getStatusIcon = (status: Order['status']) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="h-5 w-5 text-orange-500" />
+      case 'processing':
+        return <TruckIcon className="h-5 w-5 text-blue-500" />
+      case 'shipped':
+        return <TruckIcon className="h-5 w-5 text-purple-500" />
+      case 'delivered':
+        return <CheckCircle className="h-5 w-5 text-green-500" />
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-red-500" />
+      default:
+        return <AlertTriangle className="h-5 w-5 text-gray-500" />
+    }
+  }
+
+  const getStatusColor = (status: Order['status']) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-orange-100 text-orange-800'
+      case 'processing':
+        return 'bg-blue-100 text-blue-800'
+      case 'shipped':
+        return 'bg-purple-100 text-purple-800'
+      case 'delivered':
+        return 'bg-green-100 text-green-800'
+      case 'cancelled':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const canCancelOrder = (order: Order) => {
+    // Check if order is in pending or processing status
+    if (order.status !== 'pending' && order.status !== 'processing') {
+      return false
+    }
+    
+    // Check if order is within 30 minutes of creation
+    const orderDate = new Date(order.created_at)
+    const cancelWindow = addMinutes(orderDate, 30)
+    const now = new Date()
+    
+    return isBefore(now, cancelWindow)
+  }
+
+  const getTimeLeftForCancellation = (order: Order) => {
+    const orderDate = new Date(order.created_at)
+    const cancelWindow = addMinutes(orderDate, 30)
+    const now = new Date()
+    
+    if (isBefore(now, cancelWindow)) {
+      return formatDistanceToNow(cancelWindow, { addSuffix: true })
+    }
+    
+    return null
+  }
+
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      setCancellingOrderId(orderId)
+      
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'cancelled' })
+        .eq('id', orderId)
+      
+      if (error) throw error
+      
+      toast.success(t('orderCancelled'))
+      refetch()
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error(t('errorCancellingOrder'))
+    } finally {
+      setCancellingOrderId(null)
+    }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+          <p className="mt-2 text-gray-500">{t('loadingOrders')}</p>
+        </div>
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <XCircleIcon className="mx-auto h-12 w-12 text-red-500" />
-          <h3 className="mt-2 text-lg font-medium text-gray-900">{error}</h3>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            {t('returnHome')}
-          </button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center text-red-500">
+          <p>{t('errorLoadingOrders')}</p>
+          <p className="text-sm">{error}</p>
         </div>
       </div>
-    );
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <ClockIcon className="h-5 w-5 text-yellow-500" />;
-      case 'processing':
-        return <ClockIcon className="h-5 w-5 text-blue-500" />;
-      case 'shipped':
-        return <TruckIcon className="h-5 w-5 text-indigo-500" />;
-      case 'delivered':
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
-      case 'cancelled':
-        return <XCircleIcon className="h-5 w-5 text-red-500" />;
-      default:
-        return <ClockIcon className="h-5 w-5 text-gray-500" />;
-    }
-  };
-
-  const handleReorder = async (order: Order) => {
-    try {
-      setReordering(true);
-      // Clear the current cart first
-      clearCart();
-      
-      // Need to fetch product details for each item in the order
-      const productPromises = order.items?.map(async (item) => {
-        const { data: productData } = await supabase
-          .from('products')
-          .select(`
-            *,
-            categories (name),
-            product_car_models (
-              car_models (
-                make,
-                model,
-                year_start,
-                year_end
-              )
-            )
-          `)
-          .eq('id', item.product_id)
-          .eq('status', 'active') // Only add active products
-          .gt('stock', 0) // Only add products in stock
-          .single();
-        
-        return { productData, quantity: item.quantity };
-      }) || [];
-      
-      const productResults = await Promise.all(productPromises);
-      
-      // Add available products to cart
-      let availableProductsCount = 0;
-      for (const result of productResults) {
-        if (result.productData) {
-          // Transform the Supabase product data to match our Product type
-          const formattedProduct: Product = {
-            id: result.productData.id,
-            shopId: result.productData.shop_id,
-            name: result.productData.name,
-            description: result.productData.description || '',
-            price: result.productData.price,
-            image: result.productData.image || 'https://via.placeholder.com/500',
-            category: result.productData.categories?.name || 'Uncategorized',
-            compatibility: result.productData.product_car_models?.map((pcm: any) => {
-              const car = pcm.car_models;
-              return car ? `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})` : '';
-            }) || [],
-            stock: result.productData.stock
-          };
-          
-          // Add the product to cart
-          addItem(formattedProduct);
-          
-          // Apply the correct quantity after adding the item
-          if (result.quantity > 1) {
-            for (let i = 1; i < result.quantity; i++) {
-              addItem(formattedProduct);
-            }
-          }
-          
-          availableProductsCount++;
-        }
-      }
-      
-      // Navigate to checkout or show a message
-      if (availableProductsCount > 0) {
-        toast.success(availableProductsCount === productResults.length
-          ? t('reorderSuccess')
-          : t('reorderPartial'));
-        navigate('/checkout');
-      } else {
-        toast.error(t('reorderNoProducts'));
-      }
-    } catch (error) {
-      console.error('Error reordering:', error);
-      toast.error(t('reorderError'));
-    } finally {
-      setReordering(false);
-    }
-  };
-
-  if (orders.length === 0) {
-    return (
-      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto bg-white shadow rounded-lg p-8 text-center">
-          <ShoppingBagIcon className="mx-auto h-16 w-16 text-gray-400" />
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">{t('noOrders')}</h2>
-          <p className="mt-2 text-gray-500">{t('startShopping')}</p>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-6 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            {t('continueShopping')}
-          </button>
-        </div>
-      </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('myOrders')}</h1>
-        
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Orders List */}
-          <div className="lg:col-span-1">
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              <ul className="divide-y divide-gray-200">
-                {orders.map((order) => (
-                  <li
-                    key={order.id}
-                    className={`p-4 cursor-pointer hover:bg-gray-50 transition ${selectedOrder?.id === order.id ? 'bg-indigo-50' : ''}`}
-                    onClick={() => setSelectedOrder(order)}
-                  >
-                    <div className="flex justify-between">
-                      <div>
-                        <p className="font-medium">{t('orderNumber')}{order.id.substring(0, 8)}</p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center">
-                        {getStatusIcon(order.status)}
-                        <span className="ml-2 text-sm font-medium">
-                          {t(order.status)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex justify-between text-sm">
-                      <span className="text-gray-500">
-                        {order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}
-                      </span>
-                      <span className="font-medium">
-                        {order.total_amount.toFixed(2)} EGP
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          
-          {/* Order Details */}
-          <div className="lg:col-span-2">
-            {selectedOrder ? (
-              <div className="bg-white shadow rounded-lg overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">
-                      {t('orderNumber')}{selectedOrder.id.substring(0, 8)}
-                    </h2>
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(selectedOrder.status)}
-                      <span className="font-medium">{t(selectedOrder.status)}</span>
-                    </div>
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('myOrders')}</h1>
+
+      {orders.length === 0 ? (
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <PackageCheck className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <h2 className="text-lg font-medium text-gray-900 mb-1">{t('noOrdersYet')}</h2>
+          <p className="text-gray-500">{t('startShoppingToSeeOrders')}</p>
+          <Button className="mt-4" onClick={() => window.location.href = '/products'}>
+            {t('browseProducts')}
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {orders.map((order) => (
+            <div key={order.id} className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b bg-gray-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">{t('orderId')}:</span>
+                    <span className="font-medium">{order.id.substring(0, 8)}</span>
                   </div>
-                  <p className="text-gray-500 text-sm mt-1">
-                    {new Date(selectedOrder.created_at).toLocaleString()}
-                  </p>
+                  <div className="text-sm text-gray-500">
+                    {format(new Date(order.created_at), 'PPP p')}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Badge className={`flex items-center gap-1 px-3 py-1 ${getStatusColor(order.status)}`}>
+                    {getStatusIcon(order.status)}
+                    {t(order.status)}
+                  </Badge>
+                  
+                  {canCancelOrder(order) && order.status !== 'cancelled' && (
+                    <div className="flex flex-col gap-1">
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleCancelOrder(order.id)}
+                        disabled={cancellingOrderId === order.id}
+                      >
+                        {cancellingOrderId === order.id ? t('cancelling') : t('cancelOrder')}
+                      </Button>
+                      <span className="text-xs text-gray-500">
+                        {t('cancelAvailable')} {getTimeLeftForCancellation(order)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-medium mb-2">{t('shippingDetails')}</h3>
+                  <p className="text-gray-700">{order.first_name} {order.last_name}</p>
+                  <p className="text-gray-700">{order.address}</p>
+                  <p className="text-gray-700">{order.city}, {order.postal_code}</p>
+                  <p className="text-gray-700">{order.email}</p>
+                  <p className="text-gray-700">{order.phone}</p>
                 </div>
                 
-                <div className="p-6">
-                  <h3 className="font-medium mb-4">{t('orderItems')}</h3>
-                  <ul className="divide-y divide-gray-200">
-                    {selectedOrder.items?.map((item) => (
-                      <li key={item.id} className="py-3 flex justify-between">
-                        <div>
-                          <p className="font-medium">{item.product_name}</p>
-                          <p className="text-sm text-gray-500">
-                            Qty: {item.quantity} × {item.price.toFixed(2)} EGP
-                          </p>
-                        </div>
-                        <p className="font-medium">
-                          {(item.quantity * item.price).toFixed(2)} EGP
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <div className="mt-6 border-t border-gray-200 pt-6">
-                    <div className="flex justify-between text-base font-medium text-gray-900">
-                      <p>{t('subtotal')}</p>
-                      <p>{selectedOrder.total_amount.toFixed(2)} EGP</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6">
-                    <button
-                      onClick={() => handleReorder(selectedOrder)}
-                      disabled={reordering}
-                      className="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300"
-                    >
-                      {reordering ? (
-                        <span className="flex items-center">
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          {t('processing')}...
-                        </span>
-                      ) : (
-                        t('reorder')
-                      )}
-                    </button>
-                  </div>
+                <h3 className="text-lg font-medium mb-2">{t('orderedItems')}</h3>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('product')}
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('quantity')}
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {t('price')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {order.items?.map((item) => (
+                        <tr key={item.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {item.product_name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            {item.quantity}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                            {item.price.toFixed(2)} EGP
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-gray-50">
+                      <tr>
+                        <td colSpan={2} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                          {t('total')}:
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-right">
+                          {order.total_amount.toFixed(2)} EGP
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               </div>
-            ) : (
-              <div className="bg-white shadow rounded-lg p-8 text-center">
-                <div className="text-gray-500">
-                  {t('selectOrderToViewDetails')}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
     </div>
-  );
+  )
 }

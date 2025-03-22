@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -385,7 +384,7 @@ export default function Checkout() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="postalCode">{t('postalCode')}</Label>
+                    <Label htmlFor="postalCode">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
                     <Input
                       type="text"
                       id="postalCode"
@@ -393,7 +392,6 @@ export default function Checkout() {
                       value={formData.postalCode}
                       onChange={handleInputChange}
                       className="mt-1"
-                      required
                     />
                   </div>
                 </div>

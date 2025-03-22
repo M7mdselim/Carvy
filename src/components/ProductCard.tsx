@@ -1,5 +1,6 @@
 
 import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
+import { useNavigate } from 'react-router-dom'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -11,12 +12,27 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { items, addItem, removeItem, updateQuantity } = useCart()
   const { t, language } = useLanguage()
+  const navigate = useNavigate()
   const cartItem = items.find(item => item.product.id === product.id)
   const isRtl = language === 'ar'
 
   const handleImageClick = () => {
-    if (product.stock > 0) {
-      addItem(product)
+    navigate(`/products/${product.id}`)
+  }
+
+  const handleCarClick = (carModel: string, event: React.MouseEvent) => {
+    event.stopPropagation()
+    
+    // Extract car model ID from the compatibility string - this is a simplified approach
+    // In a real implementation, you'd want to store the car model IDs in the product data
+    // This is just a placeholder logic
+    const regex = /(\w+)\s+(\w+)\s+\((\d+)(?:-(\d+))?\)/
+    const match = carModel.match(regex)
+    
+    if (match) {
+      // Simulate navigation to model products - in a real implementation,
+      // you would need the actual car model ID instead of this placeholder
+      navigate(`/models/placeholder-id`)
     }
   }
 
@@ -45,7 +61,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.compatibility.map((car) => (
             <span
               key={car}
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-indigo-100"
+              onClick={(e) => handleCarClick(car, e)}
             >
               {car}
             </span>

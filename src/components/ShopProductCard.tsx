@@ -1,10 +1,10 @@
 
 import { PlusIcon, MinusIcon, EyeIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 
 interface ShopProductCardProps {
@@ -37,7 +37,23 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   }, [product.shopId])
 
   const handleImageClick = () => {
-    navigate(`/shops/${product.shopId}?product=${product.id}`)
+    navigate(`/products/${product.id}`)
+  }
+
+  const handleCarModelClick = (carModel: string, event: React.MouseEvent) => {
+    event.stopPropagation()
+    
+    // Extract model details from the compatibility string
+    // This is a simplified approach - in a real implementation, you would need to 
+    // store the actual car model IDs or extract them from the database
+    const regex = /(\w+)\s+(\w+)\s+\((\d+)(?:-(\d+))?\)/
+    const match = carModel.match(regex)
+    
+    if (match) {
+      // For demo purposes, navigate to a placeholder model ID
+      // In a real implementation, you would need the actual model ID
+      navigate(`/models/placeholder-model-id`)
+    }
   }
 
   return (
@@ -76,7 +92,8 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           {product.compatibility.map((car) => (
             <span
               key={car}
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-indigo-100"
+              onClick={(e) => handleCarModelClick(car, e)}
             >
               {car}
             </span>

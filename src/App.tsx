@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/navbar'
@@ -17,6 +16,9 @@ import Contact from './pages/Contact'
 import Profile from './pages/Profile'
 import Orders from './pages/Orders'
 import Products from './pages/Products'
+import ProductDetails from './pages/ProductDetails'
+import ModelProducts from './pages/ModelProducts'
+import Wishlist from './pages/Wishlist'
 import { useAuth } from './hooks/useAuth'
 import Checkout from './pages/Checkout'
 import { LanguageProvider } from './contexts/LanguageContext'
@@ -53,7 +55,11 @@ function App() {
             <Route path="/categories/:categoryId" element={<CategoryShops />} />
             <Route path="/shops" element={<Shops />} />
             <Route path="/shops/:shopId" element={<ShopDetails />} />
+            {/* Products */}
             <Route path="/products" element={<Products />} />
+            <Route path="/products/:productId" element={<ProductDetails />} />
+            <Route path="/models/:modelId" element={<ModelProducts />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
