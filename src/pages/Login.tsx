@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguage } from '../contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 export default function Login() {
   const { t } = useLanguage();
@@ -21,8 +22,10 @@ export default function Login() {
 
     try {
       await signIn(email, password);
+      toast.success(t('loginSuccess'));
       navigate('/');
     } catch (err) {
+      console.error("Login error:", err);
       setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {
       setLoading(false);

@@ -20,6 +20,10 @@ export default function ProtectedRoute({
   }
 
   if (!user) {
+    // Store the current location to redirect back after login
+    const currentPath = window.location.pathname + window.location.search;
+    sessionStorage.setItem("redirectAfterLogin", currentPath);
+    
     return <Navigate to="/login" replace />;
   }
 

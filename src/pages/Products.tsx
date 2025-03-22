@@ -15,27 +15,54 @@ export default function Products() {
   const { t, language } = useLanguage();
   const { products, loading: loadingProducts } = useProducts();
   const { categories, loading: loadingCategories } = useCategories();
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get parameters from URL
+  const categoryParam = searchParams.get('category');
+  const makeParam = searchParams.get('make');
+  const modelParam = searchParams.get('model');
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
   const [isRtl, setIsRtl] = useState(language === 'ar');
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Get make and model from URL params
-  const makeParam = searchParams.get('make');
-  const modelParam = searchParams.get('model');
-  const [activeFilters, setActiveFilters] = useState<{make?: string, model?: string}>({});
+  const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string}>({});
 
   useEffect(() => {
     // Set active filters from URL params
-    if (makeParam || modelParam) {
-      setActiveFilters({
-        make: makeParam || undefined,
-        model: modelParam || undefined
-      });
+    const filters: {category?: string, make?: string, model?: string} = {};
+    
+    if (categoryParam) {
+      filters.category = categoryParam;
+      setSelectedCategory(categoryParam);
     }
-  }, [makeParam, modelParam]);
+    
+    if (makeParam) {
+      filters.make = makeParam;
+    }
+    
+    if (modelParam) {
+      filters.model = modelParam;
+    }
+    
+    if (Object.keys(filters).length > 0) {
+      setActiveFilters(filters);
+    }
+  }, [categoryParam, makeParam, modelParam]);
+
+  // Update URL when category dropdown changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    if (selectedCategory) {
+      newParams.set('category', selectedCategory);
+    } else {
+      newParams.delete('category');
+    }
+    
+    setSearchParams(newParams);
+  }, [selectedCategory, setSearchParams]);
 
   useEffect(() => {
     setIsRtl(language === 'ar');
@@ -89,9 +116,10 @@ export default function Products() {
     }
   };
   
-  // Clear model filter
-  const clearModelFilter = () => {
+  // Clear filters
+  const clearFilters = () => {
     setActiveFilters({});
+    setSelectedCategory('');
     setSearchParams({});
   };
 
@@ -129,16 +157,26 @@ export default function Products() {
         </div>
       </div>
       
-      {/* Show active model filters if any */}
-      {(activeFilters.make || activeFilters.model) && (
+      {/* Show active filters if any */}
+      {(activeFilters.category || activeFilters.make || activeFilters.model) && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-gray-700">{t('activeFilters')}:</span>
-          <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
-            {activeFilters.make && `${activeFilters.make}`} {activeFilters.model && `${activeFilters.model}`}
-            <button onClick={clearModelFilter} className="ml-1">
-              <X className="h-3 w-3" />
-            </button>
-          </Badge>
+          {activeFilters.category && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {activeFilters.category}
+              <button onClick={clearFilters} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {(activeFilters.make || activeFilters.model) && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {activeFilters.make && `${activeFilters.make}`} {activeFilters.model && `${activeFilters.model}`}
+              <button onClick={clearFilters} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
         </div>
       )}
 
@@ -155,9 +193,9 @@ export default function Products() {
             {selectedCategory && `${t('for')} ${selectedCategory}`}
             {(activeFilters.make || activeFilters.model) && ` ${t('matching')} ${activeFilters.make || ''} ${activeFilters.model || ''}`}
           </p>
-          {(activeFilters.make || activeFilters.model) && (
+          {(activeFilters.category || activeFilters.make || activeFilters.model) && (
             <Button 
-              onClick={clearModelFilter}
+              onClick={clearFilters}
               variant="outline" 
               className="mt-4"
             >

@@ -1,6 +1,6 @@
 
 import { create } from 'zustand'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../integrations/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthState {
@@ -51,20 +51,24 @@ export const useAuth = create<AuthState>((set, get) => ({
   },
   initialize: async () => {
     try {
+      // First, check for existing session
+      const { data: { session } } = await supabase.auth.getSession()
+      set({ user: session?.user || null, session })
+      
+      // Then set up the auth state listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (_, session) => {
           set({ user: session?.user || null, session })
         }
       )
   
-      const { data: { session } } = await supabase.auth.getSession()
-      set({ user: session?.user || null, session })
-      
-      // Store the cleanup function separately instead of returning it
-      set({ cleanup: () => subscription.unsubscribe() })
+      // Store the cleanup function
+      set({ 
+        cleanup: () => subscription.unsubscribe(), 
+        loading: false 
+      })
     } catch (error) {
       console.error('Error initializing auth:', error)
-    } finally {
       set({ loading: false })
     }
   },

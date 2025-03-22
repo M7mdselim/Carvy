@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom'
 import type { Category } from '../types'
 
@@ -8,7 +9,7 @@ interface CategoryCardProps {
 export default function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Link
-      to={`/categories/${category.id}`}
+      to={`/products?category=${encodeURIComponent(category.name)}`}
       className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
     >
       <div className="aspect-square w-full overflow-hidden">
