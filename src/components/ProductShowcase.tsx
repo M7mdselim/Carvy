@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { CarModel } from '../types';
 import { getCarIcon } from './utils';
@@ -12,7 +11,7 @@ export default function ProductShowcase({ title, models }: ProductShowcaseProps)
   const navigate = useNavigate();
   
   const handleModelClick = (model: CarModel) => {
-    // Navigate to products page with model filtering
+    // Navigate to products page with model filtering instead of shops
     navigate(`/products?make=${encodeURIComponent(model.make)}&model=${encodeURIComponent(model.model)}`);
   };
   

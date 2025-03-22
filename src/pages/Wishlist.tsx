@@ -98,9 +98,10 @@ export default function Wishlist() {
             {t('myWishlist')}
           </h1>
           <p className="mt-2 text-gray-600">
-            {wishlistItems.length === 0
-              ? t('emptyWishlist')
-              : t('wishlistItemsCount', { count: wishlistItems.length })}
+          {wishlistItems.length === 0
+  ? t('emptyWishlist')
+  : (t as any)('wishlistItemsCount', { count: wishlistItems.length })}
+
           </p>
         </div>
       </div>
