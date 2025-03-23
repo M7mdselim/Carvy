@@ -4,8 +4,6 @@ import { MapPin, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useGoogleMapsAPI } from '../../hooks/useGoogleMapsAPI';
-import { SearchResults } from './MapSearchResults';
 
 interface GoogleMapProps {
   initialLocation: { lat: number; lng: number } | null;
@@ -28,14 +26,28 @@ export function GoogleMap({ initialLocation, onLocationSelect }: GoogleMapProps)
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   
-  // Use custom hook to load and manage Google Maps API
-  const { isLoaded, loadError } = useGoogleMapsAPI();
-  
-  // Initialize map when component mounts and API is loaded
+  // Initialize map when component mounts
   useEffect(() => {
-    if (!mapRef.current || !isLoaded || loadError) return;
-    initializeMap();
-  }, [mapRef.current, isLoaded, loadError]);
+    if (!mapRef.current) return;
+    
+    // Check if Google Maps API is already loaded
+    if (window.google && window.google.maps) {
+      initializeMap();
+    } else {
+      // If not loaded, create a script tag and load it
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY || ''}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeMap;
+      document.head.appendChild(script);
+    }
+    
+    return () => {
+      // Clean up marker and map instances if component unmounts
+      if (marker) marker.setMap(null);
+    };
+  }, [mapRef.current]);
   
   const initializeMap = () => {
     if (!mapRef.current || !window.google) return;
@@ -53,45 +65,52 @@ export function GoogleMap({ initialLocation, onLocationSelect }: GoogleMapProps)
     
     // Create marker if we have an initial location
     if (initialLocation) {
-      createOrUpdateMarker(initialLocation, mapInstance);
-    }
-    
-    // Add click event to map
-    mapInstance.addListener('click', (e: any) => {
-      const clickedPosition = e.latLng;
-      createOrUpdateMarker(
-        { lat: clickedPosition.lat(), lng: clickedPosition.lng() }, 
-        mapInstance
-      );
-      onLocationSelect(clickedPosition.lat(), clickedPosition.lng());
-    });
-  };
-  
-  const createOrUpdateMarker = (position: { lat: number, lng: number }, mapInstance: any) => {
-    if (marker) {
-      // Move existing marker
-      marker.setPosition(position);
-    } else {
-      // Create new marker
       const newMarker = new window.google.maps.Marker({
-        position,
+        position: initialLocation,
         map: mapInstance,
         draggable: true,
         animation: window.google.maps.Animation.DROP,
       });
       
       newMarker.addListener('dragend', () => {
-        const newPosition = newMarker.getPosition();
-        onLocationSelect(newPosition.lat(), newPosition.lng());
+        const position = newMarker.getPosition();
+        onLocationSelect(position.lat(), position.lng());
       });
       
       setMarker(newMarker);
     }
+    
+    // Add click event to map
+    mapInstance.addListener('click', (e: any) => {
+      const clickedPosition = e.latLng;
+      
+      if (marker) {
+        // Move existing marker
+        marker.setPosition(clickedPosition);
+      } else {
+        // Create new marker
+        const newMarker = new window.google.maps.Marker({
+          position: clickedPosition,
+          map: mapInstance,
+          draggable: true,
+          animation: window.google.maps.Animation.DROP,
+        });
+        
+        newMarker.addListener('dragend', () => {
+          const position = newMarker.getPosition();
+          onLocationSelect(position.lat(), position.lng());
+        });
+        
+        setMarker(newMarker);
+      }
+      
+      onLocationSelect(clickedPosition.lat(), clickedPosition.lng());
+    });
   };
   
   // Handle search
   const handleSearch = () => {
-    if (!map || !searchValue || !window.google) return;
+    if (!map || !searchValue) return;
     
     const service = new window.google.maps.places.PlacesService(map);
     service.textSearch({ query: searchValue }, (results: any, status: any) => {
@@ -102,16 +121,25 @@ export function GoogleMap({ initialLocation, onLocationSelect }: GoogleMapProps)
   };
   
   const selectSearchResult = (place: any) => {
-    if (!map || !window.google) return;
-    
     map.setCenter(place.geometry.location);
-    createOrUpdateMarker(
-      {
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      },
-      map
-    );
+    
+    if (marker) {
+      marker.setPosition(place.geometry.location);
+    } else {
+      const newMarker = new window.google.maps.Marker({
+        position: place.geometry.location,
+        map: map,
+        draggable: true,
+        animation: window.google.maps.Animation.DROP,
+      });
+      
+      newMarker.addListener('dragend', () => {
+        const position = newMarker.getPosition();
+        onLocationSelect(position.lat(), position.lng());
+      });
+      
+      setMarker(newMarker);
+    }
     
     onLocationSelect(
       place.geometry.location.lat(),
@@ -123,45 +151,44 @@ export function GoogleMap({ initialLocation, onLocationSelect }: GoogleMapProps)
   };
   
   const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation || !map) return;
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        
-        map.setCenter(pos);
-        createOrUpdateMarker(pos, map);
-        onLocationSelect(pos.lat, pos.lng);
-      },
-      () => {
-        alert('Error: The Geolocation service failed.');
-      }
-    );
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          
+          map.setCenter(pos);
+          
+          if (marker) {
+            marker.setPosition(pos);
+          } else {
+            const newMarker = new window.google.maps.Marker({
+              position: pos,
+              map: map,
+              draggable: true,
+              animation: window.google.maps.Animation.DROP,
+            });
+            
+            newMarker.addListener('dragend', () => {
+              const markerPos = newMarker.getPosition();
+              onLocationSelect(markerPos.lat(), markerPos.lng());
+            });
+            
+            setMarker(newMarker);
+          }
+          
+          onLocationSelect(pos.lat, pos.lng);
+        },
+        () => {
+          alert('Error: The Geolocation service failed.');
+        }
+      );
+    } else {
+      alert('Error: Your browser does not support geolocation.');
+    }
   };
-  
-  // Show error if Google Maps failed to load
-  if (loadError) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-        <div className="text-center p-4">
-          <p className="text-red-500 mb-2">{t('googleMapsError')}</p>
-          <p className="text-sm text-gray-600">{loadError}</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Show loading state while Maps API loads
-  if (!isLoaded) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-        <div className="animate-spin h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
   
   return (
     <div className="relative w-full h-full">
@@ -181,10 +208,20 @@ export function GoogleMap({ initialLocation, onLocationSelect }: GoogleMapProps)
             <Search className="h-4 w-4" />
           </button>
           
-          <SearchResults 
-            results={searchResults} 
-            onSelect={selectSearchResult} 
-          />
+          {searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-md max-h-48 overflow-y-auto">
+              {searchResults.map((result, i) => (
+                <div
+                  key={i}
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => selectSearchResult(result)}
+                >
+                  <div className="font-medium">{result.name}</div>
+                  <div className="text-sm text-gray-600">{result.formatted_address}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         
         <Button 
