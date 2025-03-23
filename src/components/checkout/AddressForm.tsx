@@ -12,13 +12,21 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '.
 import { Card, CardContent } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { toast } from 'sonner';
+import { formatCurrency } from '../../lib/utils';
 
 interface AddressFormProps {
   onAddressSelect: (address: Address) => void;
   selectedAddress?: Address | null;
+  hidePhoneField?: boolean;
+  onShippingCostChange?: (cost: number) => void;
 }
 
-export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormProps) {
+export function AddressForm({ 
+  onAddressSelect, 
+  selectedAddress, 
+  hidePhoneField = false,
+  onShippingCostChange
+}: AddressFormProps) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const isRtl = language === 'ar';
@@ -47,6 +55,27 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
   const [loading, setLoading] = useState(true);
   const [savingAddress, setSavingAddress] = useState(false);
   const [additionalDetails, setAdditionalDetails] = useState('');
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  
+  const getShippingCostForCity = async (cityName: string): Promise<number | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('cities')
+        .select('shipping_cost')
+        .eq('name', cityName)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching shipping cost:', error);
+        return null;
+      }
+      
+      return data?.shipping_cost ? Number(data.shipping_cost) : null;
+    } catch (error) {
+      console.error('Error fetching shipping cost:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     async function fetchAddresses() {
@@ -69,6 +98,12 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
           const defaultAddress = data.find(addr => addr.is_default) || data[0];
           setSelectedId(defaultAddress.id);
           onAddressSelect(defaultAddress);
+          if (defaultAddress.city && onShippingCostChange) {
+            const cost = await getShippingCostForCity(defaultAddress.city);
+            if (cost !== null) {
+              onShippingCostChange(cost);
+            }
+          }
         } else if (selectedAddress) {
           setSelectedId(selectedAddress.id);
         }
@@ -103,7 +138,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     
     fetchAddresses();
     fetchCitiesAndAreas();
-  }, [user, selectedAddress]);
+  }, [user, selectedAddress, onShippingCostChange]);
 
   useEffect(() => {
     if (newAddress.city) {
@@ -117,11 +152,18 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     }
   }, [newAddress.city, cities, areas]);
 
-  const handleSelectAddress = (addressId: string) => {
+  const handleSelectAddress = async (addressId: string) => {
     const selected = addresses.find(addr => addr.id === addressId);
     if (selected) {
       setSelectedId(addressId);
       onAddressSelect(selected);
+      if (selected.city && onShippingCostChange) {
+        const cost = await getShippingCostForCity(selected.city);
+        if (cost !== null) {
+          onShippingCostChange(cost);
+        }
+      }
+      setIsAddingNew(false);
     }
   };
 
@@ -129,8 +171,15 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     setNewAddress(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCityChange = (value: string) => {
+  const handleCityChange = async (value: string) => {
     setNewAddress(prev => ({ ...prev, city: value, area: '' }));
+    
+    if (onShippingCostChange) {
+      const cost = await getShippingCostForCity(value);
+      if (cost !== null) {
+        onShippingCostChange(cost);
+      }
+    }
   };
 
   const handleSaveAddress = async () => {
@@ -139,7 +188,10 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     setSavingAddress(true);
     
     try {
-      const requiredFields = ['recipient_name', 'phone', 'street', 'building', 'district', 'city'];
+      const requiredFields = hidePhoneField 
+        ? ['recipient_name', 'street', 'building', 'district', 'city']
+        : ['recipient_name', 'phone', 'street', 'building', 'district', 'city'];
+      
       const missingFields = requiredFields.filter(field => !newAddress[field as keyof Address]);
       
       if (missingFields.length > 0) {
@@ -165,7 +217,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
             city: newAddress.city,
             area: newAddress.area || '',
             postal_code: newAddress.postal_code || '',
-            phone: newAddress.phone,
+            phone: newAddress.phone || '',
             is_default: addresses.length === 0,
             ...locationData
           }
@@ -178,28 +230,56 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
       setAddresses([...addresses, data]);
       setSelectedId(data.id);
       onAddressSelect(data);
+      
+      if (data.city && onShippingCostChange) {
+        const cost = await getShippingCostForCity(data.city);
+        if (cost !== null) {
+          onShippingCostChange(cost);
+        }
+      }
+      
       toast.success(t('addressSaved'));
       
-      setNewAddress({
-        recipient_name: '',
-        street: '',
-        building: '',
-        floor: '',
-        apartment: '',
-        district: '',
-        city: '',
-        area: '',
-        postal_code: '',
-        phone: '',
-      });
-      setAdditionalDetails('');
-      setLocation(null);
-      setShowMap(false);
+      resetNewAddressForm();
     } catch (error) {
       console.error('Error saving address:', error);
       toast.error(error instanceof Error ? error.message : 'Error saving address');
     } finally {
       setSavingAddress(false);
+    }
+  };
+
+  const resetNewAddressForm = () => {
+    setNewAddress({
+      recipient_name: '',
+      street: '',
+      building: '',
+      floor: '',
+      apartment: '',
+      district: '',
+      city: '',
+      area: '',
+      postal_code: '',
+      phone: '',
+    });
+    setAdditionalDetails('');
+    setLocation(null);
+    setShowMap(false);
+    setIsAddingNew(false);
+  };
+
+  const handleCancelAddingAddress = () => {
+    resetNewAddressForm();
+    
+    if (selectedId && addresses.length > 0) {
+      const selected = addresses.find(addr => addr.id === selectedId);
+      if (selected && onShippingCostChange) {
+        getShippingCostForCity(selected.city).then(cost => {
+          if (cost !== null) {
+            onShippingCostChange(cost);
+          }
+        });
+      }
     }
   };
 
@@ -236,15 +316,37 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     }
   };
 
+  const startAddingNewAddress = () => {
+    setIsAddingNew(true);
+  };
+
+  const renderCityOptions = () => {
+    return cities.map(city => (
+      <SelectItem key={city.id} value={city.name}>
+        {city.name}
+      </SelectItem>
+    ));
+  };
+
   if (loading) {
     return <div className="animate-pulse h-64 bg-gray-100 rounded-lg"></div>;
   }
 
   return (
     <div className={`space-y-6 ${isRtl ? 'rtl' : 'ltr'}`}>
-      {addresses.length > 0 && (
+      {addresses.length > 0 && !isAddingNew && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">{t('savedAddresses')}</h3>
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">{t('savedAddresses')}</h3>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={startAddingNewAddress}
+              className="text-sm"
+            >
+              {t('addNewAddress')}
+            </Button>
+          </div>
           <div className="grid grid-cols-1 gap-4">
             {addresses.map(address => (
               <div 
@@ -281,7 +383,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                           handleSetDefaultAddress(address.id);
                         }}
                       >
-                        {t('setAsDefault')}
+                        {t('default')}
                       </Button>
                     )}
                   </div>
@@ -305,10 +407,12 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   </div>
                 </div>
                 
-                <div className="flex items-center mt-2 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                  <span>{address.phone}</span>
-                </div>
+                {!hidePhoneField && address.phone && (
+                  <div className="flex items-center mt-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4 mr-1 text-gray-400" />
+                    <span>{address.phone}</span>
+                  </div>
+                )}
                 
                 {address.latitude && address.longitude && (
                   <div className="flex items-center mt-2 text-xs text-green-600">
@@ -322,195 +426,208 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
         </div>
       )}
       
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium mb-4">{t('addNewAddress')}</h3>
-        
-        <Card className="bg-gray-50 border-gray-200">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="recipient_name">{t('recipientName')} *</Label>
-                <Input
-                  id="recipient_name"
-                  value={newAddress.recipient_name}
-                  onChange={(e) => handleNewAddressChange('recipient_name', e.target.value)}
-                  placeholder={t('fullName')}
-                  className="bg-white"
-                  icon={<span className="text-gray-400">👤</span>}
-                />
-              </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="phone">{t('phoneNumber')} *</Label>
-                <Input
-                  id="phone"
-                  value={newAddress.phone}
-                  onChange={(e) => handleNewAddressChange('phone', e.target.value)}
-                  placeholder="01XXXXXXXXX"
-                  className="bg-white"
-                  icon={<span className="text-gray-400">📞</span>}
-                />
-              </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="street">{t('streetName')} *</Label>
-                <Input
-                  id="street"
-                  value={newAddress.street}
-                  onChange={(e) => handleNewAddressChange('street', e.target.value)}
-                  placeholder={t('streetNamePlaceholder')}
-                  className="bg-white"
-                  icon={<Home className="h-4 w-4 text-gray-400" />}
-                />
-              </div>
-              
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="district">{t('district')} *</Label>
-                <Input
-                  id="district"
-                  value={newAddress.district}
-                  onChange={(e) => handleNewAddressChange('district', e.target.value)}
-                  placeholder={t('districtPlaceholder')}
-                  className="bg-white"
-                  icon={<MapPin className="h-4 w-4 text-gray-400" />}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="building">{t('buildingNumber')} *</Label>
-                <Input
-                  id="building"
-                  value={newAddress.building}
-                  onChange={(e) => handleNewAddressChange('building', e.target.value)}
-                  placeholder={t('buildingNumberPlaceholder')}
-                  className="bg-white"
-                  icon={<Building className="h-4 w-4 text-gray-400" />}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="floor">{t('floorNumber')}</Label>
-                <Input
-                  id="floor"
-                  value={newAddress.floor}
-                  onChange={(e) => handleNewAddressChange('floor', e.target.value)}
-                  placeholder={t('floorNumberPlaceholder')}
-                  className="bg-white"
-                  icon={<Layers className="h-4 w-4 text-gray-400" />}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="apartment">{t('apartmentNumber')}</Label>
-                <Input
-                  id="apartment"
-                  value={newAddress.apartment}
-                  onChange={(e) => handleNewAddressChange('apartment', e.target.value)}
-                  placeholder={t('apartmentNumberPlaceholder')}
-                  className="bg-white"
-                  icon={<DoorOpen className="h-4 w-4 text-gray-400" />}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="postal_code">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
-                <Input
-                  id="postal_code"
-                  value={newAddress.postal_code}
-                  onChange={(e) => handleNewAddressChange('postal_code', e.target.value)}
-                  placeholder={t('postalCodePlaceholder')}
-                  className="bg-white"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="city">{t('city')} *</Label>
-                <Select
-                  value={newAddress.city}
-                  onValueChange={handleCityChange}
-                >
-                  <SelectTrigger id="city" className="bg-white">
-                    <SelectValue placeholder={t('selectCity')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map(city => (
-                      <SelectItem key={city.id} value={city.name}>
-                        {city.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="area">{t('area')}</Label>
-                <Select
-                  value={newAddress.area}
-                  onValueChange={(value) => handleNewAddressChange('area', value)}
-                  disabled={!newAddress.city}
-                >
-                  <SelectTrigger id="area" className="bg-white">
-                    <SelectValue placeholder={t('selectArea')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredAreas.map(area => (
-                      <SelectItem key={area.id} value={area.name}>
-                        {area.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      {(isAddingNew || addresses.length === 0) && (
+        <div className={addresses.length > 0 ? "border-t pt-6" : ""}>
+          <h3 className="text-lg font-medium mb-4">{addresses.length > 0 ? t('addNewAddress') : t('addAddress')}</h3>
+          
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="recipient_name">{t('recipientName')} *</Label>
+                  <Input
+                    id="recipient_name"
+                    value={newAddress.recipient_name}
+                    onChange={(e) => handleNewAddressChange('recipient_name', e.target.value)}
+                    placeholder={t('fullName')}
+                    className="bg-white"
+                    icon={<span className="text-gray-400">👤</span>}
+                  />
+                </div>
+                
+                {!hidePhoneField && (
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="phone">{t('phoneNumber')}</Label>
+                    <Input
+                      id="phone"
+                      value={newAddress.phone}
+                      onChange={(e) => handleNewAddressChange('phone', e.target.value)}
+                      placeholder="01XXXXXXXXX"
+                      className="bg-white"
+                      icon={<span className="text-gray-400">📞</span>}
+                    />
+                  </div>
+                )}
+                
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="street">{t('streetName')} *</Label>
+                  <Input
+                    id="street"
+                    value={newAddress.street}
+                    onChange={(e) => handleNewAddressChange('street', e.target.value)}
+                    placeholder={t('streetNamePlaceholder')}
+                    className="bg-white"
+                    icon={<Home className="h-4 w-4 text-gray-400" />}
+                  />
+                </div>
+                
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="district">{t('district')} *</Label>
+                  <Input
+                    id="district"
+                    value={newAddress.district}
+                    onChange={(e) => handleNewAddressChange('district', e.target.value)}
+                    placeholder={t('districtPlaceholder')}
+                    className="bg-white"
+                    icon={<MapPin className="h-4 w-4 text-gray-400" />}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="building">{t('buildingNumber')} *</Label>
+                  <Input
+                    id="building"
+                    value={newAddress.building}
+                    onChange={(e) => handleNewAddressChange('building', e.target.value)}
+                    placeholder={t('buildingNumberPlaceholder')}
+                    className="bg-white"
+                    icon={<Building className="h-4 w-4 text-gray-400" />}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="floor">{t('floorNumber')}</Label>
+                  <Input
+                    id="floor"
+                    value={newAddress.floor}
+                    onChange={(e) => handleNewAddressChange('floor', e.target.value)}
+                    placeholder={t('floorNumberPlaceholder')}
+                    className="bg-white"
+                    icon={<Layers className="h-4 w-4 text-gray-400" />}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="apartment">{t('apartmentNumber')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
+                  <Input
+                    id="apartment"
+                    value={newAddress.apartment}
+                    onChange={(e) => handleNewAddressChange('apartment', e.target.value)}
+                    placeholder={t('apartmentNumberPlaceholder')}
+                    className="bg-white"
+                    icon={<DoorOpen className="h-4 w-4 text-gray-400" />}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="postal_code">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
+                  <Input
+                    id="postal_code"
+                    value={newAddress.postal_code}
+                    onChange={(e) => handleNewAddressChange('postal_code', e.target.value)}
+                    placeholder={t('postalCodePlaceholder')}
+                    className="bg-white"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="city">{t('city')} *</Label>
+                  <Select
+                    value={newAddress.city}
+                    onValueChange={handleCityChange}
+                  >
+                    <SelectTrigger id="city" className="bg-white">
+                      <SelectValue placeholder={t('selectCity')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {renderCityOptions()}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="area">{t('area')}</Label>
+                  <Select
+                    value={newAddress.area}
+                    onValueChange={(value) => handleNewAddressChange('area', value)}
+                    disabled={!newAddress.city}
+                  >
+                    <SelectTrigger id="area" className="bg-white">
+                      <SelectValue placeholder={t('selectArea')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredAreas.map(area => (
+                        <SelectItem key={area.id} value={area.name}>
+                          {area.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="additional_details">{t('additionalDetails')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
-                <Textarea
-                  id="additional_details"
-                  value={additionalDetails}
-                  onChange={(e) => setAdditionalDetails(e.target.value)}
-                  placeholder={t('additionalDetailsPlaceholder')}
-                  className="bg-white"
-                  rows={3}
-                />
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="additional_details">{t('additionalDetails')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
+                  <Textarea
+                    id="additional_details"
+                    value={additionalDetails}
+                    onChange={(e) => setAdditionalDetails(e.target.value)}
+                    placeholder={t('additionalDetailsPlaceholder')}
+                    className="bg-white"
+                    rows={3}
+                  />
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex items-center gap-2 w-full justify-center"
-            onClick={() => setShowMap(!showMap)}
-          >
-            <MapPin className="h-4 w-4" />
-            {showMap ? t('hideMap') : t('pickLocationOnMap')}
-          </Button>
+            </CardContent>
+          </Card>
           
-          {showMap && (
-            <div className="mt-4 h-[400px] rounded-lg overflow-hidden border shadow-md">
-              <GoogleMap onLocationSelect={handleLocationSelect} initialLocation={location} />
-            </div>
-          )}
+          <div className="mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2 w-full justify-center"
+              onClick={() => setShowMap(!showMap)}
+            >
+              <MapPin className="h-4 w-4" />
+              {showMap ? t('hideMap') : t('pickLocationOnMap')}
+            </Button>
+            
+            {showMap && (
+              <div className="mt-4 h-[400px] rounded-lg overflow-hidden border shadow-md">
+                <GoogleMap onLocationSelect={handleLocationSelect} initialLocation={location} />
+              </div>
+            )}
+            
+            {location && (
+              <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+                <Navigation className="h-4 w-4" />
+                {t('locationSelected')}
+              </div>
+            )}
+          </div>
           
-          {location && (
-            <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
-              <Navigation className="h-4 w-4" />
-              {t('locationSelected')}
-            </div>
-          )}
+          <div className="mt-6 flex gap-4">
+            {addresses.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={handleCancelAddingAddress}
+              >
+                {t('cancel')}
+              </Button>
+            )}
+            <Button
+              type="button"
+              className={addresses.length > 0 ? "flex-1" : "w-full"}
+              onClick={handleSaveAddress}
+              disabled={savingAddress}
+            >
+              {savingAddress ? t('saving') : t('saveAddress')}
+            </Button>
+          </div>
         </div>
-        
-        <Button
-          type="button"
-          className="mt-6 w-full"
-          onClick={handleSaveAddress}
-          disabled={savingAddress}
-        >
-          {savingAddress ? t('saving') : t('saveAddress')}
-        </Button>
-      </div>
+      )}
     </div>
   );
 }
+

@@ -63,6 +63,19 @@ export default function UserMenu({ user, signOut }: UserMenuProps) {
           <Menu.Item>
             {({ active }) => (
               <Link
+                to="/saved-addresses"
+                className={classNames(
+                  active ? 'bg-gray-50' : '',
+                  'block px-4 py-2 text-sm text-gray-700'
+                )}
+              >
+                {t('savedAddresses')}
+              </Link>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <Link
                 to="/orders"
                 className={classNames(
                   active ? 'bg-gray-50' : '',

@@ -65,3 +65,36 @@ export function handleSupabaseError(error: any): string {
   
   return 'An unexpected error occurred';
 }
+
+// Add password reset functionality
+export async function resetPassword(email: string) {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/Carvy/reset-password',
+    });
+    
+    if (error) throw error;
+    return { success: true, message: 'Password reset link sent to your email' };
+  } catch (error: any) {
+    console.error('Password reset error:', error);
+    return { success: false, message: error.message || 'Failed to send reset link' };
+  }
+}
+
+// Social sign-in functions
+export async function signInWithProvider(provider: 'google' | 'facebook') {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin + '/Carvy/',
+      },
+    });
+    
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error: any) {
+    console.error(`${provider} sign-in error:`, error);
+    return { success: false, message: error.message || `Failed to sign in with ${provider}` };
+  }
+}

@@ -59,6 +59,20 @@ export default function MobileNav({ navigation, isCurrentPath, user, signOut }: 
             </Disclosure.Button>
             <Disclosure.Button
               as={Link}
+              to="/wishlist"
+              className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            >
+              {t('wishlist')}
+            </Disclosure.Button>
+            <Disclosure.Button
+              as={Link}
+              to="/saved-addresses"
+              className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+            >
+              {t('savedAddresses')}
+            </Disclosure.Button>
+            <Disclosure.Button
+              as={Link}
               to="/orders"
               className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
             >

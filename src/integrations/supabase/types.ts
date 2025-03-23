@@ -148,16 +148,19 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          shipping_cost: number
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          shipping_cost?: number
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          shipping_cost?: number
         }
         Relationships: []
       }
@@ -242,7 +245,7 @@ export type Database = {
           id: string
           order_id: string
           price: number
-          product_id: string
+          product_id: string | null
           product_name: string
           quantity: number
         }
@@ -251,7 +254,7 @@ export type Database = {
           id?: string
           order_id: string
           price: number
-          product_id: string
+          product_id?: string | null
           product_name: string
           quantity: number
         }
@@ -260,7 +263,7 @@ export type Database = {
           id?: string
           order_id?: string
           price?: number
-          product_id?: string
+          product_id?: string | null
           product_name?: string
           quantity?: number
         }

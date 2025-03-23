@@ -7,7 +7,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { CarIcon } from 'lucide-react'
 
 export default function SearchResults() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
@@ -34,9 +34,10 @@ export default function SearchResults() {
   }
 
   const hasResults = products.length > 0 || shops.length > 0 || carModels.length > 0;
+  const isRtl = language === 'ar';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
         {t('searchResults')} "{query}"
       </h1>

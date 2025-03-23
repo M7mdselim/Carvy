@@ -70,12 +70,13 @@ export interface Address {
 export interface City {
   id: string;
   name: string;
+  shipping_cost: number;
 }
 
 export interface Area {
   id: string;
-  name: string;
   city_id: string;
+  name: string;
 }
 
 // Update PaymentMethod type to include 'bank_transfer' and 'other'

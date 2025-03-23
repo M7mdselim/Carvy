@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { supabase, initializeAuth } from '../lib/supabase';
+import { supabase, initializeAuth, resetPassword, signInWithProvider } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
@@ -20,6 +20,8 @@ interface AuthState {
   initialize: () => Promise<void>;
   getUserProfile: () => { firstName: string; lastName: string; phoneNumber: string } | null;
   cleanup: () => void;
+  forgotPassword: (email: string) => Promise<{success: boolean; message: string}>;
+  signInWithSocial: (provider: 'google' | 'facebook') => Promise<void>;
 }
 
 export const useAuth = create<AuthState>((set, get) => ({
@@ -145,6 +147,30 @@ export const useAuth = create<AuthState>((set, get) => ({
       lastName: user.user_metadata.last_name || '',
       phoneNumber: user.user_metadata.phone_number || ''
     };
+  },
+  
+  forgotPassword: async (email: string) => {
+    const result = await resetPassword(email);
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+    }
+    return result;
+  },
+  
+  signInWithSocial: async (provider: 'google' | 'facebook') => {
+    try {
+      const result = await signInWithProvider(provider);
+      if (!result.success && result.message) {
+        toast.error(result.message);
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      console.error(`Sign in with ${provider} error:`, error);
+      toast.error(error.message || `Failed to sign in with ${provider}`);
+      throw error;
+    }
   },
   
   cleanup: () => {

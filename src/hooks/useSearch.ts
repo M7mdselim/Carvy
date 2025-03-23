@@ -51,7 +51,7 @@ export function useSearch(query: string): SearchResults {
       setResults(prev => ({ ...prev, loading: true, error: null }))
 
       try {
-        // Search products
+        // Search products - only search by name, not description
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
@@ -66,14 +66,14 @@ export function useSearch(query: string): SearchResults {
               )
             )
           `)
-          .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+          .ilike('name', `%${query}%`)
           .eq('status', 'active')
           .order('name')
           .limit(5)
 
         if (productsError) throw productsError
 
-        // Search shops
+        // Search shops - only by name, not description
         const { data: shopsData, error: shopsError } = await supabase
           .from('shops')
           .select(`
@@ -82,7 +82,7 @@ export function useSearch(query: string): SearchResults {
               categories (name)
             )
           `)
-          .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+          .ilike('name', `%${query}%`)
           .order('name')
           .limit(5)
 

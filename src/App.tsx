@@ -11,6 +11,8 @@ import ShopDetails from './pages/ShopDetails'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import SearchResults from './pages/SearchResults'
 import Contact from './pages/Contact'
 import Profile from './pages/Profile'
@@ -20,6 +22,9 @@ import ProductDetails from './pages/ProductDetails'
 import ModelProducts from './pages/ModelProducts'
 import Wishlist from './pages/Wishlist'
 import Checkout from './pages/Checkout'
+import SavedAddresses from './pages/SavedAddresses'
+import FAQ from './pages/FAQ'
+import TermsAndConditions from './pages/TermsAndConditions'
 import { LanguageProvider } from './contexts/LanguageContext'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -75,13 +80,18 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/orders" element={<Orders />} />
+              <Route path="/saved-addresses" element={<SavedAddresses />} />
             </Route>
             
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

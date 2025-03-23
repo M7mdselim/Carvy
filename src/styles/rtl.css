@@ -68,9 +68,13 @@
   margin-right: 1.5rem;
 }
 
-/* Flip icons for RTL */
-.rtl svg:not(.no-flip) {
-  transform: scaleX(-1);
+/* Prevent specific icons from flipping in RTL */
+.rtl svg.no-flip, 
+.rtl .auth-icon,
+.rtl .social-icon, 
+.rtl .brand-icon,
+.rtl .logo-icon {
+  transform: none !important;
 }
 
 /* Fix flexbox direction for RTL - but not for navbar */
@@ -127,8 +131,8 @@
 }
 
 /* Fix buttons with icons in RTL */
-.rtl button svg:not(.no-flip),
-.rtl a svg:not(.no-flip) {
+.rtl button svg:not(.no-flip, .auth-icon, .social-icon),
+.rtl a svg:not(.no-flip, .auth-icon, .social-icon) {
   margin-left: 0;
   margin-right: 0.5rem;
 }
@@ -163,4 +167,81 @@
 .rtl .mr-4 {
   margin-right: 0;
   margin-left: 1rem;
+}
+
+/* Product Details page specific RTL fixes */
+.rtl .product-details-container .product-image-nav {
+  flex-direction: row-reverse;
+}
+
+.rtl .product-details-container .product-prev-button {
+  right: 2px;
+  left: auto;
+  transform: scaleX(-1);
+}
+
+.rtl .product-details-container .product-next-button {
+  left: 2px;
+  right: auto;
+  transform: scaleX(-1);
+}
+
+.rtl .product-details-container .product-info {
+  text-align: right;
+}
+
+.rtl .product-details-actions {
+  flex-direction: row-reverse;
+}
+
+/* RTL fix for quantity buttons */
+.rtl .product-quantity-control {
+  flex-direction: row-reverse;
+}
+
+/* RTL specific fixes for password reset pages */
+.rtl .password-strength-meter {
+  direction: ltr;
+}
+
+.rtl .password-reset-container form {
+  text-align: right;
+}
+
+.rtl .password-reset-link {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.rtl .password-reset-link svg {
+  transform: scaleX(-1);
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* Authentication pages RTL styles */
+.rtl .auth-page {
+  text-align: right;
+}
+
+/* Prevent social login icons from flipping */
+.rtl .auth-social-btn svg {
+  transform: none !important;
+}
+
+/* Fix form inputs in RTL mode for auth pages */
+.rtl .auth-input-group {
+  direction: rtl;
+}
+
+.rtl .auth-input-icon {
+  right: 0.75rem;
+  left: auto;
+}
+
+.rtl .auth-input {
+  padding-right: 2.5rem !important;
+  padding-left: 0.75rem !important;
+  text-align: right;
 }

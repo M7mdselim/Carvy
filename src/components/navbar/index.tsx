@@ -1,5 +1,5 @@
 
-import { Navbar } from './Navbar';
+import { Navbar as NavbarComponent } from './Navbar';
 
-export default Navbar;
+export default NavbarComponent;
 export type { NavbarProps } from './types';

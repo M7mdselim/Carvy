@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../hooks/useAuth';
-import { CreditCard, Shield, Edit2, Save, Truck, CreditCard as CreditCardIcon } from 'lucide-react';
+import { CreditCard, Shield, Truck, CreditCard as CreditCardIcon } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
@@ -13,13 +12,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { CouponInput } from '../components/CouponInput';
 import { AddressForm } from '../components/checkout/AddressForm';
 import { Address } from '../types';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '../components/ui/select';
+import { formatCurrency } from '../lib/utils';
 
 export default function Checkout() {
   const { t, language } = useLanguage();
@@ -38,14 +31,13 @@ export default function Checkout() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [discount, setDiscount] = useState<{
     percentage?: number;
     amount?: number;
   }>({});
+  const [shippingCost, setShippingCost] = useState<number>(70.00);
 
-  // Credit card fields
   const [cardDetails, setCardDetails] = useState({
     cardNumber: '',
     expiryDate: '',
@@ -58,7 +50,7 @@ export default function Checkout() {
       return;
     }
 
-    if (user && userProfile && !profileLoaded && !isEditingPhone) {
+    if (user && userProfile && !profileLoaded) {
       setFormData(prev => ({
         ...prev,
         email: user.email || '',
@@ -68,7 +60,7 @@ export default function Checkout() {
       }));
       setProfileLoaded(true);
     }
-  }, [user, userProfile, navigate, profileLoaded, isEditingPhone]);
+  }, [user, userProfile, navigate, profileLoaded]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,24 +80,6 @@ export default function Checkout() {
     setSelectedAddress(address);
   };
 
-  const handleUpdatePhone = async () => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        data: { phone_number: formData.phone }
-      });
-
-      if (error) throw error;
-
-      toast.success(t('phoneUpdated'));
-      setIsEditingPhone(false);
-    } catch (error) {
-      console.error("Error updating phone number:", error);
-      toast.error(t('phoneUpdateError'));
-    }
-  };
-
   const handleApplyCoupon = (discountData: { percentage?: number, amount?: number }) => {
     setDiscount(discountData);
   };
@@ -120,7 +94,6 @@ export default function Checkout() {
   };
 
   const calculateFinalTotal = () => {
-    const shippingCost = 70.00;
     const discountAmount = calculateDiscountAmount();
     return total + shippingCost - discountAmount;
   };
@@ -149,6 +122,8 @@ export default function Checkout() {
 
       const discountAmount = calculateDiscountAmount();
       const totalWithShipping = calculateFinalTotal();
+      
+      const phoneToUse = formData.phone;
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -157,12 +132,13 @@ export default function Checkout() {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
-          phone: formData.phone,
+          phone: phoneToUse,
           address: `${selectedAddress.building} ${selectedAddress.street}, ${selectedAddress.district}, ${selectedAddress.city}`,
           city: selectedAddress.city,
           postal_code: selectedAddress.postal_code,
           total_amount: totalWithShipping,
           discount_amount: discountAmount,
+          shipping_cost: shippingCost,
           status: 'pending',
           payment_method: paymentMethod
         })
@@ -225,7 +201,7 @@ export default function Checkout() {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>{product.name}</h3>
-                            <p className="ml-4">{(product.price * quantity).toFixed(2)}</p>
+                            <p className="ml-4">{formatCurrency(product.price * quantity)}</p>
                           </div>
                         </div>
                         <div className="flex flex-1 items-end justify-between text-sm">
@@ -244,7 +220,7 @@ export default function Checkout() {
                 
                 <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                   <div className="text-base font-medium text-gray-900">{t('subtotal')}</div>
-                  <div className="text-base font-medium text-gray-900">{total.toFixed(2)}</div>
+                  <div className="text-base font-medium text-gray-900">{formatCurrency(total)}</div>
                 </div>
                 
                 {(discount.percentage || discount.amount) && (
@@ -252,19 +228,19 @@ export default function Checkout() {
                     <div className="text-base font-medium">
                       {t('discount')} {discount.percentage ? `(${discount.percentage}%)` : ''}
                     </div>
-                    <div className="text-base font-medium">-{calculateDiscountAmount().toFixed(2)}</div>
+                    <div className="text-base font-medium">-{formatCurrency(calculateDiscountAmount())}</div>
                   </div>
                 )}
                 
                 <div className="flex items-center justify-between">
                   <div className="text-base font-medium text-gray-900">{t('shipping')}</div>
-                  <div className="text-base font-medium text-gray-900">70.00</div>
+                  <div className="text-base font-medium text-gray-900">{formatCurrency(shippingCost)}</div>
                 </div>
                 
                 <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                   <div className="text-lg font-semibold text-gray-900">{t('total')}</div>
                   <div className="text-lg font-semibold text-gray-900">
-                    {calculateFinalTotal().toFixed(2)} EGP
+                    {formatCurrency(calculateFinalTotal())}
                   </div>
                 </div>
               </div>
@@ -287,75 +263,75 @@ export default function Checkout() {
           <div className="lg:col-span-3">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="bg-white p-8 rounded-lg shadow">
-                <h2 className="text-2xl font-semibold mb-6">{t('contactInformation')}</h2>
-                <div className="space-y-4">
+                <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('contactInformation')}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                   <div>
-                    <Label htmlFor="email">{t('emailAddress')}</Label>
+                    <Label htmlFor="firstName" className="text-gray-700 font-medium block mb-1.5">{t('firstName')}</Label>
+                    <Input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      className="w-full"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName" className="text-gray-700 font-medium block mb-1.5">{t('lastName')}</Label>
+                    <Input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      className="w-full"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email" className="text-gray-700 font-medium block mb-1.5">{t('emailAddress')}</Label>
                     <Input
                       type="email"
                       id="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="mt-1"
+                      className="w-full"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">{t('phoneNumber')}</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        placeholder="0100000000"
-                        value={formData.phone}
-                        onChange={(e) => {
-                          if (!isEditingPhone) {
-                            setIsEditingPhone(true);
-                          }
-                          handleInputChange(e);
-                        }}
-                        className={isEditingPhone ? "border-indigo-300 ring-1 ring-indigo-500" : ""}
-                        required
-                      />
-                      {isEditingPhone ? (
-                        <Button 
-                          type="button"
-                          onClick={handleUpdatePhone}
-                          variant="outline"
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          {t('save')}
-                        </Button>
-                      ) : (
-                        <Button 
-                          type="button"
-                          onClick={() => setIsEditingPhone(true)}
-                          variant="outline"
-                        >
-                          <Edit2 className="h-4 w-4 mr-2" />
-                          {t('edit')}
-                        </Button>
-                      )}
-                    </div>
+                    <Label htmlFor="phone" className="text-gray-700 font-medium block mb-1.5">{t('phoneNumber')}</Label>
+                    <Input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      placeholder="0100000000"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full"
+                      required
+                    />
                   </div>
                 </div>
               </div>
               
               {/* Shipping Information - using AddressForm component */}
               <div className="bg-white p-8 rounded-lg shadow">
-                <h2 className="text-2xl font-semibold mb-6">{t('shippingInformation')}</h2>
+                <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('shippingInformation')}</h2>
                 <AddressForm 
                   onAddressSelect={handleAddressSelect}
                   selectedAddress={selectedAddress}
+                  hidePhoneField={true}
+                  onShippingCostChange={setShippingCost}
                 />
               </div>
 
               {/* Payment Method Selection */}
               <div className="bg-white p-8 rounded-lg shadow">
-                <h2 className="text-2xl font-semibold mb-6">{t('paymentMethod')}</h2>
-                <div className="space-y-4">
+                <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('paymentMethod')}</h2>
+                <div className="space-y-4 mt-4">
                   <div 
                     className={`flex items-center space-x-3 border p-4 rounded-md hover:bg-gray-50 cursor-pointer ${paymentMethod === 'credit_card' ? 'border-indigo-500 bg-indigo-50' : ''}`}
                     onClick={() => setPaymentMethod('credit_card')}
@@ -399,23 +375,23 @@ export default function Checkout() {
               {/* Conditional Payment Information Section */}
               {paymentMethod === 'credit_card' && (
                 <div className="bg-white p-8 rounded-lg shadow">
-                  <h2 className="text-2xl font-semibold mb-6">{t('paymentInformation')}</h2>
-                  <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('paymentInformation')}</h2>
+                  <div className="space-y-6 mt-4">
                     <div>
-                      <Label htmlFor="cardNumber">{t('cardNumber')}</Label>
+                      <Label htmlFor="cardNumber" className="text-gray-700 font-medium block mb-1.5">{t('cardNumber')}</Label>
                       <Input
                         type="text"
                         id="cardNumber"
                         name="cardNumber"
                         value={cardDetails.cardNumber}
                         onChange={handleCardDetailsChange}
-                        className="mt-1"
+                        className="w-full"
                         required={paymentMethod === 'credit_card'}
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="expiryDate">{t('expiryDate')}</Label>
+                        <Label htmlFor="expiryDate" className="text-gray-700 font-medium block mb-1.5">{t('expiryDate')}</Label>
                         <Input
                           type="text"
                           id="expiryDate"
@@ -423,19 +399,19 @@ export default function Checkout() {
                           placeholder="MM/YY"
                           value={cardDetails.expiryDate}
                           onChange={handleCardDetailsChange}
-                          className="mt-1"
+                          className="w-full"
                           required={paymentMethod === 'credit_card'}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cvv">CVV</Label>
+                        <Label htmlFor="cvv" className="text-gray-700 font-medium block mb-1.5">CVV</Label>
                         <Input
                           type="text"
                           id="cvv"
                           name="cvv"
                           value={cardDetails.cvv}
                           onChange={handleCardDetailsChange}
-                          className="mt-1"
+                          className="w-full"
                           required={paymentMethod === 'credit_card'}
                         />
                       </div>
