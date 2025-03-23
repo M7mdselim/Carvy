@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     <script>
-        var pathname = window.location.pathname;
-        if (pathname.startsWith("/Carvy")) {
-            window.location.replace("/Carvy/#" + pathname.replace("/Carvy", ""));
-        } else {
-            window.location.replace("/Carvy/#/");
-        }
+        var path = window.location.pathname;
+        var newPath = "/Carvy/#" + path.replace("/Carvy", "");
+        window.location.replace(newPath);
     </script>
 </head>
 <body>
