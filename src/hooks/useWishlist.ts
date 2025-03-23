@@ -28,7 +28,10 @@ export function useWishlist() {
         .select('product_id')
         .eq('user_id', user.id);
 
-      if (wishlistError) throw wishlistError;
+      if (wishlistError) {
+        console.error('Error fetching wishlist data:', wishlistError);
+        throw wishlistError;
+      }
       
       if (!wishlistData || wishlistData.length === 0) {
         setWishlistItems([]);
@@ -56,7 +59,10 @@ export function useWishlist() {
         `)
         .in('id', productIds);
 
-      if (productsError) throw productsError;
+      if (productsError) {
+        console.error('Error fetching product data:', productsError);
+        throw productsError;
+      }
 
       if (!productsData) {
         setWishlistItems([]);
@@ -80,7 +86,8 @@ export function useWishlist() {
         setWishlistItems(formattedProducts);
       }
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to fetch wishlist'));
+      const errorMessage = e instanceof Error ? e.message : 'Failed to fetch wishlist';
+      setError(e instanceof Error ? e : new Error(errorMessage));
       console.error('Error fetching wishlist:', e);
     } finally {
       setLoading(false);
@@ -96,7 +103,7 @@ export function useWishlist() {
     }
   }, [user, fetchWishlist]);
 
-  async function addToWishlist(productId: string) {
+  const addToWishlist = async (productId: string) => {
     if (!user) {
       toast.error('Please log in to add items to your wishlist');
       return false;
@@ -123,9 +130,9 @@ export function useWishlist() {
       toast.error('Failed to add to wishlist');
       return false;
     }
-  }
+  };
 
-  async function removeFromWishlist(productId: string) {
+  const removeFromWishlist = async (productId: string) => {
     if (!user) return false;
 
     try {
@@ -145,9 +152,9 @@ export function useWishlist() {
       toast.error('Failed to remove from wishlist');
       return false;
     }
-  }
+  };
 
-  async function isInWishlist(productId: string): Promise<boolean> {
+  const isInWishlist = async (productId: string): Promise<boolean> => {
     if (!user) return false;
 
     try {
@@ -156,7 +163,7 @@ export function useWishlist() {
         .select('*')
         .eq('user_id', user.id)
         .eq('product_id', productId)
-        .maybeSingle();
+        .maybeSingle(); // Using maybeSingle instead of single to prevent errors
 
       if (error) throw error;
 
@@ -165,7 +172,7 @@ export function useWishlist() {
       console.error('Error checking wishlist:', e);
       return false;
     }
-  }
+  };
 
   return {
     wishlistItems,

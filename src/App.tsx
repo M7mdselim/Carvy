@@ -21,12 +21,11 @@ import ModelProducts from './pages/ModelProducts'
 import Wishlist from './pages/Wishlist'
 import Checkout from './pages/Checkout'
 import { LanguageProvider } from './contexts/LanguageContext'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
-import { useAuth as useZustandAuth } from './hooks/useAuth'
+import { useAuth } from './hooks/useAuth'
+import { Toaster } from 'sonner'
 
-// ScrollToTop component to handle scrolling to top on route changes
 function ScrollToTop() {
   const { pathname } = useLocation();
   
@@ -37,7 +36,6 @@ function ScrollToTop() {
   return null;
 }
 
-// RedirectAfterLogin component to handle redirecting users after login
 function RedirectAfterLogin() {
   const { user } = useAuth();
   const redirectPath = sessionStorage.getItem("redirectAfterLogin");
@@ -52,61 +50,43 @@ function RedirectAfterLogin() {
   return null;
 }
 
-// Initialize auth at the app level
-function AuthInitializer() {
-  const { initialize, cleanup } = useZustandAuth();
-  
-  useEffect(() => {
-    initialize();
-    return () => {
-      if (cleanup) cleanup();
-    };
-  }, [initialize, cleanup]);
-  
-  return null;
-}
-
 function App() {
   return (
     <LanguageProvider>
       <Router basename="/Carvy/">
-        <AuthProvider>
-          <AuthInitializer />
-          <div className="min-h-screen flex flex-col bg-gray-50">
-            <Navbar />
-            <ScrollToTop />
-            <RedirectAfterLogin />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/categories/:categoryId" element={<CategoryShops />} />
-              <Route path="/shops" element={<Shops />} />
-              <Route path="/shops/:shopId" element={<ShopDetails />} />
-              
-              {/* Products */}
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:productId" element={<ProductDetails />} />
-              <Route path="/models/:modelId" element={<ModelProducts />} />
-              
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/orders" element={<Orders />} />
-              </Route>
-              
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-          </div>
-        </AuthProvider>
+        <div className="min-h-screen flex flex-col bg-gray-50">
+          <Navbar />
+          <ScrollToTop />
+          <RedirectAfterLogin />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/:categoryId" element={<CategoryShops />} />
+            <Route path="/shops" element={<Shops />} />
+            <Route path="/shops/:shopId" element={<ShopDetails />} />
+            
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:productId" element={<ProductDetails />} />
+            <Route path="/models/:modelId" element={<ModelProducts />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/orders" element={<Orders />} />
+            </Route>
+            
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Footer />
+          <Toaster position="top-right" richColors />
+        </div>
       </Router>
     </LanguageProvider>
   )

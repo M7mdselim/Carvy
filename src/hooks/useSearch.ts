@@ -1,10 +1,12 @@
+
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Product, Shop } from '../types'
+import type { Product, Shop, CarModel } from '../types'
 
 interface SearchResults {
   products: Product[]
   shops: Shop[]
+  carModels: CarModel[]
   loading: boolean
   error: Error | null
 }
@@ -28,6 +30,7 @@ export function useSearch(query: string): SearchResults {
   const [results, setResults] = useState<SearchResults>({
     products: [],
     shops: [],
+    carModels: [],
     loading: false,
     error: null,
   })
@@ -38,6 +41,7 @@ export function useSearch(query: string): SearchResults {
         setResults({
           products: [],
           shops: [],
+          carModels: [],
           loading: false,
           error: null,
         })
@@ -84,6 +88,17 @@ export function useSearch(query: string): SearchResults {
 
         if (shopsError) throw shopsError
 
+        // Search car models
+        const { data: carModelsData, error: carModelsError } = await supabase
+          .from('car_models')
+          .select('*')
+          .or(`make.ilike.%${query}%,model.ilike.%${query}%`)
+          .order('make', { ascending: true })
+          .order('model', { ascending: true })
+          .limit(5)
+        
+        if (carModelsError) throw carModelsError
+
         setResults({
           products: productsData.map(product => ({
             id: product.id,
@@ -109,6 +124,13 @@ export function useSearch(query: string): SearchResults {
               .filter((name: string | null | undefined): name is string => !!name) || [],
             rating: shop.rating || 0,
             reviewCount: shop.review_count || 0,
+          })),
+          carModels: carModelsData.map(carModel => ({
+            id: carModel.id,
+            make: carModel.make,
+            model: carModel.model,
+            yearStart: carModel.year_start,
+            yearEnd: carModel.year_end || undefined,
           })),
           loading: false,
           error: null,

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -10,6 +11,8 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { useLanguage } from '../contexts/LanguageContext';
 import { CouponInput } from '../components/CouponInput';
+import { AddressForm } from '../components/checkout/AddressForm';
+import { Address } from '../types';
 import { 
   Select,
   SelectContent,
@@ -29,16 +32,10 @@ export default function Checkout() {
     email: '',
     phone: '',
     firstName: '',
-    lastName: '',
-    address: '',
-    city: '',
-    country: '',
-    postalCode: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: ''
+    lastName: ''
   });
 
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -47,6 +44,13 @@ export default function Checkout() {
     percentage?: number;
     amount?: number;
   }>({});
+
+  // Credit card fields
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
+  });
 
   useEffect(() => {
     if (!user) {
@@ -71,12 +75,17 @@ export default function Checkout() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCardDetailsChange = (e) => {
+    const { name, value } = e.target;
+    setCardDetails(prev => ({ ...prev, [name]: value }));
+  };
+
   const handlePaymentMethodChange = (value) => {
     setPaymentMethod(value);
   };
 
-  const handleCityChange = (value: string) => {
-    setFormData(prev => ({ ...prev, city: value }));
+  const handleAddressSelect = (address: Address) => {
+    setSelectedAddress(address);
   };
 
   const handleUpdatePhone = async () => {
@@ -130,6 +139,11 @@ export default function Checkout() {
       return;
     }
 
+    if (!selectedAddress) {
+      toast.error(t('pleaseSelectAddress'));
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -144,9 +158,9 @@ export default function Checkout() {
           last_name: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          postal_code: formData.postalCode,
+          address: `${selectedAddress.building} ${selectedAddress.street}, ${selectedAddress.district}, ${selectedAddress.city}`,
+          city: selectedAddress.city,
+          postal_code: selectedAddress.postal_code,
           total_amount: totalWithShipping,
           discount_amount: discountAmount,
           status: 'pending',
@@ -329,72 +343,13 @@ export default function Checkout() {
                 </div>
               </div>
               
+              {/* Shipping Information - using AddressForm component */}
               <div className="bg-white p-8 rounded-lg shadow">
                 <h2 className="text-2xl font-semibold mb-6">{t('shippingInformation')}</h2>
-                <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="firstName">{t('firstName')}</Label>
-                    <Input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">{t('lastName')}</Label>
-                    <Input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Label htmlFor="address">{t('address')}</Label>
-                    <Input
-                      type="text"
-                      id="address"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">{t('city')}</Label>
-                    <Select 
-                      value={formData.city} 
-                      onValueChange={handleCityChange}
-                    >
-                      <SelectTrigger className="w-full mt-1">
-                        <SelectValue placeholder={t('selectCity')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cairo">{t('cairo')}</SelectItem>
-                        <SelectItem value="giza">{t('giza')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="postalCode">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
-                    <Input
-                      type="text"
-                      id="postalCode"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
+                <AddressForm 
+                  onAddressSelect={handleAddressSelect}
+                  selectedAddress={selectedAddress}
+                />
               </div>
 
               {/* Payment Method Selection */}
@@ -452,8 +407,8 @@ export default function Checkout() {
                         type="text"
                         id="cardNumber"
                         name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleInputChange}
+                        value={cardDetails.cardNumber}
+                        onChange={handleCardDetailsChange}
                         className="mt-1"
                         required={paymentMethod === 'credit_card'}
                       />
@@ -466,8 +421,8 @@ export default function Checkout() {
                           id="expiryDate"
                           name="expiryDate"
                           placeholder="MM/YY"
-                          value={formData.expiryDate}
-                          onChange={handleInputChange}
+                          value={cardDetails.expiryDate}
+                          onChange={handleCardDetailsChange}
                           className="mt-1"
                           required={paymentMethod === 'credit_card'}
                         />
@@ -478,8 +433,8 @@ export default function Checkout() {
                           type="text"
                           id="cvv"
                           name="cvv"
-                          value={formData.cvv}
-                          onChange={handleInputChange}
+                          value={cardDetails.cvv}
+                          onChange={handleCardDetailsChange}
                           className="mt-1"
                           required={paymentMethod === 'credit_card'}
                         />
@@ -491,7 +446,7 @@ export default function Checkout() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !selectedAddress}
                 className="w-full py-6 rounded-lg mt-6 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 shadow-lg hover:shadow-xl"
                 size="lg"
               >

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlassIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
+import { CarIcon } from 'lucide-react'
 import CategoryCard from '../components/CategoryCard'
 import ShopCard from '../components/ShopCard'
 import ProductCard from '../components/ProductCard'
@@ -17,17 +18,17 @@ export default function Home() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const { products: searchProducts, shops: searchShops, loading: searchLoading } = useSearch(searchQuery);
+  const { products: searchProducts, shops: searchShops, carModels: searchCarModels, loading: searchLoading } = useSearch(searchQuery);
   const { categories, loading: loadingCategories } = useCategories();
   const { shops, loading: loadingShops } = useShops();
   const { products, loading: loadingProducts } = useProducts();
   
-  // Added states for product filtering and pagination
+  // States for product filtering and pagination
   const [productFilter, setProductFilter] = useState('');
   const [currentProductPage, setCurrentProductPage] = useState(1);
   const productsPerPage = 6;
   
-  // Added states for shop filtering and pagination
+  // States for shop filtering and pagination
   const [shopFilter, setShopFilter] = useState('');
   const [currentShopPage, setCurrentShopPage] = useState(1);
   const shopsPerPage = 6;
@@ -37,6 +38,10 @@ export default function Home() {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+  
+  const handleCarModelClick = (make: string, model: string) => {
+    navigate(`/products?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`);
   };
   
   // Filter and paginate products
@@ -105,6 +110,30 @@ export default function Home() {
                   <div className="p-4 text-center text-gray-500">{t('searching')}</div>
                 ) : (
                   <>
+                    {searchCarModels.length > 0 && (
+                      <div className="border-b">
+                        <div className="p-2 bg-gray-50 text-sm font-medium text-gray-700">
+                          {t('carModels')}
+                        </div>
+                        {searchCarModels.slice(0, 3).map(carModel => (
+                          <div
+                            key={carModel.id}
+                            className="p-4 hover:bg-gray-50 cursor-pointer flex items-center"
+                            onClick={() => handleCarModelClick(carModel.make, carModel.model)}
+                          >
+                            <div className="mr-3 rounded-full p-2 bg-indigo-100">
+                              <CarIcon className="h-4 w-4 text-indigo-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">{carModel.make} {carModel.model}</div>
+                              <div className="text-sm text-gray-500">
+                                {carModel.yearStart}{carModel.yearEnd ? ` - ${carModel.yearEnd}` : '+'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     {searchShops.length > 0 && (
                       <div className="border-b">
                         <div className="p-2 bg-gray-50 text-sm font-medium text-gray-700">
@@ -139,7 +168,7 @@ export default function Home() {
                         ))}
                       </div>
                     )}
-                    {searchQuery && (searchProducts.length > 3 || searchShops.length > 3) && (
+                    {searchQuery && (searchProducts.length > 3 || searchShops.length > 3 || searchCarModels.length > 3) && (
                       <button
                         onClick={handleSearch}
                         className="w-full p-3 text-center text-sm text-indigo-600 hover:bg-gray-50"
@@ -147,7 +176,7 @@ export default function Home() {
                         {t('viewAllResults')}
                       </button>
                     )}
-                    {searchQuery && !searchProducts.length && !searchShops.length && (
+                    {searchQuery && !searchProducts.length && !searchShops.length && !searchCarModels.length && (
                       <div className="p-4 text-center text-gray-500">
                         {t('noResults')} "{searchQuery}"
                       </div>

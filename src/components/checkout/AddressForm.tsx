@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
@@ -6,12 +5,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { MapPin, MapIcon, Navigation } from 'lucide-react';
+import { MapPin, MapIcon, Navigation, Home, Building, Layers, DoorOpen, Map } from 'lucide-react';
 import { Address, City, Area } from '../../types';
 import { GoogleMap } from './GoogleMap';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 import { Card, CardContent } from '../ui/card';
 import { Textarea } from '../ui/textarea';
+import { toast } from 'sonner';
 
 interface AddressFormProps {
   onAddressSelect: (address: Address) => void;
@@ -48,7 +48,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
   const [savingAddress, setSavingAddress] = useState(false);
   const [additionalDetails, setAdditionalDetails] = useState('');
 
-  // Fetch user's addresses
   useEffect(() => {
     async function fetchAddresses() {
       if (!user) return;
@@ -66,7 +65,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
         
         setAddresses(data || []);
         
-        // Pre-select the default address if available and no address was previously selected
         if (data && data.length > 0 && !selectedAddress) {
           const defaultAddress = data.find(addr => addr.is_default) || data[0];
           setSelectedId(defaultAddress.id);
@@ -83,7 +81,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     
     async function fetchCitiesAndAreas() {
       try {
-        // Fetch cities
         const { data: citiesData, error: citiesError } = await supabase
           .from('cities')
           .select('*')
@@ -92,7 +89,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
         if (citiesError) throw citiesError;
         setCities(citiesData || []);
         
-        // Fetch all areas
         const { data: areasData, error: areasError } = await supabase
           .from('areas')
           .select('*')
@@ -109,7 +105,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     fetchCitiesAndAreas();
   }, [user, selectedAddress]);
 
-  // Filter areas based on selected city
   useEffect(() => {
     if (newAddress.city) {
       const selectedCity = cities.find(city => city.name === newAddress.city);
@@ -144,7 +139,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
     setSavingAddress(true);
     
     try {
-      // Validate required fields
       const requiredFields = ['recipient_name', 'phone', 'street', 'building', 'district', 'city'];
       const missingFields = requiredFields.filter(field => !newAddress[field as keyof Address]);
       
@@ -152,7 +146,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
         throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
       }
       
-      // Include location data if available
       const locationData = location ? {
         latitude: location.lat,
         longitude: location.lng
@@ -173,7 +166,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
             area: newAddress.area || '',
             postal_code: newAddress.postal_code || '',
             phone: newAddress.phone,
-            is_default: addresses.length === 0, // Make default if it's the first address
+            is_default: addresses.length === 0,
             ...locationData
           }
         ])
@@ -185,8 +178,8 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
       setAddresses([...addresses, data]);
       setSelectedId(data.id);
       onAddressSelect(data);
+      toast.success(t('addressSaved'));
       
-      // Reset form
       setNewAddress({
         recipient_name: '',
         street: '',
@@ -204,7 +197,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
       setShowMap(false);
     } catch (error) {
       console.error('Error saving address:', error);
-      alert(error instanceof Error ? error.message : 'Error saving address');
+      toast.error(error instanceof Error ? error.message : 'Error saving address');
     } finally {
       setSavingAddress(false);
     }
@@ -212,6 +205,35 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
 
   const handleLocationSelect = (lat: number, lng: number) => {
     setLocation({ lat, lng });
+    toast.success(t('locationSelected'));
+  };
+
+  const handleSetDefaultAddress = async (addressId: string) => {
+    if (!user) return;
+    
+    try {
+      await supabase
+        .from('addresses')
+        .update({ is_default: false })
+        .eq('user_id', user.id);
+      
+      const { error } = await supabase
+        .from('addresses')
+        .update({ is_default: true })
+        .eq('id', addressId);
+      
+      if (error) throw error;
+      
+      setAddresses(addresses.map(addr => ({
+        ...addr,
+        is_default: addr.id === addressId
+      })));
+      
+      toast.success(t('defaultAddressUpdated'));
+    } catch (error) {
+      console.error('Error setting default address:', error);
+      toast.error(t('defaultAddressError'));
+    }
   };
 
   if (loading) {
@@ -220,7 +242,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
 
   return (
     <div className={`space-y-6 ${isRtl ? 'rtl' : 'ltr'}`}>
-      {/* Existing addresses */}
       {addresses.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-medium">{t('savedAddresses')}</h3>
@@ -234,26 +255,64 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                 `}
                 onClick={() => handleSelectAddress(address.id)}
               >
-                <div className="flex justify-between">
-                  <div className="font-medium">{address.recipient_name}</div>
-                  {address.is_default && (
-                    <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
-                      {t('default')}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      checked={selectedId === address.id}
+                      onChange={() => handleSelectAddress(address.id)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <div className="font-medium">{address.recipient_name}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {address.is_default && (
+                      <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                        {t('default')}
+                      </span>
+                    )}
+                    {!address.is_default && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs text-indigo-600 hover:text-indigo-800"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSetDefaultAddress(address.id);
+                        }}
+                      >
+                        {t('setAsDefault')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3 text-sm text-gray-600">
+                  <div className="flex items-start gap-2">
+                    <Home className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
+                    <span>
+                      {address.building} {address.street}, {address.district}, {address.city}
+                      {address.area && `, ${address.area}`}
                     </span>
-                  )}
+                  </div>
+                  
+                  <div className="flex items-start gap-2">
+                    <Building className="h-4 w-4 mt-0.5 text-gray-400 flex-shrink-0" />
+                    <span>
+                      {address.floor && `${t('floor')}: ${address.floor}`}
+                      {address.apartment && `, ${t('apartment')}: ${address.apartment}`}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {address.building} {address.street}, {address.district}, {address.city}
-                  {address.area && `, ${address.area}`}
+                
+                <div className="flex items-center mt-2 text-sm text-gray-600">
+                  <MapPin className="h-4 w-4 mr-1 text-gray-400" />
+                  <span>{address.phone}</span>
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {address.floor && `${t('floor')}: ${address.floor}, `}
-                  {address.apartment && `${t('apartment')}: ${address.apartment}`}
-                </div>
-                <div className="text-sm text-gray-600 mt-1">{address.phone}</div>
+                
                 {address.latitude && address.longitude && (
                   <div className="flex items-center mt-2 text-xs text-green-600">
-                    <MapPin className="h-3 w-3 mr-1" />
+                    <Map className="h-3 w-3 mr-1" />
                     {t('locationSaved')}
                   </div>
                 )}
@@ -263,14 +322,13 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
         </div>
       )}
       
-      {/* Add new address form */}
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium mb-4">{t('addNewAddress')}</h3>
         
         <Card className="bg-gray-50 border-gray-200">
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="recipient_name">{t('recipientName')} *</Label>
                 <Input
                   id="recipient_name"
@@ -278,10 +336,11 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('recipient_name', e.target.value)}
                   placeholder={t('fullName')}
                   className="bg-white"
+                  icon={<span className="text-gray-400">👤</span>}
                 />
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="phone">{t('phoneNumber')} *</Label>
                 <Input
                   id="phone"
@@ -289,10 +348,11 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('phone', e.target.value)}
                   placeholder="01XXXXXXXXX"
                   className="bg-white"
+                  icon={<span className="text-gray-400">📞</span>}
                 />
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="street">{t('streetName')} *</Label>
                 <Input
                   id="street"
@@ -300,6 +360,19 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('street', e.target.value)}
                   placeholder={t('streetNamePlaceholder')}
                   className="bg-white"
+                  icon={<Home className="h-4 w-4 text-gray-400" />}
+                />
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="district">{t('district')} *</Label>
+                <Input
+                  id="district"
+                  value={newAddress.district}
+                  onChange={(e) => handleNewAddressChange('district', e.target.value)}
+                  placeholder={t('districtPlaceholder')}
+                  className="bg-white"
+                  icon={<MapPin className="h-4 w-4 text-gray-400" />}
                 />
               </div>
               
@@ -311,6 +384,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('building', e.target.value)}
                   placeholder={t('buildingNumberPlaceholder')}
                   className="bg-white"
+                  icon={<Building className="h-4 w-4 text-gray-400" />}
                 />
               </div>
               
@@ -322,6 +396,7 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('floor', e.target.value)}
                   placeholder={t('floorNumberPlaceholder')}
                   className="bg-white"
+                  icon={<Layers className="h-4 w-4 text-gray-400" />}
                 />
               </div>
               
@@ -333,16 +408,17 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   onChange={(e) => handleNewAddressChange('apartment', e.target.value)}
                   placeholder={t('apartmentNumberPlaceholder')}
                   className="bg-white"
+                  icon={<DoorOpen className="h-4 w-4 text-gray-400" />}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="district">{t('district')} *</Label>
+                <Label htmlFor="postal_code">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
                 <Input
-                  id="district"
-                  value={newAddress.district}
-                  onChange={(e) => handleNewAddressChange('district', e.target.value)}
-                  placeholder={t('districtPlaceholder')}
+                  id="postal_code"
+                  value={newAddress.postal_code}
+                  onChange={(e) => handleNewAddressChange('postal_code', e.target.value)}
+                  placeholder={t('postalCodePlaceholder')}
                   className="bg-white"
                 />
               </div>
@@ -385,17 +461,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="postal_code">{t('postalCode')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
-                <Input
-                  id="postal_code"
-                  value={newAddress.postal_code}
-                  onChange={(e) => handleNewAddressChange('postal_code', e.target.value)}
-                  placeholder={t('postalCodePlaceholder')}
-                  className="bg-white"
-                />
-              </div>
 
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="additional_details">{t('additionalDetails')} <span className="text-gray-400 text-xs">{t('optional')}</span></Label>
@@ -412,7 +477,6 @@ export function AddressForm({ onAddressSelect, selectedAddress }: AddressFormPro
           </CardContent>
         </Card>
         
-        {/* Map location picker */}
         <div className="mt-6">
           <Button
             type="button"

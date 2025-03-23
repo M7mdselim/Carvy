@@ -1,7 +1,8 @@
 
-import { create } from 'zustand'
-import { supabase } from '../integrations/supabase/client'
-import type { User, Session } from '@supabase/supabase-js'
+import { create } from 'zustand';
+import { supabase, initializeAuth } from '../lib/supabase';
+import type { User, Session } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 interface AuthState {
   user: User | null;
@@ -18,68 +19,139 @@ interface AuthState {
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   getUserProfile: () => { firstName: string; lastName: string; phoneNumber: string } | null;
-  cleanup?: () => void;
+  cleanup: () => void;
 }
 
 export const useAuth = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   loading: true,
+  
   signIn: async (email: string, password: string) => {
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    if (error) throw error
-    set({ user: data.user, session: data.session })
+    try {
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      set({ 
+        user: data.user, 
+        session: data.session 
+      });
+      
+      console.log("Sign in successful:", data.user?.id);
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      toast.error(error.message || 'Failed to sign in');
+      throw error;
+    }
   },
+  
   signUp: async (email: string, password: string, options = {}) => {
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: options.data
-      }
-    })
-    if (error) throw error
-    set({ user: data.user, session: data.session })
+    try {
+      const { error, data } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: options.data
+        }
+      });
+      
+      if (error) throw error;
+      
+      set({ 
+        user: data.user, 
+        session: data.session 
+      });
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      toast.error(error.message || 'Failed to sign up');
+      throw error;
+    }
   },
+  
   signOut: async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    set({ user: null, session: null })
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) throw error;
+      
+      set({ 
+        user: null, 
+        session: null 
+      });
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      toast.error(error.message || 'Failed to sign out');
+      throw error;
+    }
   },
+  
   initialize: async () => {
     try {
-      // First, check for existing session
-      const { data: { session } } = await supabase.auth.getSession()
-      set({ user: session?.user || null, session })
+      set({ loading: true });
+      
+      // Use the centralized initialization function with retry mechanism
+      const session = await initializeAuth();
+      
+      // If we have a session, set the user and session
+      if (session) {
+        console.log("Session found during initialization:", session.user.id);
+        set({ 
+          user: session.user, 
+          session: session 
+        });
+      } else {
+        console.log("No session found during initialization");
+        set({ 
+          user: null, 
+          session: null 
+        });
+      }
       
       // Then set up the auth state listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (_, session) => {
-          set({ user: session?.user || null, session })
+        (event, session) => {
+          console.log("Auth state changed:", event, session?.user?.id);
+          set({ 
+            user: session?.user || null, 
+            session: session 
+          });
         }
-      )
-  
+      );
+      
       // Store the cleanup function
-      set({ 
-        cleanup: () => subscription.unsubscribe(), 
-        loading: false 
-      })
+      set({
+        cleanup: () => {
+          subscription.unsubscribe();
+        },
+        loading: false
+      });
     } catch (error) {
-      console.error('Error initializing auth:', error)
-      set({ loading: false })
+      console.error('Error initializing auth:', error);
+      toast.error('Error initializing authentication. Some features might not work correctly.');
+      set({ loading: false });
     }
   },
+  
   getUserProfile: () => {
-    const user = get().user
-    if (!user?.user_metadata) return null
+    const user = get().user;
+    if (!user?.user_metadata) return null;
 
     return {
       firstName: user.user_metadata.first_name || '',
       lastName: user.user_metadata.last_name || '',
       phoneNumber: user.user_metadata.phone_number || ''
-    }
+    };
+  },
+  
+  cleanup: () => {
+    // This will be replaced with the actual cleanup function when initialize() is called
+    console.log("Default cleanup function called before initialization");
   }
-}))
+}));
+
+// Initialize authentication state when the hook is first imported
+useAuth.getState().initialize();

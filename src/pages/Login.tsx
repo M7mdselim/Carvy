@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -9,11 +9,20 @@ import { toast } from 'sonner'
 export default function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin") || "/";
+      sessionStorage.removeItem("redirectAfterLogin");
+      navigate(redirectPath);
+    }
+  }, [user, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +32,7 @@ export default function Login() {
     try {
       await signIn(email, password);
       toast.success(t('loginSuccess'));
-      navigate('/');
+      // Navigation happens in the useEffect above when user state changes
     } catch (err) {
       console.error("Login error:", err);
       setError(err instanceof Error ? err.message : 'Failed to sign in');

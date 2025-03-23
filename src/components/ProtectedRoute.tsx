@@ -1,6 +1,6 @@
 
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function ProtectedRoute({ 
   requireAdmin = false,
@@ -9,9 +9,9 @@ export default function ProtectedRoute({
   requireAdmin?: boolean,
   requireOwner?: boolean 
 }) {
-  const { user, isAdmin, isOwner, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
@@ -25,14 +25,6 @@ export default function ProtectedRoute({
     sessionStorage.setItem("redirectAfterLogin", currentPath);
     
     return <Navigate to="/login" replace />;
-  }
-
-  if (requireAdmin && !isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (requireOwner && !isOwner && !isAdmin) {
-    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
