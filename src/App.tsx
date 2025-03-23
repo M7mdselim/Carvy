@@ -1,6 +1,5 @@
-
 import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -58,7 +57,7 @@ function RedirectAfterLogin() {
 function App() {
   return (
     <LanguageProvider>
-      <Router basename="/Carvy/">
+      <Router basename="/Carvy/"> {/* ✅ Keeping Basename & Using HashRouter */}
         <div className="min-h-screen flex flex-col bg-gray-50">
           <Navbar />
           <ScrollToTop />
