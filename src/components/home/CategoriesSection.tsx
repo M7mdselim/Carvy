@@ -40,28 +40,29 @@ const CategoriesSection = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">{t('browseModels')}</h2>
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder={t('searchCategories')}
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="pl-10 pr-4 py-2"
-            />
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-          <button
-            onClick={handleViewAll}
-            className="flex items-center text-indigo-600 hover:text-indigo-800"
-          >
-            {t('viewAll')}
-            <ArrowRightIcon className="ml-1 h-4 w-4" />
-          </button>
-        </div>
-      </div>
+     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 relative">
+  <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">{t('browseModels')}</h2>
+  <div className="flex flex-col md:flex-row md:items-center gap-4 relative">
+    <div className="relative">
+      <Input
+        type="text"
+        placeholder={t('searchCategories')}
+        value={categoryFilter}
+        onChange={(e) => setCategoryFilter(e.target.value)}
+        className="pl-10 pr-4 py-2"
+      />
+      <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+    </div>
+    <button
+      onClick={handleViewAll}
+    className="flex items-center text-indigo-600 hover:text-indigo-800"
+    >
+      {t('viewAll')}
+      <ArrowRightIcon className="ml-1 h-4 w-4" />
+    </button>
+  </div>
+</div>
+
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
         {loadingCategories ? (
