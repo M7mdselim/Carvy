@@ -123,7 +123,7 @@ export default function Checkout() {
       const discountAmount = calculateDiscountAmount();
       const totalWithShipping = calculateFinalTotal();
       
-      const phoneToUse = formData.phone;
+      const phoneToUse = formData.phone || selectedAddress.phone;
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -133,9 +133,9 @@ export default function Checkout() {
           last_name: formData.lastName,
           email: formData.email,
           phone: phoneToUse,
-          address: `${selectedAddress.building} ${selectedAddress.street}, ${selectedAddress.district}, ${selectedAddress.city}`,
+          address: `${selectedAddress.building || ''} ${selectedAddress.street}, ${selectedAddress.district || ''}, ${selectedAddress.city}`,
           city: selectedAddress.city,
-          postal_code: selectedAddress.postal_code,
+          postal_code: selectedAddress.postal_code || '',
           total_amount: totalWithShipping,
           discount_amount: discountAmount,
           shipping_cost: shippingCost,
@@ -145,7 +145,14 @@ export default function Checkout() {
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error("Order creation error:", orderError);
+        throw new Error(orderError.message || "Failed to create order");
+      }
+
+      if (!order || !order.id) {
+        throw new Error("Order created but no ID returned");
+      }
 
       const orderItems = items.map(item => ({
         order_id: order.id,
@@ -159,14 +166,17 @@ export default function Checkout() {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error("Order items error:", itemsError);
+        throw new Error(itemsError.message || "Failed to add order items");
+      }
 
       clearCart();
       toast.success(t('orderSuccess'));
-      navigate('/');
+      navigate('/orders');
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error(t('orderError'));
+      toast.error(t('orderError') + (error instanceof Error ? `: ${error.message}` : ''));
     } finally {
       setIsSubmitting(false);
     }

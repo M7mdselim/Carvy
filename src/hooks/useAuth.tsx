@@ -43,7 +43,7 @@ export const useAuth = create<AuthState>((set, get) => ({
         session: data.session 
       });
       
-      console.log("Sign in successful:");
+      console.log("Sign in successful:", data.user?.id);
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error(error.message || 'Failed to sign in');
@@ -100,7 +100,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       
       // If we have a session, set the user and session
       if (session) {
-        console.log("Session found during initialization:");
+        console.log("Session found during initialization:", session.user.id);
         set({ 
           user: session.user, 
           session: session 
@@ -116,7 +116,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       // Then set up the auth state listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (event, session) => {
-          console.log("Auth state changed:", event , 'Wewawewa');
+          console.log("Auth state changed:", event, session?.user?.id);
           set({ 
             user: session?.user || null, 
             session: session 

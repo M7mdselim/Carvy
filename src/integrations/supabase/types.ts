@@ -298,6 +298,7 @@ export type Database = {
           payment_method: string | null
           phone: string
           postal_code: string
+          shipping_cost: number | null
           status: string
           total_amount: number
           user_id: string
@@ -315,6 +316,7 @@ export type Database = {
           payment_method?: string | null
           phone: string
           postal_code: string
+          shipping_cost?: number | null
           status?: string
           total_amount: number
           user_id: string
@@ -332,6 +334,7 @@ export type Database = {
           payment_method?: string | null
           phone?: string
           postal_code?: string
+          shipping_cost?: number | null
           status?: string
           total_amount?: number
           user_id?: string
