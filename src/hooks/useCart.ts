@@ -2,6 +2,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Product } from '../types'
+import { toast } from 'sonner'
 
 interface CartItem {
   product: Product
@@ -36,6 +37,15 @@ export const useCart = create<CartStore>()(
       addItem: (product) => {
         const currentItems = get().items
         const existingItem = currentItems.find(item => item.product.id === product.id)
+
+        // Check if we're exceeding available stock
+        const currentQuantity = existingItem ? existingItem.quantity : 0
+        const requestedQuantity = currentQuantity + 1
+        
+        if (requestedQuantity > product.stock) {
+          toast.error(`Sorry, only ${product.stock} units available in stock`)
+          return
+        }
 
         let updatedItems
         if (existingItem) {
@@ -72,11 +82,21 @@ export const useCart = create<CartStore>()(
           return
         }
 
-        const updatedItems = get().items.map(item =>
+        const currentItems = get().items
+        const item = currentItems.find(item => item.product.id === productId)
+        
+        // Check if requested quantity exceeds stock
+        if (item && quantity > item.product.stock) {
+          toast.error(`Sorry, only ${item.product.stock} units available in stock`)
+          return
+        }
+
+        const updatedItems = currentItems.map(item =>
           item.product.id === productId
             ? { ...item, quantity }
             : item
         )
+        
         set({
           items: updatedItems,
           total: get().calculateTotal(updatedItems) // Recalculate total

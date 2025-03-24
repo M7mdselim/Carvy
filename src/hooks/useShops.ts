@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Shop } from '../types'
@@ -26,12 +27,15 @@ export function useShops() {
               )
             )
           `)
-          .order('name')
+          .order('id', { ascending: false }) // Fetch in random order (newest first)
 
         if (shopsError) throw shopsError
 
+        // Shuffle the array to get random ordering
+        const shuffledShops = [...shopsData].sort(() => Math.random() - 0.5)
+
         setShops(
-          shopsData.map((shop) => ({
+          shuffledShops.map((shop) => ({
             id: shop.id,
             name: shop.name,
             description: shop.description || '',

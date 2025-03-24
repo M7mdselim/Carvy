@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
 import { useLanguage } from '../contexts/LanguageContext'
+import { toast } from 'sonner'
 
 interface ProductCardProps {
   product: Product
@@ -34,6 +35,31 @@ export default function ProductCard({ product }: ProductCardProps) {
       // you would need the actual car model ID instead of this placeholder
       navigate(`/models/placeholder-id`)
     }
+  }
+
+  const handleAddToCart = () => {
+    if (product.stock <= 0) {
+      toast.error(t('outOfStock'))
+      return
+    }
+    
+    if (cartItem && cartItem.quantity >= product.stock) {
+      toast.error(`${t('maxStockReached')}: ${product.stock}`)
+      return
+    }
+    
+    addItem(product)
+  }
+
+  const handleIncreaseQuantity = () => {
+    if (!cartItem) return
+    
+    if (cartItem.quantity >= product.stock) {
+      toast.error(`${t('maxStockReached')}: ${product.stock}`)
+      return
+    }
+    
+    updateQuantity(product.id, cartItem.quantity + 1)
   }
 
   return (
@@ -80,7 +106,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </button>
                 <span className="text-lg font-medium text-gray-900">{cartItem.quantity}</span>
                 <button
-                  onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
+                  onClick={handleIncreaseQuantity}
                   className="flex-1 flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
                 >
                   <PlusIcon className="h-5 w-5" />
@@ -94,7 +120,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
             ) : (
               <button
-                onClick={() => addItem(product)}
+                onClick={handleAddToCart}
                 className="w-full flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700"
               >
                 <PlusIcon className={`h-5 w-5 ${isRtl ? 'ml-2' : 'mr-2'}`} />

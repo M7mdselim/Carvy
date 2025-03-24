@@ -33,6 +33,11 @@ const CategoriesSection = () => {
   const indexOfFirstCategory = indexOfLastCategory - itemsPerPage
   const currentCategories = filteredCategories.slice(indexOfFirstCategory, indexOfLastCategory)
 
+  // Handler for the "View All" button
+  const handleViewAll = () => {
+    navigate('/categories')
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
@@ -49,7 +54,7 @@ const CategoriesSection = () => {
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
           <button
-            onClick={() => navigate('/categories')}
+            onClick={handleViewAll}
             className="flex items-center text-indigo-600 hover:text-indigo-800"
           >
             {t('viewAll')}

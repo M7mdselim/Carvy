@@ -36,13 +36,16 @@ export default function Cart() {
         <ul className="divide-y divide-gray-200">
           {items.map(({ product, quantity }) => (
             <li key={product.id} className="flex flex-col sm:flex-row py-4 px-3 sm:py-6 sm:px-6">
-              <div className="flex-shrink-0 w-full sm:w-24 h-32 sm:h-24 mb-3 sm:mb-0 mx-auto sm:mx-0 border border-gray-200 rounded-md overflow-hidden">
+              <Link 
+                to={`/products/${product.id}`}
+                className="flex-shrink-0 w-full sm:w-24 h-32 sm:h-24 mb-3 sm:mb-0 mx-auto sm:mx-0 border border-gray-200 rounded-md overflow-hidden"
+              >
                 <img
                   src={product.image}
                   alt={product.name}
                   className="w-full h-full object-center object-cover"
                 />
-              </div>
+              </Link>
               <div className="sm:ml-4 flex-1 flex flex-col">
                 <div>
                   <div className="flex flex-col sm:flex-row sm:justify-between text-base font-medium text-gray-900">

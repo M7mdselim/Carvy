@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -117,7 +118,37 @@ export default function Checkout() {
       return;
     }
 
+    const stockCheckPromises = items.map(async (item) => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('stock')
+        .eq('id', item.product.id)
+        .single();
+      
+      if (error) throw error;
+      
+      if (!data || data.stock < item.quantity) {
+        return {
+          product: item.product.name,
+          available: data ? data.stock : 0,
+          requested: item.quantity,
+          hasEnough: false
+        };
+      }
+      
+      return { hasEnough: true };
+    });
+    
     try {
+      const stockResults = await Promise.all(stockCheckPromises);
+      const insufficientStock = stockResults.filter(result => !result.hasEnough);
+      
+      if (insufficientStock.length > 0) {
+        const firstItem = insufficientStock[0];
+        toast.error(`Not enough stock for "${firstItem.product}". Available: ${firstItem.available}, Requested: ${firstItem.requested}`);
+        return;
+      }
+
       setIsSubmitting(true);
 
       const discountAmount = calculateDiscountAmount();
@@ -170,6 +201,17 @@ export default function Checkout() {
         console.error("Order items error:", itemsError);
         throw new Error(itemsError.message || "Failed to add order items");
       }
+
+      // Update the stock for each product using RPC function
+      const stockUpdatePromises = items.map(item => 
+        supabase
+          .rpc('decrement_stock', {
+            row_id: item.product.id,
+            amount: item.quantity
+          })
+      );
+      
+      await Promise.all(stockUpdatePromises);
 
       clearCart();
       toast.success(t('orderSuccess'));

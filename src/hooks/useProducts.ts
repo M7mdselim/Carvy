@@ -35,12 +35,14 @@ export function useProducts() {
             )
           `)
           .eq('status', 'active')
-          .order('created_at', { ascending: false })
 
         if (productsError) throw productsError
 
+        // Shuffle the array to get random ordering
+        const shuffledProducts = [...productsData].sort(() => Math.random() - 0.5)
+
         setProducts(
-          productsData.map((product) => ({
+          shuffledProducts.map((product) => ({
             id: product.id,
             shopId: product.shop_id,
             name: product.name,

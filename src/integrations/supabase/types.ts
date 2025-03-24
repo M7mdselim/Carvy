@@ -626,6 +626,13 @@ export type Database = {
         }
         Returns: Json
       }
+      decrement_stock: {
+        Args: {
+          row_id: string
+          amount: number
+        }
+        Returns: number
+      }
       grant_admin_access: {
         Args: Record<PropertyKey, never>
         Returns: boolean

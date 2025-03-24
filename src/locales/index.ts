@@ -1,10 +1,10 @@
 
-import enTranslations from './en';
-import arTranslations from './ar';
+import { en } from './en';
+import { ar } from './ar';
 
 export const translations = {
-  en: enTranslations,
-  ar: arTranslations
+  en,
+  ar
 };
 
-export type TranslationKey = keyof typeof enTranslations;
+export type TranslationKey = keyof typeof en;
