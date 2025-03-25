@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -36,6 +35,11 @@ export default function Checkout() {
   const [discount, setDiscount] = useState<{
     percentage?: number;
     amount?: number;
+    couponId?: string;
+    couponCode?: string;
+    ownerId?: string;
+    ownerBenefitValue?: number;
+    ownerBenefitType?: string;
   }>({});
   const [shippingCost, setShippingCost] = useState<number>(70.00);
 
@@ -81,7 +85,15 @@ export default function Checkout() {
     setSelectedAddress(address);
   };
 
-  const handleApplyCoupon = (discountData: { percentage?: number, amount?: number }) => {
+  const handleApplyCoupon = (discountData: { 
+    percentage?: number, 
+    amount?: number, 
+    couponId?: string, 
+    couponCode?: string,
+    ownerId?: string,
+    ownerBenefitValue?: number,
+    ownerBenefitType?: string
+  }) => {
     setDiscount(discountData);
   };
 
@@ -152,7 +164,7 @@ export default function Checkout() {
       setIsSubmitting(true);
 
       const discountAmount = calculateDiscountAmount();
-      const totalWithShipping = calculateFinalTotal();
+      const finalTotal = calculateFinalTotal();
       
       const phoneToUse = formData.phone || selectedAddress.phone;
 
@@ -167,11 +179,13 @@ export default function Checkout() {
           address: `${selectedAddress.building || ''} ${selectedAddress.street}, ${selectedAddress.district || ''}, ${selectedAddress.city}`,
           city: selectedAddress.city,
           postal_code: selectedAddress.postal_code || '',
-          total_amount: totalWithShipping,
+          total_amount: finalTotal,
           discount_amount: discountAmount,
           shipping_cost: shippingCost,
           status: 'pending',
-          payment_method: paymentMethod
+          payment_method: paymentMethod,
+          coupon_id: discount.couponId || null,
+          coupon_code: discount.couponCode || null
         })
         .select()
         .single();
@@ -202,7 +216,6 @@ export default function Checkout() {
         throw new Error(itemsError.message || "Failed to add order items");
       }
 
-      // Update the stock for each product using RPC function
       const stockUpdatePromises = items.map(item => 
         supabase
           .rpc('decrement_stock', {
@@ -212,6 +225,50 @@ export default function Checkout() {
       );
       
       await Promise.all(stockUpdatePromises);
+
+      if (discount.couponId && discount.ownerId && discount.ownerBenefitValue && discount.ownerBenefitValue > 0) {
+        console.log(`Processing coupon ${discount.couponId} for order ${order.id} with benefit ${discount.ownerBenefitValue}`);
+        
+        try {
+          const { error: usageError } = await supabase
+            .from('coupon_usage')
+            .insert({
+              coupon_id: discount.couponId,
+              user_id: user.id,
+              order_id: order.id
+            });
+            
+          if (usageError) {
+            console.error("Error recording coupon usage:", usageError);
+          }
+          
+          const { data: balanceData, error: balanceError } = await supabase
+            .rpc('increment_balance', {
+              row_id: discount.ownerId,
+              amount: discount.ownerBenefitValue
+            });
+            
+          if (balanceError) {
+            console.error("Error incrementing owner balance:", balanceError);
+            toast.error("Error applying coupon benefit");
+          } else {
+            console.log("Successfully processed coupon owner benefit:", balanceData);
+            toast.success("Coupon benefit applied successfully");
+            
+            const { error: couponUpdateError } = await supabase
+              .from('coupons')
+              .update({ times_used: discount.couponCode ? discount.couponCode.length : 0 + 1 })
+              .eq('id', discount.couponId);
+              
+            if (couponUpdateError) {
+              console.error("Error updating coupon usage counter:", couponUpdateError);
+            }
+          }
+        } catch (couponError) {
+          console.error("Error processing coupon benefit:", couponError);
+          toast.error("Failed to process coupon benefit");
+        }
+      }
 
       clearCart();
       toast.success(t('orderSuccess'));

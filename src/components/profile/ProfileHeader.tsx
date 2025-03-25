@@ -1,10 +1,11 @@
 
 import { UserIcon } from '@heroicons/react/24/outline';
 import { User } from '@supabase/supabase-js';
+import { ProfileData } from '../../types';
 
 interface ProfileHeaderProps {
   user: User;
-  profile: { firstName: string; lastName: string; phoneNumber: string } | null;
+  profile: ProfileData;
 }
 
 export function ProfileHeader({ user, profile }: ProfileHeaderProps) {
@@ -16,10 +17,10 @@ export function ProfileHeader({ user, profile }: ProfileHeaderProps) {
         </div>
         <div className="ml-6 text-white">
           <h1 className="text-2xl font-bold">
-            {profile?.firstName} {profile?.lastName}
+            {profile.firstName || ''} {profile.lastName || ''}
           </h1>
           <p className="text-indigo-100">{user.email}</p>
-          <p className="text-indigo-100 mt-1">{profile?.phoneNumber}</p>
+          <p className="text-indigo-100 mt-1">{profile.phoneNumber || ''}</p>
         </div>
       </div>
     </div>

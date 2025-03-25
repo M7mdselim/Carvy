@@ -166,24 +166,24 @@ export type Database = {
       }
       coupon_usage: {
         Row: {
-          coupon_id: string
+          coupon_id: string | null
           id: string
           order_id: string | null
-          used_at: string
+          used_at: string | null
           user_id: string
         }
         Insert: {
-          coupon_id: string
+          coupon_id?: string | null
           id?: string
           order_id?: string | null
-          used_at?: string
+          used_at?: string | null
           user_id: string
         }
         Update: {
-          coupon_id?: string
+          coupon_id?: string | null
           id?: string
           order_id?: string | null
-          used_at?: string
+          used_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -211,6 +211,8 @@ export type Database = {
           discount_amount: number | null
           discount_percentage: number
           id: string
+          owner_benefit_type: string | null
+          owner_benefit_value: number | null
           owner_id: string | null
           times_used: number
           usage_limit: number
@@ -222,6 +224,8 @@ export type Database = {
           discount_amount?: number | null
           discount_percentage: number
           id?: string
+          owner_benefit_type?: string | null
+          owner_benefit_value?: number | null
           owner_id?: string | null
           times_used?: number
           usage_limit?: number
@@ -233,6 +237,8 @@ export type Database = {
           discount_amount?: number | null
           discount_percentage?: number
           id?: string
+          owner_benefit_type?: string | null
+          owner_benefit_value?: number | null
           owner_id?: string | null
           times_used?: number
           usage_limit?: number
@@ -289,6 +295,7 @@ export type Database = {
           address: string
           city: string
           coupon_code: string | null
+          coupon_id: string | null
           created_at: string
           discount_amount: number | null
           email: string
@@ -307,6 +314,7 @@ export type Database = {
           address: string
           city: string
           coupon_code?: string | null
+          coupon_id?: string | null
           created_at?: string
           discount_amount?: number | null
           email: string
@@ -325,6 +333,7 @@ export type Database = {
           address?: string
           city?: string
           coupon_code?: string | null
+          coupon_id?: string | null
           created_at?: string
           discount_amount?: number | null
           email?: string
@@ -339,7 +348,15 @@ export type Database = {
           total_amount?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_history: {
         Row: {
@@ -494,6 +511,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          balance_credits: number | null
           created_at: string | null
           id: string
           is_admin: boolean | null
@@ -501,6 +519,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          balance_credits?: number | null
           created_at?: string | null
           id: string
           is_admin?: boolean | null
@@ -508,6 +527,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          balance_credits?: number | null
           created_at?: string | null
           id?: string
           is_admin?: boolean | null
@@ -674,6 +694,13 @@ export type Database = {
       grant_admin_access: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      increment_balance: {
+        Args: {
+          row_id: string
+          amount: number
+        }
+        Returns: number
       }
     }
     Enums: {

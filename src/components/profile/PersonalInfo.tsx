@@ -6,10 +6,11 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { User } from '@supabase/supabase-js';
+import { ProfileData } from '../../types';
 
 interface PersonalInfoProps {
   user: User;
-  profile: { firstName: string; lastName: string; phoneNumber: string } | null;
+  profile: ProfileData;
 }
 
 export function PersonalInfo({ user, profile }: PersonalInfoProps) {

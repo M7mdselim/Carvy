@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { supabase, initializeAuth, resetPassword, signInWithProvider } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
+import { ProfileData } from '../types';
 
 interface AuthState {
   user: User | null;
@@ -18,7 +19,7 @@ interface AuthState {
   }) => Promise<void>;
   signOut: () => Promise<void>;
   initialize: () => Promise<void>;
-  getUserProfile: () => { firstName: string; lastName: string; phoneNumber: string } | null;
+  getUserProfile: () => ProfileData | null;
   cleanup: () => void;
   forgotPassword: (email: string) => Promise<{success: boolean; message: string}>;
   signInWithSocial: (provider: 'google' | 'facebook') => Promise<void>;
@@ -140,13 +141,20 @@ export const useAuth = create<AuthState>((set, get) => ({
   
   getUserProfile: () => {
     const user = get().user;
-    if (!user?.user_metadata) return null;
+    if (!user) return null;
 
-    return {
-      firstName: user.user_metadata.first_name || '',
-      lastName: user.user_metadata.last_name || '',
-      phoneNumber: user.user_metadata.phone_number || ''
+    // First try to get data from user metadata
+    const metadataProfile = {
+      id: user.id,
+      firstName: user.user_metadata?.first_name || '',
+      lastName: user.user_metadata?.last_name || '',
+      phoneNumber: user.user_metadata?.phone_number || '',
+      balanceCredits: 0, // Default to 0 until we get actual data
+      isAdmin: false,
+      ownerId: null
     };
+
+    return metadataProfile;
   },
   
   forgotPassword: async (email: string) => {

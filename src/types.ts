@@ -79,5 +79,30 @@ export interface Area {
   name: string;
 }
 
-// Update PaymentMethod type to include 'bank_transfer' and 'other'
+export interface ProfileData {
+  id: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  balanceCredits: number;
+  isAdmin?: boolean;
+  ownerId?: string | null;
+}
+
 export type PaymentMethod = 'cash' | 'cash_on_delivery' | 'credit_card' | 'debit_card' | 'bank_transfer' | 'other';
+
+export type CouponOwnerBenefitType = 'percentage' | 'amount' | null;
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount_percentage: number;
+  discount_amount: number | null;
+  active: boolean;
+  usage_limit: number;
+  times_used: number;
+  owner_id: string | null;
+  owner_benefit_type: CouponOwnerBenefitType;
+  owner_benefit_value: number;
+}
