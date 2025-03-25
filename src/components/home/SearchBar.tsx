@@ -30,16 +30,14 @@ const SearchBar = () => {
       />
       <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-indigo-400" />
       
-      <div className="absolute w-full z-[200]">
-        <SearchResults 
-          searchQuery={searchQuery}
-          searchLoading={searchLoading}
-          searchProducts={searchProducts}
-          searchShops={searchShops}
-          searchCarModels={searchCarModels}
-          handleSearch={handleSearch}
-        />
-      </div>
+      <SearchResults 
+        searchQuery={searchQuery}
+        searchLoading={searchLoading}
+        searchProducts={searchProducts}
+        searchShops={searchShops}
+        searchCarModels={searchCarModels}
+        handleSearch={handleSearch}
+      />
     </form>
   )
 }

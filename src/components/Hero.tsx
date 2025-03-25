@@ -2,14 +2,12 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedButton } from './ui/AnimatedButton';
-import { useLanguage } from '../contexts/LanguageContext';
 
 const Hero: React.FC = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subHeadingRef = useRef<HTMLParagraphElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const { t } = useLanguage();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -51,14 +49,14 @@ const Hero: React.FC = () => {
               ref={headingRef} 
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6 opacity-0 translate-y-8 transition-all duration-700 ease-apple"
             >
-              {t('experienceSmartDriving')} <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">{t('brandName')}</span>
+              Experience <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">Smart Driving</span> Like Never Before
             </h1>
             
             <p 
               ref={subHeadingRef}
               className="text-lg md:text-xl text-gray-700 mb-8 opacity-0 translate-y-8 transition-all duration-700 ease-apple delay-100"
             >
-              {t('carDescription')}
+              Carvy transforms your vehicle into an intelligent companion, providing real-time insights and assistance for a seamless driving experience.
             </p>
             
             <div 
@@ -69,11 +67,11 @@ const Hero: React.FC = () => {
                 variant="primary" 
                 icon={<ArrowRight className="w-5 h-5" />}
               >
-                {t('getStarted')}
+                Get Started
               </AnimatedButton>
               
               <AnimatedButton variant="secondary">
-                {t('learnMore')}
+                Learn More
               </AnimatedButton>
             </div>
           </div>
@@ -83,7 +81,7 @@ const Hero: React.FC = () => {
           <img 
             ref={imageRef}
             src="https://images.unsplash.com/photo-1617704548623-340376564e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-            alt={t('brandName') + " Dashboard"} 
+            alt="Carvy Dashboard" 
             className="w-full max-w-lg rounded-2xl shadow-2xl opacity-0 translate-y-8 transition-all duration-700 ease-apple delay-300 object-cover border-4 border-white"
           />
         </div>

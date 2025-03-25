@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom'
 import { CarIcon } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -30,7 +31,7 @@ const SearchResults = ({
   if (!searchQuery) return null
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl overflow-hidden z-[200]">
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl overflow-hidden z-10">
       {searchLoading ? (
         <div className="p-4 text-center text-gray-500">{t('searching')}</div>
       ) : (

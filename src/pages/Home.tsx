@@ -11,24 +11,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       {/* Hero Section with Search */}
-      <div className="relative z-20">
-        <HomeHero />
-      </div>
+      <HomeHero />
 
       {/* Categories Section */}
-      <div className="mt-20 relative z-10">
-        <CategoriesSection />
-      </div>
+      <CategoriesSection />
 
       {/* Featured Shops Section */}
-      <div className="mt-16">
-        <ShopsSection />
-      </div>
+      <ShopsSection />
 
       {/* Featured Products Section */}
-      <div className="mt-16">
-        <ProductsSection />
-      </div>
+      <ProductsSection />
     </div>
   )
 }
