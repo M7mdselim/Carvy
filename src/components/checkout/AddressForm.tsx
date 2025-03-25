@@ -536,10 +536,10 @@ export function AddressForm({
                     value={newAddress.city}
                     onValueChange={handleCityChange}
                   >
-                    <SelectTrigger id="city" className="bg-white">
+                    <SelectTrigger id="city" className="bg-white border-gray-300 hover:border-gray-400 shadow-sm">
                       <SelectValue placeholder={t('selectCity')} />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-gray-200 shadow-lg">
                       {renderCityOptions()}
                     </SelectContent>
                   </Select>
@@ -552,10 +552,10 @@ export function AddressForm({
                     onValueChange={(value) => handleNewAddressChange('area', value)}
                     disabled={!newAddress.city}
                   >
-                    <SelectTrigger id="area" className="bg-white">
+                    <SelectTrigger id="area" className="bg-white border-gray-300 hover:border-gray-400 shadow-sm">
                       <SelectValue placeholder={t('selectArea')} />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-gray-200 shadow-lg">
                       {filteredAreas.map(area => (
                         <SelectItem key={area.id} value={area.name}>
                           {area.name}
@@ -630,4 +630,3 @@ export function AddressForm({
     </div>
   );
 }
-

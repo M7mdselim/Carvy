@@ -1,41 +1,44 @@
 
 import React, { useEffect } from 'react';
 import { observeElements } from '@/utils/animations';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const features = [
   {
-    title: "Intelligent Navigation",
-    description: "AI-powered routes that adapt to traffic conditions in real-time, saving you time and fuel.",
+    titleKey: "intelligentNavigation",
+    descriptionKey: "navigationDescription",
     icon: "🧭",
   },
   {
-    title: "Voice Control",
-    description: "Natural language processing allows you to control every aspect of your journey with simple voice commands.",
+    titleKey: "voiceControl",
+    descriptionKey: "voiceControlDescription",
     icon: "🎤",
   },
   {
-    title: "Safety Alerts",
-    description: "Proactive warnings about road hazards, weather conditions, and potential vehicle issues.",
+    titleKey: "safetyAlerts",
+    descriptionKey: "safetyDescription",
     icon: "🛡️",
   },
   {
-    title: "Eco Driving",
-    description: "Smart insights to help you drive more efficiently, reducing your carbon footprint and fuel costs.",
+    titleKey: "ecoDriving",
+    descriptionKey: "ecoDescription",
     icon: "🌿",
   },
   {
-    title: "Seamless Connectivity",
-    description: "Integrates with your digital ecosystem, including smart home devices and personal calendars.",
+    titleKey: "seamlessConnectivity",
+    descriptionKey: "connectivityDescription",
     icon: "📱",
   },
   {
-    title: "Personalization",
-    description: "Learns your preferences and habits to create a customized driving experience that anticipates your needs.",
+    titleKey: "personalization",
+    descriptionKey: "personalizationDescription",
     icon: "👤",
   }
 ];
 
 const Features: React.FC = () => {
+  const { t } = useLanguage();
+  
   useEffect(() => {
     const observer = observeElements();
     return () => {
@@ -48,10 +51,10 @@ const Features: React.FC = () => {
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-20 reveal-on-scroll">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Intelligent Features for Modern Drivers
+            {t('intelligentFeatures')}
           </h2>
           <p className="text-lg text-gray-700">
-            Carvy integrates cutting-edge technology to make your driving experience safer, more efficient, and enjoyable.
+            {t('featureDescription')}
           </p>
         </div>
         
@@ -66,8 +69,8 @@ const Features: React.FC = () => {
                 <span className="text-2xl">{feature.icon}</span>
                 <div className="absolute inset-0 bg-primary/5 rounded-full animate-pulse-slow"></div>
               </div>
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-700">{feature.description}</p>
+              <h3 className="text-xl font-semibold mb-3">{t(feature.titleKey)}</h3>
+              <p className="text-gray-700">{t(feature.descriptionKey)}</p>
             </div>
           ))}
         </div>
