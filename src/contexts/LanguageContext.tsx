@@ -23,7 +23,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const t = (key: string) => {
     const lang = language as keyof typeof translations;
-    return translations[lang][key as TranslationKey] || key;
+    
+    // Check if the key exists in the current language's translations
+    if (translations[lang] && key in translations[lang]) {
+      return translations[lang][key as TranslationKey] || key;
+    }
+    
+    // Fallback to English if the key doesn't exist in the current language
+    if (lang !== 'en' && translations['en'] && key in translations['en']) {
+      return translations['en'][key as TranslationKey];
+    }
+    
+    // Return the key itself as fallback if not found in any language
+    return key;
   };
 
   const value: LanguageContextProps = {

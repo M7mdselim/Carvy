@@ -1,0 +1,27 @@
+
+export default {
+  home: 'Home',
+  categories: 'Categories',
+  shops: 'Shops',
+  products: 'Products',
+  cart: 'Cart',
+  login: 'Login',
+  register: 'Register',
+  logout: 'Logout',
+  profile: 'Profile',
+  orders: 'Orders',
+  wishlist: 'Wishlist',
+  contact: 'Contact',
+  faq: 'FAQ',
+  terms: 'Terms & Conditions',
+  search: 'Search',
+  searchPlaceholder: 'Search for products, shops, and more',
+  searchProductsModelsShops: 'Search products, models, and shops',
+  viewAll: 'View All',
+  browseAllProducts: 'Browse All Products',
+  browseAllShops: 'Browse All Shops',
+  browseAllCarModels: 'Browse All Car Models',
+  returnHome: 'Return to Home',
+  backToProducts: 'Back to Products',
+  backToLogin: 'Back to Login'
+};

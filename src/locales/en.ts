@@ -313,3 +313,4 @@ export const en = {
   "pageNotFound": "Page Not Found",
   "pageDoesntExist": "The page you're looking for doesn't exist or has been moved."
 };
+export default en;

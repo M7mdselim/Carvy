@@ -6,10 +6,12 @@ import ProductShowcase from '@/components/ProductShowcase';
 import { observeElements } from '@/utils/animations';
 import { CarModel } from '../types';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Index = () => {
   const [models, setModels] = useState<CarModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const observer = observeElements();
@@ -52,7 +54,7 @@ const Index = () => {
       <main>
         <Hero />
         <Features />
-        {!loading && <ProductShowcase title="Popular Car Models" models={models} />}
+        {!loading && <ProductShowcase title={t('popularCarModels')} models={models} />}
       </main>
     </div>
   );

@@ -1,0 +1,27 @@
+
+export default {
+  home: 'الرئيسية',
+  categories: 'الأقسام',
+  shops: 'المتاجر',
+  products: 'المنتجات',
+  cart: 'السلة',
+  login: 'تسجيل الدخول',
+  register: 'التسجيل',
+  logout: 'تسجيل الخروج',
+  profile: 'الملف الشخصي',
+  orders: 'الطلبات',
+  wishlist: 'المفضلة',
+  contact: 'اتصل بنا',
+  faq: 'الأسئلة الشائعة',
+  terms: 'الشروط والأحكام',
+  search: 'بحث',
+  searchPlaceholder: 'ابحث عن قطع الغيار أو المتاجر...',
+  searchProductsModelsShops: 'ابحث عن المنتجات والموديلات والمتاجر',
+  viewAll: 'عرض الكل',
+  browseAllProducts: 'تصفح جميع المنتجات',
+  browseAllShops: 'تصفح جميع المتاجر',
+  browseAllCarModels: 'تصفح جميع موديلات السيارات',
+  returnHome: 'العودة إلى الرئيسية',
+  backToProducts: 'العودة إلى المنتجات',
+  backToLogin: 'العودة إلى تسجيل الدخول'
+};

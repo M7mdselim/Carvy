@@ -1,19 +1,34 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOrders, Order } from '../hooks/useOrders'
 import { useLanguage } from '../contexts/LanguageContext'
 import { Button } from '../components/ui/button'
-import { Clock, CheckCircle, TruckIcon, PackageCheck, XCircle, AlertTriangle } from 'lucide-react'
-import { format, formatDistanceToNow, isBefore, addMinutes } from 'date-fns'
+import { Clock, CheckCircle, TruckIcon, PackageCheck, XCircle, AlertTriangle, RefreshCw } from 'lucide-react'
+import { format, formatDistanceToNow, isBefore, addMinutes, isAfter, addDays } from 'date-fns'
 import { Badge } from '../components/ui/badge'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
+import { RefundRequestDialog } from '../components/RefundRequestDialog'
+import { useRefundRequests } from '../hooks/useRefundRequests'
 
 export default function Orders() {
   const { orders, loading, error, refetch } = useOrders()
   const { t, language } = useLanguage()
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
   const isRtl = language === 'ar'
+  const { refundRequests, fetchRefundRequests } = useRefundRequests()
+  const [refundRequestedOrders, setRefundRequestedOrders] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    fetchRefundRequests();
+  }, [fetchRefundRequests]);
+
+  useEffect(() => {
+    if (refundRequests.length > 0) {
+      const orderIds = new Set(refundRequests.map(request => request.order_id));
+      setRefundRequestedOrders(orderIds);
+    }
+  }, [refundRequests]);
 
   const getStatusIcon = (status: Order['status']) => {
     switch (status) {
@@ -50,12 +65,10 @@ export default function Orders() {
   }
 
   const canCancelOrder = (order: Order) => {
-    // Check if order is in pending or processing status
     if (order.status !== 'pending' && order.status !== 'processing') {
       return false
     }
     
-    // Check if order is within 30 minutes of creation
     const orderDate = new Date(order.created_at)
     const cancelWindow = addMinutes(orderDate, 30)
     const now = new Date()
@@ -96,6 +109,26 @@ export default function Orders() {
     }
   }
 
+  const canRequestRefund = (order: Order) => {
+    // Allow refund requests for all statuses except pending and cancelled
+    if (order.status === 'pending' || order.status === 'cancelled') return false;
+    
+    const orderDate = new Date(order.created_at);
+    const refundWindow = addDays(orderDate, 14);
+    const now = new Date();
+    
+    // Don't allow if already requested
+    if (refundRequestedOrders.has(order.id)) return false;
+    
+    // Can request refund if within 14 days of order creation
+    return isBefore(now, refundWindow);
+  }
+
+  const handleRefundSuccess = () => {
+    fetchRefundRequests();
+    toast.success(t('refundRequestSubmitted'));
+  }
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -120,7 +153,13 @@ export default function Orders() {
 
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('myOrders')}</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">{t('myOrders')}</h1>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="flex items-center gap-2">
+          <RefreshCw className="h-4 w-4" />
+          {t('refresh')}
+        </Button>
+      </div>
 
       {orders.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
@@ -151,8 +190,8 @@ export default function Orders() {
                     {t(order.status)}
                   </Badge>
                   
-                  {canCancelOrder(order) && order.status !== 'cancelled' && (
-                    <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1">
+                    {canCancelOrder(order) && order.status !== 'cancelled' && (
                       <Button 
                         variant="destructive" 
                         size="sm"
@@ -161,11 +200,28 @@ export default function Orders() {
                       >
                         {cancellingOrderId === order.id ? t('cancelling') : t('cancelOrder')}
                       </Button>
+                    )}
+                    
+                    {canRequestRefund(order) && (
+                      <RefundRequestDialog 
+                        orderId={order.id} 
+                        onSuccess={handleRefundSuccess}
+                        disabled={refundRequestedOrders.has(order.id)}
+                      />
+                    )}
+                    
+                    {refundRequestedOrders.has(order.id) && (
+                      <span className="text-xs text-amber-600 font-medium">
+                        {t('refundRequested')}
+                      </span>
+                    )}
+                    
+                    {canCancelOrder(order) && order.status !== 'cancelled' && (
                       <span className="text-xs text-gray-500">
                         {t('cancelAvailable')} {getTimeLeftForCancellation(order)}
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
               

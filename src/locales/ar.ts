@@ -313,3 +313,6 @@ export const ar = {
   "pageNotFound": "الصفحة غير موجودة",
   "pageDoesntExist": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها."
 };
+
+
+export default ar;
