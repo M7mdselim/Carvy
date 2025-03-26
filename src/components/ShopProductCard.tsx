@@ -1,5 +1,5 @@
 
-import { PlusIcon, MinusIcon, EyeIcon } from 'lucide-react'
+import { PlusIcon, MinusIcon, EyeIcon, Trash2Icon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../types'
 import { useCart } from '../hooks/useCart'
@@ -43,18 +43,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
 
   const handleCarModelClick = (carModel: string, event: React.MouseEvent) => {
     event.stopPropagation()
-    
-    // Extract model details from the compatibility string
-    // This is a simplified approach - in a real implementation, you would need to 
-    // store the actual car model IDs or extract them from the database
-    const regex = /(\w+)\s+(\w+)\s+\((\d+)(?:-(\d+))?\)/
-    const match = carModel.match(regex)
-    
-    if (match) {
-      // For demo purposes, navigate to a placeholder model ID
-      // In a real implementation, you would need the actual model ID
-      navigate(`/models/placeholder-model-id`)
-    }
+    navigate(`/products/${product.id}`)
   }
 
   const handleAddToCart = () => {
@@ -83,7 +72,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-[420px]">
       <div 
         className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer relative"
         onClick={handleImageClick}
@@ -103,29 +92,33 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           <EyeIcon className="h-4 w-4 text-gray-700" />
         </button>
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 h-14">
           {product.name} {shopName && <span className="text-gray-600">({shopName})</span>}
         </h3>
-        <p className="mt-1 text-sm text-gray-500 line-clamp-2">{product.description}</p>
+        <p className="mt-1 text-sm text-gray-500 line-clamp-2 h-10">{product.description}</p>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-lg font-bold text-gray-900">{product.price.toFixed(2)} EGP</span>
           <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
             {product.stock > 0 ? `${product.stock} ${t('inStock')}` : t('outOfStock')}
           </span>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {product.compatibility.map((car) => (
-            <span
-              key={car}
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-indigo-100"
-              onClick={(e) => handleCarModelClick(car, e)}
-            >
-              {car}
-            </span>
-          ))}
+        
+        <div className="mt-2 overflow-y-auto max-h-16 scrollbar-thin scrollbar-thumb-gray-300">
+          <div className="flex flex-wrap gap-1">
+            {product.compatibility.map((car) => (
+              <span
+                key={car}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-indigo-100"
+                onClick={(e) => handleCarModelClick(car, e)}
+              >
+                {car}
+              </span>
+            ))}
+          </div>
         </div>
-        <div className="mt-4">
+        
+        <div className="mt-auto pt-3">
           {product.stock > 0 && (
             cartItem ? (
               <div className="flex items-center justify-between gap-2">
@@ -144,9 +137,10 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
                 </button>
                 <button
                   onClick={() => removeItem(product.id)}
-                  className="flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700"
+                  className="flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-red-100 text-red-600 hover:bg-red-200"
+                  aria-label={t('remove')}
                 >
-                  {t('remove')}
+                  <Trash2Icon className="h-5 w-5" />
                 </button>
               </div>
             ) : (

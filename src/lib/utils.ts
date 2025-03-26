@@ -7,5 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = 'EGP'): string {
-  return `${amount} ${currency}`;
+  return `${amount.toFixed(2)} ${currency}`;
 }

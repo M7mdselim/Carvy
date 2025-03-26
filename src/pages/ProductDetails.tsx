@@ -16,6 +16,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Separator } from '../components/ui/separator'
 import { useWishlist } from '../hooks/useWishlist'
 import { Badge } from '../components/ui/badge'
+import { formatCurrency } from '../lib/utils'
 
 export default function ProductDetails() {
   const { productId } = useParams<{ productId: string }>()
@@ -299,7 +300,7 @@ export default function ProductDetails() {
                 <Badge variant="outline" className="bg-indigo-50 text-indigo-700 mb-2">
                   {product.category}
                 </Badge>
-                <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 break-words">{product.name}</h1>
                 <div className="flex items-center mt-2 mb-4">
                   <Link 
                     to={`/shops/${product.shopId}`}
@@ -337,7 +338,7 @@ export default function ProductDetails() {
             <div className="mb-4">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-indigo-600">
-                  {product.price.toFixed(2)} EGP
+                  {formatCurrency(product.price)}
                 </span>
               </div>
               
@@ -360,7 +361,9 @@ export default function ProductDetails() {
             
             <div className="mb-6">
               <h3 className="text-lg font-medium text-gray-900 mb-3">{t('description')}</h3>
-              <p className="text-gray-600 whitespace-pre-line">{product.description}</p>
+              <p className="text-gray-600 whitespace-pre-line break-words overflow-hidden">
+                {product.description}
+              </p>
             </div>
             
             {product.compatibility.length > 0 && (
