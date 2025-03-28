@@ -388,6 +388,7 @@ export type Database = {
           postal_code: string
           shipping_cost: number | null
           status: string
+          subtotal: number
           total_amount: number
           user_id: string
         }
@@ -407,6 +408,7 @@ export type Database = {
           postal_code: string
           shipping_cost?: number | null
           status?: string
+          subtotal?: number
           total_amount: number
           user_id: string
         }
@@ -426,6 +428,7 @@ export type Database = {
           postal_code?: string
           shipping_cost?: number | null
           status?: string
+          subtotal?: number
           total_amount?: number
           user_id?: string
         }

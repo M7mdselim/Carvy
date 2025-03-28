@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -7,6 +8,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '../contexts/LanguageContext';
 import { v4 as uuidv4 } from 'uuid';
 import { Address } from '../types';
+import { calculateCouponBenefit } from '../lib/utils';
 
 export interface OrderItem {
   id: string;
@@ -153,7 +155,13 @@ export const useOrders = () => {
       let discount = 0;
       
       if (couponData.percentage) {
-        discount = subtotal * (couponData.percentage / 100);
+        // Calculate percentage discount based on subtotal (excluding shipping)
+        discount = calculateCouponBenefit(
+          couponData.percentage, 
+          'percentage', 
+          subtotal, 
+          0 // No shipping cost to exclude from subtotal calculation
+        );
       } else if (couponData.amount) {
         discount = couponData.amount;
       } else {
@@ -176,7 +184,7 @@ export const useOrders = () => {
           discount_amount: discount,
           total_amount: total,
           coupon_id: couponData.couponId || null,
-          coupon_code: couponData.code || null,
+          coupon_code: couponData.couponCode || null,
           first_name: address.recipient_name.split(' ')[0] || '',
           last_name: address.recipient_name.split(' ').slice(1).join(' ') || '',
           email: user.email || '',
@@ -236,9 +244,22 @@ export const useOrders = () => {
             .eq('id', couponData.couponId);
             
           if (couponData.ownerId && couponData.ownerBenefitValue > 0) {
+            // Calculate the actual benefit value based on the benefit type
+            let benefitAmount = couponData.ownerBenefitValue;
+            
+            // If it's a percentage type, calculate based on the order subtotal
+            if (couponData.ownerBenefitType === 'percentage') {
+              benefitAmount = calculateCouponBenefit(
+                couponData.ownerBenefitValue, 
+                couponData.ownerBenefitType, 
+                subtotal, 
+                0 // No shipping cost to exclude from owner benefit calculation
+              );
+            }
+            
             await supabase.rpc('increment_balance', {
               row_id: couponData.ownerId,
-              amount: couponData.ownerBenefitValue
+              amount: benefitAmount
             });
           }
         }

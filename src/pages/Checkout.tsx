@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../hooks/useAuth';
+import { useOrders } from '../hooks/useOrders.tsx';
 
-import { CreditCard, Shield, Truck, CreditCard as CreditCardIcon, AlertTriangle, Info ,ImageIcon } from 'lucide-react';
+import { CreditCard, Shield, Truck, CreditCard as CreditCardIcon, AlertTriangle, Info, ImageIcon } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
@@ -23,6 +23,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { user, getUserProfile } = useAuth();
   const userProfile = getUserProfile();
+  const { orders, loading, error, refetch, placeOrder, isSubmitting: isOrderSubmitting } = useOrders();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -142,149 +143,52 @@ export default function Checkout() {
       return;
     }
 
-    const stockCheckPromises = items.map(async (item) => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('stock')
-        .eq('id', item.product.id)
-        .single();
-      
-      if (error) throw error;
-      
-      if (!data || data.stock < item.quantity) {
-        return {
-          product: item.product.name,
-          available: data ? data.stock : 0,
-          requested: item.quantity,
-          hasEnough: false
-        };
-      }
-      
-      return { hasEnough: true };
-    });
+    setIsSubmitting(true);
     
     try {
+      const stockCheckPromises = items.map(async (item) => {
+        const { data, error } = await supabase
+          .from('products')
+          .select('stock')
+          .eq('id', item.product.id)
+          .single();
+        
+        if (error) throw error;
+        
+        if (!data || data.stock < item.quantity) {
+          return {
+            product: item.product.name,
+            available: data ? data.stock : 0,
+            requested: item.quantity,
+            hasEnough: false
+          };
+        }
+        
+        return { hasEnough: true };
+      });
+      
       const stockResults = await Promise.all(stockCheckPromises);
       const insufficientStock = stockResults.filter(result => !result.hasEnough);
       
       if (insufficientStock.length > 0) {
         const firstItem = insufficientStock[0];
         toast.error(`Not enough stock for "${firstItem.product}". Available: ${firstItem.available}, Requested: ${firstItem.requested}`);
+        setIsSubmitting(false);
         return;
       }
 
-      setIsSubmitting(true);
-
-      const discountAmount = calculateDiscountAmount();
-      const finalTotal = calculateFinalTotal();
-      
-      const phoneToUse = formData.phone || selectedAddress.phone;
-
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: phoneToUse,
-          address: `${selectedAddress.building || ''} ${selectedAddress.street}, ${selectedAddress.district || ''}, ${selectedAddress.city}`,
-          city: selectedAddress.city,
-          postal_code: selectedAddress.postal_code || '',
-          total_amount: finalTotal,
-          discount_amount: discountAmount,
-          shipping_cost: shippingCost,
-          status: 'pending',
-          payment_method: paymentMethod,
-          coupon_id: discount.couponId || null,
-          coupon_code: discount.couponCode || null
-        })
-        .select()
-        .single();
-
-      if (orderError) {
-        console.error("Order creation error:", orderError);
-        throw new Error(orderError.message || "Failed to create order");
-      }
-
-      if (!order || !order.id) {
-        throw new Error("Order created but no ID returned");
-      }
-
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        product_id: item.product.id,
-        product_name: item.product.name,
-        quantity: item.quantity,
-        price: item.product.price
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        console.error("Order items error:", itemsError);
-        throw new Error(itemsError.message || "Failed to add order items");
-      }
-
-      const stockUpdatePromises = items.map(item => 
-        supabase
-          .rpc('decrement_stock', {
-            row_id: item.product.id,
-            amount: item.quantity
-          })
+      const orderId = await placeOrder(
+        selectedAddress,
+        paymentMethod,
+        shippingCost,
+        discount
       );
-      
-      await Promise.all(stockUpdatePromises);
 
-      if (discount.couponId && discount.ownerId && discount.ownerBenefitValue && discount.ownerBenefitValue > 0) {
-        console.log(`Processing coupon ${discount.couponId} for order ${order.id} with benefit ${discount.ownerBenefitValue}`);
-        
-        try {
-          const { error: usageError } = await supabase
-            .from('coupon_usage')
-            .insert({
-              coupon_id: discount.couponId,
-              user_id: user.id,
-              order_id: order.id
-            });
-            
-          if (usageError) {
-            console.error("Error recording coupon usage:", usageError);
-          }
-          
-          const { data: balanceData, error: balanceError } = await supabase
-            .rpc('increment_balance', {
-              row_id: discount.ownerId,
-              amount: discount.ownerBenefitValue
-            });
-            
-          if (balanceError) {
-            console.error("Error incrementing owner balance:", balanceError);
-            toast.error("Error applying coupon benefit");
-          } else {
-            console.log("Successfully processed coupon owner benefit:", balanceData);
-            toast.success("Coupon benefit applied successfully");
-            
-            const { error: couponUpdateError } = await supabase
-              .from('coupons')
-              .update({ times_used: discount.couponCode ? discount.couponCode.length : 0 + 1 })
-              .eq('id', discount.couponId);
-              
-            if (couponUpdateError) {
-              console.error("Error updating coupon usage counter:", couponUpdateError);
-            }
-          }
-        } catch (couponError) {
-          console.error("Error processing coupon benefit:", couponError);
-          toast.error("Failed to process coupon benefit");
-        }
+      if (orderId) {
+        clearCart();
+        toast.success(t('orderSuccess'));
+        navigate('/orders');
       }
-
-      clearCart();
-      toast.success(t('orderSuccess'));
-      navigate('/orders');
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error(t('orderError') + (error instanceof Error ? `: ${error.message}` : ''));
@@ -444,7 +348,6 @@ export default function Checkout() {
                 </div>
               </div>
               
-              {/* Shipping Information - using AddressForm component */}
               <div className="bg-white p-8 rounded-lg shadow">
                 <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('shippingInformation')}</h2>
                 <AddressForm 
@@ -455,7 +358,6 @@ export default function Checkout() {
                 />
               </div>
 
-              {/* Payment Method Selection */}
               <div className="bg-white p-8 rounded-lg shadow">
                 <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('paymentMethod')}</h2>
                 <div className="space-y-4 mt-4">
@@ -503,54 +405,6 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {/* Conditional Payment Information Section */}
-              {paymentMethod === 'credit_card' && (
-                <div className="bg-white p-8 rounded-lg shadow">
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('paymentInformation')}</h2>
-                  <div className="space-y-6 mt-4">
-                    <div>
-                      <Label htmlFor="cardNumber" className="text-gray-700 font-medium block mb-1.5">{t('cardNumber')}</Label>
-                      <Input
-                        type="text"
-                        id="cardNumber"
-                        name="cardNumber"
-                        value={cardDetails.cardNumber}
-                        onChange={handleCardDetailsChange}
-                        className="w-full"
-                        required={paymentMethod === 'credit_card'}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="expiryDate" className="text-gray-700 font-medium block mb-1.5">{t('expiryDate')}</Label>
-                        <Input
-                          type="text"
-                          id="expiryDate"
-                          name="expiryDate"
-                          placeholder="MM/YY"
-                          value={cardDetails.expiryDate}
-                          onChange={handleCardDetailsChange}
-                          className="w-full"
-                          required={paymentMethod === 'credit_card'}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="cvv" className="text-gray-700 font-medium block mb-1.5">CVV</Label>
-                        <Input
-                          type="text"
-                          id="cvv"
-                          name="cvv"
-                          value={cardDetails.cvv}
-                          onChange={handleCardDetailsChange}
-                          className="w-full"
-                          required={paymentMethod === 'credit_card'}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {!selectedAddress && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
                   <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -562,14 +416,13 @@ export default function Checkout() {
 
               <Button
                 type="submit"
-                disabled={isSubmitting || !selectedAddress}
+                disabled={isSubmitting || isOrderSubmitting || !selectedAddress}
                 className="w-full py-6 rounded-lg mt-6 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 shadow-lg hover:shadow-xl"
                 size="lg"
               >
-                {isSubmitting ? t('processing') : t('completeOrder')}
+                {isSubmitting || isOrderSubmitting ? t('processing') : t('completeOrder')}
               </Button>
               
-             
             </form>
           </div>
         </div>

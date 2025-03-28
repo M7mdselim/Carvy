@@ -37,8 +37,43 @@ serve(async (req) => {
 
     console.log(`Processing credit for user: ${userId}, amount: ${amount}, orderId: ${orderId}, couponId: ${couponId}`)
 
-    // Always use the fixed amount benefit
+    // Get coupon details if couponId is provided
     let calculatedAmount = amount;
+    let benefitType = null;
+    let orderTotal = 0;
+    
+    if (couponId && orderId) {
+      // First, get the coupon details to determine the benefit type
+      const { data: couponData, error: couponError } = await supabase
+        .from('coupons')
+        .select('owner_benefit_type, owner_benefit_value')
+        .eq('id', couponId)
+        .single();
+        
+      if (couponError) {
+        console.error('Error fetching coupon details:', couponError);
+      } else if (couponData) {
+        benefitType = couponData.owner_benefit_type;
+        
+        // If benefit type is percentage, we need to get the order total
+        if (benefitType === 'percentage') {
+          const { data: orderData, error: orderError } = await supabase
+            .from('orders')
+            .select('total_amount')
+            .eq('id', orderId)
+            .single();
+            
+          if (orderError) {
+            console.error('Error fetching order details:', orderError);
+          } else if (orderData) {
+            orderTotal = orderData.total_amount;
+            // Calculate the percentage amount
+            calculatedAmount = (orderTotal * couponData.owner_benefit_value) / 100;
+            console.log(`Calculated percentage benefit: ${calculatedAmount} (${couponData.owner_benefit_value}% of ${orderTotal})`);
+          }
+        }
+      }
+    }
 
     // Use RPC function to update balance with the fixed order (row_id, amount)
     console.log(`Incrementing balance for user ${userId} by ${calculatedAmount}`)
@@ -99,7 +134,9 @@ serve(async (req) => {
         success: true, 
         newBalance: newBalance,
         couponTracked: !!(orderId && couponId),
-        calculatedAmount: calculatedAmount
+        calculatedAmount: calculatedAmount,
+        benefitType: benefitType,
+        orderTotal: orderTotal
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

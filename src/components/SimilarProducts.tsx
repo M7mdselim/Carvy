@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import { 
   Carousel,
   CarouselContent,
@@ -185,9 +185,7 @@ export default function SimilarProducts({ productId, categoryId, shopId }: Simil
 
 // Mini product card specifically for the similar products section
 function MiniProductCard({ product }: { product: Product }) {
-  const navigate = (path: string) => {
-    window.location.href = path;
-  };
+  const navigate = useNavigate();
   const { t } = useLanguage();
 
   return (
