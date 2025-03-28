@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Shop, Product } from '../types'
@@ -52,7 +53,7 @@ export function useShopDetails(shopId: string) {
           id: shopData.id,
           name: shopData.name,
           description: shopData.description || '',
-          logo: shopData.logo || 'https://via.placeholder.com/500',
+          logo: shopData.logo || '',
           categories: uniqueCategories,
           rating: shopData.rating || 0,
           reviewCount: shopData.review_count || 0,
@@ -86,7 +87,7 @@ export function useShopDetails(shopId: string) {
             name: product.name,
             description: product.description || '',
             price: product.price,
-            image: product.image || 'https://via.placeholder.com/500',
+            image: product.image || '',
             category: product.categories?.name || 'Uncategorized',
             compatibility: product.product_car_models?.map((pcm: ProductCarModel) => {
               const car = pcm.car_models

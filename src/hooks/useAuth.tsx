@@ -45,6 +45,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       });
       
       console.log("Sign in successful:", data.user?.id);
+      toast.success("Signed in successfully!");
     } catch (error: any) {
       console.error('Sign in error:', error);
       toast.error(error.message || 'Failed to sign in');
@@ -68,6 +69,8 @@ export const useAuth = create<AuthState>((set, get) => ({
         user: data.user, 
         session: data.session 
       });
+      
+      toast.success("Account created successfully!");
     } catch (error: any) {
       console.error('Sign up error:', error);
       toast.error(error.message || 'Failed to sign up');
@@ -85,6 +88,8 @@ export const useAuth = create<AuthState>((set, get) => ({
         user: null, 
         session: null 
       });
+      
+      toast.success("Signed out successfully");
     } catch (error: any) {
       console.error('Sign out error:', error);
       toast.error(error.message || 'Failed to sign out');

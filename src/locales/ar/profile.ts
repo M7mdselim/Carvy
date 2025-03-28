@@ -68,5 +68,21 @@ export default {
   noCouponsFound: 'لم يتم العثور على كوبونات',
   creditsEarned: 'الرصيد المكتسب',
   balanceRefreshed: 'تم تحديث الرصيد',
-  refresh: 'تحديث'
+  refresh: 'تحديث',
+  // New keys
+  addressName: 'اسم العنوان',
+  apartment: 'الشقة',
+  zipCode: 'الرمز البريدي',
+  phoneNumber: 'رقم الهاتف',
+  country: 'الدولة',
+  cancel: 'إلغاء',
+  save: 'حفظ',
+  no: 'لا',
+  yes: 'نعم',
+  makeDefaultAddress: 'اجعله العنوان الافتراضي',
+  defaultAddress: 'العنوان الافتراضي',
+  noSavedAddresses: 'لا توجد عناوين محفوظة',
+  addYourFirstAddress: 'أضف عنوان الشحن الأول الخاص بك',
+  defaultAddressChanged: 'تم تغيير العنوان الافتراضي',
+  confirmDeleteAddress: 'هل أنت متأكد أنك تريد حذف هذا العنوان؟'
 };

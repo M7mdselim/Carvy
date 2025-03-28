@@ -22,6 +22,7 @@ export default {
   youMayAlsoLike: 'You may also like',
   noProductsInStock: 'No products in stock',
   noProductsMatching: 'No products matching',
+  inThisShop: 'in this shop',
   addToWishlist: 'Add to Wishlist',
   removeFromWishlist: 'Remove from Wishlist',
   addedToWishlist: 'Added to Wishlist!',
@@ -32,5 +33,16 @@ export default {
   noCarModelsFound: 'No car models found',
   inStock: 'In Stock',
   outOfStock: 'Out of Stock',
-  maxStockReached: 'Maximum stock reached'
+  maxStockReached: 'Maximum stock reached',
+  sortBy: 'Sort By',
+  default: 'Default',
+  priceLowToHigh: 'Price: Low to High',
+  priceHighToLow: 'Price: High to Low',
+  nameAToZ: 'Name: A to Z',
+  nameZToA: 'Name: Z to A',
+  activeFilters: 'Active Filters',
+  clearFilters: 'Clear Filters',
+  compatibleWith: 'Compatible With',
+  loading: 'Loading...',
+  noProductsAvailable: 'No products available'
 };

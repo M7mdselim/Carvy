@@ -47,6 +47,9 @@ export default function Profile() {
     navigate('/login');
   };
 
+  // Determine if user has coupons to display balance credits
+  const showBalanceCredits = coupons && coupons.length > 0;
+
   if (isLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -66,8 +69,10 @@ export default function Profile() {
           <ProfileHeader user={user} profile={profile} />
 
           <div className="p-6 space-y-6">
-            {/* Balance Credits Card */}
-            <BalanceCredits balance={profile.balanceCredits} onRefresh={refreshProfile} />
+            {/* Balance Credits Card - Only show for users with coupons */}
+            {showBalanceCredits && (
+              <BalanceCredits balance={profile.balanceCredits} onRefresh={refreshProfile} />
+            )}
             
             {/* Personal Information */}
             <PersonalInfo user={user} profile={profile} />

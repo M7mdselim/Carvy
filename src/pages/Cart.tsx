@@ -4,6 +4,7 @@ import { TrashIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
 import { useCart } from '../hooks/useCart'
 import { useIsMobile } from '../hooks/use-mobile'
 import { useLanguage } from '../contexts/LanguageContext'
+import { ImageIcon } from 'lucide-react'
 
 export default function Cart() {
   const { t } = useLanguage();
@@ -19,7 +20,7 @@ export default function Cart() {
             {t('startShopping')}
           </p>
           <Link
-            to="/"
+            to="/products"
             className="mt-4 md:mt-6 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             {t('continueShopping')}
@@ -40,11 +41,17 @@ export default function Cart() {
                 to={`/products/${product.id}`}
                 className="flex-shrink-0 w-full sm:w-24 h-32 sm:h-24 mb-3 sm:mb-0 mx-auto sm:mx-0 border border-gray-200 rounded-md overflow-hidden"
               >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-center object-cover"
-                />
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-center object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <ImageIcon className="h-10 w-10 text-gray-400" />
+                  </div>
+                )}
               </Link>
               <div className="sm:ml-4 flex-1 flex flex-col">
                 <div>

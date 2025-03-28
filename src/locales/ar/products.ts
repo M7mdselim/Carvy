@@ -22,6 +22,7 @@ export default {
   youMayAlsoLike: 'قد يعجبك أيضًا',
   noProductsInStock: 'لا توجد منتجات في المخزون',
   noProductsMatching: 'لا توجد منتجات مطابقة',
+  inThisShop: 'في هذا المتجر',
   addToWishlist: 'أضف إلى المفضلة',
   removeFromWishlist: 'إزالة من المفضلة',
   addedToWishlist: 'تمت إضافة المنتج إلى قائمة المفضلة!',
@@ -32,5 +33,16 @@ export default {
   noCarModelsFound: 'لم يتم العثور على موديلات سيارات',
   inStock: 'متوفر',
   outOfStock: 'غير متوفر',
-  maxStockReached: 'تم الوصول إلى الحد الأقصى للمخزون'
+  maxStockReached: 'تم الوصول إلى الحد الأقصى للمخزون',
+  sortBy: 'ترتيب حسب',
+  default: 'الافتراضي',
+  priceLowToHigh: 'السعر: من الأقل إلى الأعلى',
+  priceHighToLow: 'السعر: من الأعلى إلى الأقل',
+  nameAToZ: 'الاسم: من الألف إلى الياء',
+  nameZToA: 'الاسم: من الياء إلى الألف',
+  activeFilters: 'الفلاتر النشطة',
+  clearFilters: 'مسح الفلاتر',
+  compatibleWith: 'متوافق مع',
+  loading: 'جاري التحميل...',
+  noProductsAvailable: 'لا توجد منتجات متاحة'
 };

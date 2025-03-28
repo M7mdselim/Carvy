@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../lib/supabase';
@@ -5,7 +6,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { MapPin, MapIcon, Navigation, Home, Building, Layers, DoorOpen, Map } from 'lucide-react';
+import { MapPin, MapIcon, Navigation, Home, Building, Layers, DoorOpen, Map, Save, Loader2 } from 'lucide-react';
 import { Address, City, Area } from '../../types';
 import { GoogleMap } from './GoogleMap';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
@@ -19,13 +20,15 @@ interface AddressFormProps {
   selectedAddress?: Address | null;
   hidePhoneField?: boolean;
   onShippingCostChange?: (cost: number) => void;
+  onAddressSaved?: (address: Address) => void;
 }
 
 export function AddressForm({ 
   onAddressSelect, 
   selectedAddress, 
   hidePhoneField = false,
-  onShippingCostChange
+  onShippingCostChange,
+  onAddressSaved
 }: AddressFormProps) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -240,6 +243,10 @@ export function AddressForm({
       
       toast.success(t('addressSaved'));
       
+      if (onAddressSaved) {
+        onAddressSaved(data);
+      }
+      
       resetNewAddressForm();
     } catch (error) {
       console.error('Error saving address:', error);
@@ -336,13 +343,13 @@ export function AddressForm({
     <div className={`space-y-6 ${isRtl ? 'rtl' : 'ltr'}`}>
       {addresses.length > 0 && !isAddingNew && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
             <h3 className="text-lg font-medium">{t('savedAddresses')}</h3>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={startAddingNewAddress}
-              className="text-sm"
+              className="text-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 w-full sm:w-auto"
             >
               {t('addNewAddress')}
             </Button>
@@ -430,7 +437,7 @@ export function AddressForm({
         <div className={addresses.length > 0 ? "border-t pt-6" : ""}>
           <h3 className="text-lg font-medium mb-4">{addresses.length > 0 ? t('addNewAddress') : t('addAddress')}</h3>
           
-          <Card className="bg-gray-50 border-gray-200">
+          <Card className="bg-white border-gray-200 shadow-sm">
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
@@ -584,7 +591,7 @@ export function AddressForm({
             <Button
               type="button"
               variant="outline"
-              className="flex items-center gap-2 w-full justify-center"
+              className="flex items-center gap-2 w-full justify-center hover:bg-gray-50"
               onClick={() => setShowMap(!showMap)}
             >
               <MapPin className="h-4 w-4" />
@@ -610,7 +617,7 @@ export function AddressForm({
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 hover:bg-gray-50"
                 onClick={handleCancelAddingAddress}
               >
                 {t('cancel')}
@@ -618,11 +625,21 @@ export function AddressForm({
             )}
             <Button
               type="button"
-              className={addresses.length > 0 ? "flex-1" : "w-full"}
+              className={`${addresses.length > 0 ? "flex-1" : "w-full"} bg-indigo-600 hover:bg-indigo-700 shadow-sm flex items-center justify-center gap-2`}
               onClick={handleSaveAddress}
               disabled={savingAddress}
             >
-              {savingAddress ? t('saving') : t('saveAddress')}
+              {savingAddress ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t('saving')}
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {t('saveAddress')}
+                </>
+              )}
             </Button>
           </div>
         </div>

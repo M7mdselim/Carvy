@@ -48,7 +48,7 @@ export function useProducts() {
             name: product.name,
             description: product.description || '',
             price: product.price,
-            image: product.image || 'https://via.placeholder.com/500',
+            image: product.image || '', // Empty string if no image is set
             category: product.categories?.name || 'Uncategorized',
             compatibility: product.product_car_models?.map((pcm: ProductCarModel) => {
               const car = pcm.car_models

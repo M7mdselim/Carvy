@@ -6,10 +6,11 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { useSearchParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination'
-import { Search, Filter, X } from 'lucide-react'
+import { Search, Filter, X, ArrowDownAZ, ArrowUpAZ, ArrowDownUp } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { ShopProductCard } from '../components/ShopProductCard'
 import { Badge } from '../components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 
 export default function Products() {
   const { t, language } = useLanguage();
@@ -25,6 +26,7 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortOption, setSortOption] = useState<string>('default');
   const productsPerPage = 9;
   const [isRtl, setIsRtl] = useState(language === 'ar');
   const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string}>({});
@@ -72,8 +74,8 @@ export default function Products() {
     };
   }, [language]);
 
-  // Filter products based on category, search query, and make/model
-  const filteredProducts = products
+  // Filter and sort products
+  const filteredAndSortedProducts = products
     .filter(product => !selectedCategory || product.category === selectedCategory)
     .filter(product => 
       !searchQuery || 
@@ -96,18 +98,32 @@ export default function Products() {
         }
         return true;
       });
+    })
+    .sort((a, b) => {
+      switch(sortOption) {
+        case 'priceAsc':
+          return a.price - b.price;
+        case 'priceDesc':
+          return b.price - a.price;
+        case 'nameAsc':
+          return a.name.localeCompare(b.name);
+        case 'nameDesc':
+          return b.name.localeCompare(a.name);
+        default:
+          return 0; // Keep original order
+      }
     });
 
   // Paginate products
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const currentProducts = filteredAndSortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchQuery, activeFilters]);
+  }, [selectedCategory, searchQuery, activeFilters, sortOption]);
 
   // Load more products
   const handleLoadMore = () => {
@@ -120,6 +136,7 @@ export default function Products() {
   const clearFilters = () => {
     setActiveFilters({});
     setSelectedCategory('');
+    setSortOption('default');
     setSearchParams({});
   };
 
@@ -154,11 +171,23 @@ export default function Products() {
               ))}
             </select>
           </div>
+          <Select value={sortOption} onValueChange={setSortOption}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder={t('sortBy')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">{t('Sort by')}</SelectItem>
+              <SelectItem value="priceAsc">{t('priceLowToHigh')}</SelectItem>
+              <SelectItem value="priceDesc">{t('priceHighToLow')}</SelectItem>
+              <SelectItem value="nameAsc">{t('nameAToZ')}</SelectItem>
+              <SelectItem value="nameDesc">{t('nameZToA')}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       
       {/* Show active filters if any */}
-      {(activeFilters.category || activeFilters.make || activeFilters.model) && (
+      {(activeFilters.category || activeFilters.make || activeFilters.model || sortOption !== 'default') && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-gray-700">{t('activeFilters')}:</span>
           {activeFilters.category && (
@@ -177,6 +206,17 @@ export default function Products() {
               </button>
             </Badge>
           )}
+          {sortOption !== 'default' && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {sortOption === 'priceAsc' && t('priceLowToHigh')}
+              {sortOption === 'priceDesc' && t('priceHighToLow')}
+              {sortOption === 'nameAsc' && t('nameAToZ')}
+              {sortOption === 'nameDesc' && t('nameZToA')}
+              <button onClick={() => setSortOption('default')} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
         </div>
       )}
 
@@ -185,7 +225,7 @@ export default function Products() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">{t('loadingProducts')}</p>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : filteredAndSortedProducts.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg shadow-sm">
           <div className="text-gray-400 text-5xl mb-4">🔍</div>
           <h3 className="text-xl font-medium text-gray-700 mb-2">{t('noProductsFound')}</h3>
@@ -193,7 +233,7 @@ export default function Products() {
             {selectedCategory && `${t('for')} ${selectedCategory}`}
             {(activeFilters.make || activeFilters.model) && ` ${t('matching')} ${activeFilters.make || ''} ${activeFilters.model || ''}`}
           </p>
-          {(activeFilters.category || activeFilters.make || activeFilters.model) && (
+          {(activeFilters.category || activeFilters.make || activeFilters.model || sortOption !== 'default') && (
             <Button 
               onClick={clearFilters}
               variant="outline" 
@@ -205,14 +245,14 @@ export default function Products() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {currentProducts.map((product) => (
               <ShopProductCard key={product.id} product={product} />
             ))}
           </div>
 
           <div className="mt-8 flex flex-col items-center">
-            {indexOfLastProduct < filteredProducts.length && (
+            {indexOfLastProduct < filteredAndSortedProducts.length && (
               <Button 
                 onClick={handleLoadMore} 
                 className="mb-4"

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -9,7 +8,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/button'
 import { 
   Heart, Share2, Plus, Minus, ArrowLeft, ArrowRight,
-  ShoppingCart
+  ShoppingCart, ImageIcon
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent } from '../components/ui/card'
@@ -17,6 +16,7 @@ import { Separator } from '../components/ui/separator'
 import { useWishlist } from '../hooks/useWishlist'
 import { Badge } from '../components/ui/badge'
 import { formatCurrency } from '../lib/utils'
+import SimilarProducts from '../components/SimilarProducts'
 
 export default function ProductDetails() {
   const { productId } = useParams<{ productId: string }>()
@@ -33,6 +33,7 @@ export default function ProductDetails() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [inWishlist, setInWishlist] = useState(false)
   const [loadingWishlist, setLoadingWishlist] = useState(false)
+  const [categoryId, setCategoryId] = useState<string | null>(null)
   const cartItem = items.find(item => item.product.id === productId)
   const isRtl = language === 'ar'
 
@@ -92,12 +93,9 @@ export default function ProductDetails() {
         productImages = [...productImages, ...additionalImages]
       }
       
-      if (productImages.length === 0) {
-        productImages = ['https://via.placeholder.com/500']
-      }
-      
       setImages(productImages)
       setShopName(shopData.name)
+      setCategoryId(productData.category_id)
       
       const formattedProduct: Product = {
         id: productData.id,
@@ -105,7 +103,7 @@ export default function ProductDetails() {
         name: productData.name,
         description: productData.description || '',
         price: productData.price,
-        image: productImages[0],
+        image: productData.image || '', // Ensure empty string if no image
         category: productData.categories?.name || 'Uncategorized',
         compatibility: productData.product_car_models?.map((pcm: any) => {
           const car = pcm.car_models
@@ -188,7 +186,6 @@ export default function ProductDetails() {
   }
 
   function handleCarModelClick(carModel: string) {
-    // Extract make, model, and years from the compatibility string
     const regex = /(\w+)\s+(\w+)\s+\((\d+)(?:-(\d+))?\)/
     const match = carModel.match(regex)
     
@@ -244,11 +241,17 @@ export default function ProductDetails() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <Card className="overflow-hidden border-0 shadow-lg">
           <div className="aspect-square bg-white rounded-lg overflow-hidden relative">
-            <img 
-              src={images[currentImageIndex]} 
-              alt={product.name} 
-              className="w-full h-full object-contain p-4"
-            />
+            {images.length > 0 ? (
+              <img 
+                src={images[currentImageIndex]} 
+                alt={product.name} 
+                className="w-full h-full object-contain p-4"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 p-4">
+                <ImageIcon className="h-32 w-32 text-gray-400" />
+              </div>
+            )}
             
             {images.length > 1 && (
               <>
@@ -447,6 +450,14 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+      
+      {product && productId && (
+        <SimilarProducts 
+          productId={productId} 
+          categoryId={categoryId} 
+          shopId={product.shopId} 
+        />
+      )}
     </div>
   )
 }

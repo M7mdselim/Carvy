@@ -68,5 +68,21 @@ export default {
   noCouponsFound: 'No coupons found',
   creditsEarned: 'Credits Earned',
   balanceRefreshed: 'Balance refreshed',
-  refresh: 'Refresh'
+  refresh: 'Refresh',
+  // New keys
+  addressName: 'Address Name',
+  apartment: 'Apartment',
+  zipCode: 'Zip Code',
+  phoneNumber: 'Phone Number',
+  country: 'Country',
+  cancel: 'Cancel',
+  save: 'Save',
+  no: 'No',
+  yes: 'Yes',
+  makeDefaultAddress: 'Make Default Address',
+  defaultAddress: 'Default Address',
+  noSavedAddresses: 'No Saved Addresses',
+  addYourFirstAddress: 'Add your first shipping address',
+  defaultAddressChanged: 'Default address changed',
+  confirmDeleteAddress: 'Are you sure you want to delete this address?'
 };

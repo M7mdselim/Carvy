@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../hooks/useAuth';
-import { CreditCard, Shield, Truck, CreditCard as CreditCardIcon } from 'lucide-react';
+
+import { CreditCard, Shield, Truck, CreditCard as CreditCardIcon, AlertTriangle, Info ,ImageIcon } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Button } from '../components/ui/button';
@@ -13,6 +15,7 @@ import { CouponInput } from '../components/CouponInput';
 import { AddressForm } from '../components/checkout/AddressForm';
 import { Address } from '../types';
 import { formatCurrency } from '../lib/utils';
+import { Alert } from '../components/ui/alert';
 
 export default function Checkout() {
   const { t, language } = useLanguage();
@@ -29,7 +32,7 @@ export default function Checkout() {
   });
 
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
+  const [paymentMethod, setPaymentMethod] = useState('cash_on_delivery');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [discount, setDiscount] = useState<{
@@ -66,6 +69,15 @@ export default function Checkout() {
       setProfileLoaded(true);
     }
   }, [user, userProfile, navigate, profileLoaded]);
+
+  useEffect(() => {
+    if (selectedAddress && !formData.phone) {
+      setFormData(prev => ({
+        ...prev,
+        phone: selectedAddress.phone
+      }));
+    }
+  }, [selectedAddress, formData.phone]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -300,11 +312,17 @@ export default function Checkout() {
                   {items.map(({ product, quantity }) => (
                     <li key={product.id} className="flex py-4">
                       <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-full w-full object-cover object-center"
-                        />
+                        {product.image ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-gray-100">
+                            <ImageIcon className="h-6 w-6 text-gray-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="ml-4 flex flex-1 flex-col">
                         <div>
@@ -442,8 +460,8 @@ export default function Checkout() {
                 <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{t('paymentMethod')}</h2>
                 <div className="space-y-4 mt-4">
                   <div 
-                    className={`flex items-center space-x-3 border p-4 rounded-md hover:bg-gray-50 cursor-pointer ${paymentMethod === 'credit_card' ? 'border-indigo-500 bg-indigo-50' : ''}`}
-                    onClick={() => setPaymentMethod('credit_card')}
+                    className={`relative flex items-center space-x-3 border p-4 rounded-md hover:bg-gray-50 cursor-pointer ${paymentMethod === 'credit_card' ? 'border-indigo-500 bg-indigo-50' : 'opacity-60'}`}
+                    onClick={() => toast.info(t('creditCardComingSoon'))}
                   >
                     <input
                       type="radio"
@@ -451,13 +469,17 @@ export default function Checkout() {
                       name="paymentMethod"
                       value="credit_card"
                       checked={paymentMethod === 'credit_card'}
-                      onChange={() => setPaymentMethod('credit_card')}
+                      onChange={() => {}}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                      disabled
                     />
                     <Label htmlFor="credit_card" className="flex items-center gap-3 cursor-pointer">
                       <CreditCardIcon className="h-5 w-5 text-indigo-600" />
                       <span className="font-medium">{t('creditCard')}</span>
                     </Label>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">
+                      {t('creditCardComingSoon')}
+                    </div>
                   </div>
                   
                   <div 
@@ -529,6 +551,15 @@ export default function Checkout() {
                 </div>
               )}
 
+              {!selectedAddress && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-amber-800 text-sm">
+                    {t('saveAddressFirst')}
+                  </p>
+                </div>
+              )}
+
               <Button
                 type="submit"
                 disabled={isSubmitting || !selectedAddress}
@@ -537,6 +568,8 @@ export default function Checkout() {
               >
                 {isSubmitting ? t('processing') : t('completeOrder')}
               </Button>
+              
+             
             </form>
           </div>
         </div>

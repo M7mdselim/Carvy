@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom'
 import { CarIcon } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
@@ -25,6 +26,10 @@ const SearchResults = ({
 
   const handleCarModelClick = (make: string, model: string) => {
     navigate(`/products?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`)
+  }
+
+  const handleProductClick = (productId: string) => {
+    navigate(`/products/${productId}`)
   }
 
   if (!searchQuery) return null
@@ -85,7 +90,7 @@ const SearchResults = ({
                 <div
                   key={product.id}
                   className="p-4 hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/shops/${product.shopId}?product=${product.id}`)}
+                  onClick={() => handleProductClick(product.id)}
                 >
                   <div className="font-medium">{product.name}</div>
                   <div className="text-sm text-gray-500">{product.price.toFixed(2)} EGP</div>

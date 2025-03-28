@@ -42,13 +42,13 @@ export function RefundRequestDialog({ orderId, onSuccess, disabled = false }: Re
         <Button 
           variant="outline" 
           size="sm" 
-          className="border-red-200 text-red-700 hover:bg-red-50"
+          className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 shadow-sm"
           disabled={disabled}
         >
           {t('requestRefund')}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
           <AlertDialogTitle>{t('requestRefund')}</AlertDialogTitle>
           <AlertDialogDescription>
@@ -61,18 +61,18 @@ export function RefundRequestDialog({ orderId, onSuccess, disabled = false }: Re
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={4}
-            className="w-full"
+            className="w-full focus:border-red-300 focus:ring-red-200"
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogCancel className="hover:bg-gray-100">{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();
               handleSubmit();
             }}
             disabled={isSubmitting || !reason.trim()}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="bg-red-600 hover:bg-red-700 text-white shadow-sm"
           >
             {isSubmitting ? (
               <>

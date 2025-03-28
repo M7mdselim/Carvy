@@ -1,86 +1,54 @@
 
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MagnifyingGlassIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
-import { useLanguage } from '../../contexts/LanguageContext'
 import { useShops } from '../../hooks/useShops'
-import { Input } from '../ui/input'
+import { Button } from '../../components/ui/button'
+import { useLanguage } from '../../contexts/LanguageContext'
 import ShopCard from '../ShopCard'
-import PaginationControls from './PaginationControls'
+import { useIsMobile } from '../../hooks/use-mobile'
 
 const ShopsSection = () => {
   const { t } = useLanguage()
+  const { shops, loading } = useShops()
   const navigate = useNavigate()
-  const { shops, loading: loadingShops } = useShops()
-  
-  // State for pagination
-  const [currentShopPage, setCurrentShopPage] = useState(1)
-  
-  // Items per page constants
-  const itemsPerPage = 5
-  
-  // State for filtering
-  const [shopFilter, setShopFilter] = useState('')
+  const isMobile = useIsMobile()
 
-  // Filter and paginate shops
-  const filteredShops = shopFilter
-    ? shops.filter(shop => 
-        shop.name.toLowerCase().includes(shopFilter.toLowerCase()) ||
-        shop.description.toLowerCase().includes(shopFilter.toLowerCase()))
-    : shops
-    
-  const totalShopPages = Math.ceil(filteredShops.length / itemsPerPage)
-  const indexOfLastShop = currentShopPage * itemsPerPage
-  const indexOfFirstShop = indexOfLastShop - itemsPerPage
-  const currentShops = filteredShops.slice(indexOfFirstShop, indexOfLastShop)
+  // Get featured shops (first 6)
+  const featuredShops = shops.slice(0, 6)
 
   return (
-    <div className="bg-white py-16 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 md:mb-0">{t('browseShops')}</h2>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder={t('searchShops')}
-                value={shopFilter}
-                onChange={(e) => setShopFilter(e.target.value)}
-                className="pl-10 pr-4 py-2"
-              />
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-            <button
-              onClick={() => navigate('/shops')}
-              className="flex items-center text-indigo-600 hover:text-indigo-800"
-            >
-              {t('viewAll')}
-              <ArrowRightIcon className="ml-1 h-4 w-4" />
-            </button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          {loadingShops ? (
-            <div className="col-span-full text-center py-12">{t('loadingShops')}</div>
-          ) : currentShops.length > 0 ? (
-            currentShops.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12 text-gray-500">
-              {t('noShopsFound')}
-            </div>
-          )}
-        </div>
-        
-        {/* Shops Pagination */}
-        <PaginationControls 
-          currentPage={currentShopPage}
-          totalPages={totalShopPages}
-          setPage={setCurrentShopPage}
-        />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">{t('featuredShops')}</h2>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/shops')}
+        >
+          {t('viewAll')}
+        </Button>
       </div>
+
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {[...Array(6)].map((_, index) => (
+            <div 
+              key={index} 
+              className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse h-64"
+            >
+              <div className="h-32 bg-gray-200"></div>
+              <div className="p-4">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {featuredShops.map(shop => (
+            <ShopCard key={shop.id} shop={shop} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

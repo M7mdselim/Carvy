@@ -18,10 +18,13 @@ import { Heart } from 'lucide-react'
 
 export function Navbar({ transparent = false }: NavbarProps) {
   const { user, signOut } = useAuth()
-  const { items, total } = useCart()
+  const { items } = useCart()
   const location = useLocation()
   const { t } = useLanguage()
+  
+  // Calculate cart totals here instead of using hook values directly
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
 
   const navigation = [
     { name: t('home'), href: '/' },

@@ -7,10 +7,10 @@ interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
-  const { language, setLanguage } = useLanguage();
+  const { language, changeLanguage } = useLanguage();
 
   const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ar' : 'en');
+    changeLanguage(language === 'en' ? 'ar' : 'en');
   };
 
   return (
