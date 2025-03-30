@@ -26,7 +26,7 @@ export const ar = {
   "cart": "السلة",
   "each": "للحبة",
   "myWishlist": "المفضله لي"  ,
-  
+  "number":"٠١١٥٥٠٠٣٥٣٧",
   "shippingTaxes": "سيتم حساب الشحن عند الدفع",
   "checkout": "انتقال الى نقطه الدفع",
   "or": "أو",
