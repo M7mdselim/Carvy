@@ -25,7 +25,8 @@ export const en = {
   "subtotal": "Subtotal",
   "cart": "Cart",
   "each": "Each",
-  "shippingTaxes": "Shipping & taxes calculated at checkout",
+  "myWishlist": "My Wishlist"  ,
+  "shippingTaxes": "Shipping calculated at checkout",
   "checkout": "Checkout",
   "or": "Or",
   "continueShopping": "Continue Shopping",
@@ -314,6 +315,8 @@ export const en = {
   "stillHaveQuestions": "Still have questions?",
   "contactUsMessage": "Our customer support team is available to help you with any questions or concerns.",
   "pageNotFound": "Page Not Found",
-  "pageDoesntExist": "The page you're looking for doesn't exist or has been moved."
+  "pageDoesntExist": "The page you're looking for doesn't exist or has been moved.",
+  "featuredProducts":"Featured Products",
+  "featuredShops":"Featured Shops"
 };
 export default en;

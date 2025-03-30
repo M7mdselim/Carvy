@@ -25,8 +25,10 @@ export const ar = {
   "subtotal": "المجموع الجزئي",
   "cart": "السلة",
   "each": "للحبة",
-  "shippingTaxes": "سيتم حساب الشحن والضرائب عند الدفع",
-  "checkout": "الدفع",
+  "myWishlist": "المفضله لي"  ,
+  
+  "shippingTaxes": "سيتم حساب الشحن عند الدفع",
+  "checkout": "انتقال الى نقطه الدفع",
   "or": "أو",
   "continueShopping": "متابعة التسوق",
   "emptyCart": "سلتك فارغة حالياً",
@@ -313,7 +315,9 @@ export const ar = {
   "stillHaveQuestions": "هل لا تزال لديك أسئلة؟",
   "contactUsMessage": "فريق دعم العملاء لدينا متواجد لمساعدتك في أي أسئلة أو مخاوف.",
   "pageNotFound": "الصفحة غير موجودة",
-  "pageDoesntExist": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها."
+  "pageDoesntExist": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+  "featuredProducts":"قطع غيار",
+  "featuredShops":"محلات"
 };
 
 
