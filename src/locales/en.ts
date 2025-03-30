@@ -27,6 +27,7 @@ export const en = {
   "each": "Each",
   "myWishlist": "My Wishlist"  ,
   "number":"+20 1155003537",
+  "updateName": "Update Name",
   "shippingTaxes": "Shipping calculated at checkout",
   "checkout": "Checkout",
   "or": "Or",

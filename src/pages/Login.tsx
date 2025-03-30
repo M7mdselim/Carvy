@@ -79,7 +79,7 @@ export default function Login() {
           {t('Sign in Your Account')}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          {t('Dont Have Account')}{' '}
+          {t('Dont Have Account?')}{' '}
           <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
             {t('Create Account')}
           </Link>

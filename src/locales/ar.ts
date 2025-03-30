@@ -27,6 +27,7 @@ export const ar = {
   "each": "للحبة",
   "myWishlist": "المفضله لي"  ,
   "number":"٠١١٥٥٠٠٣٥٣٧",
+  "updateName": "تحديث الاسم",
   "shippingTaxes": "سيتم حساب الشحن عند الدفع",
   "checkout": "انتقال الى نقطه الدفع",
   "or": "أو",
