@@ -75,7 +75,7 @@ export default function Checkout() {
     if (selectedAddress && !formData.phone) {
       setFormData(prev => ({
         ...prev,
-        phone: selectedAddress.phone
+        phone: userProfile.phoneNumber
       }));
     }
   }, [selectedAddress, formData.phone]);
