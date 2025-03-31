@@ -761,6 +761,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_owner_benefit: {
+        Args: {
+          p_owner_id: string
+          p_order_id: string
+          p_benefit_type: string
+          p_benefit_value: number
+          p_status: string
+        }
+        Returns: undefined
+      }
       apply_coupon: {
         Args: {
           coupon_code: string
@@ -783,6 +793,12 @@ export type Database = {
         Args: {
           row_id: string
           amount: number
+        }
+        Returns: number
+      }
+      increment_usage: {
+        Args: {
+          coupon_id: string
         }
         Returns: number
       }

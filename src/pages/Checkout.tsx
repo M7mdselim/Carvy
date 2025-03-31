@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -177,11 +178,18 @@ export default function Checkout() {
         return;
       }
 
+      const phoneToUse = formData.phone && formData.phone.trim() !== '' 
+        ? formData.phone 
+        : (userProfile?.phoneNumber || '');
+        
       const orderId = await placeOrder(
         selectedAddress,
         paymentMethod,
         shippingCost,
-        discount
+        discount,
+        phoneToUse,
+        formData.firstName,
+        formData.lastName
       );
 
       if (orderId) {

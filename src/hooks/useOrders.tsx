@@ -125,7 +125,10 @@ export const useOrders = () => {
     address: Address,
     paymentMethod: string,
     shippingCost: number,
-    couponData: any = {}
+    couponData: any = {},
+    contactPhone: string = '',
+    firstName: string = '',
+    lastName: string = ''
   ) => {
     if (!user) {
       toast.error(t('loginToOrder'));
@@ -172,6 +175,21 @@ export const useOrders = () => {
       
       const orderId = uuidv4();
       
+      // Ensure we have proper contact information
+      const phoneNumber = contactPhone && contactPhone.trim() !== '' 
+        ? contactPhone 
+        : (address.phone || '');
+        
+      // Use provided first name or extract from address recipient name
+      const firstNameToUse = firstName && firstName.trim() !== ''
+        ? firstName
+        : address.recipient_name.split(' ')[0] || '';
+        
+      // Use provided last name or extract from address recipient name  
+      const lastNameToUse = lastName && lastName.trim() !== ''
+        ? lastName
+        : address.recipient_name.split(' ').slice(1).join(' ') || '';
+      
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -185,10 +203,10 @@ export const useOrders = () => {
           total_amount: total,
           coupon_id: couponData.couponId || null,
           coupon_code: couponData.couponCode || null,
-          first_name: address.recipient_name.split(' ')[0] || '',
-          last_name: address.recipient_name.split(' ').slice(1).join(' ') || '',
+          first_name: firstNameToUse,
+          last_name: lastNameToUse,
           email: user.email || '',
-          phone: address.phone || '',
+          phone: phoneNumber,
           address: `${address.building} ${address.street}, ${address.apartment || ''}`,
           city: address.city,
           postal_code: address.postal_code || ''
