@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react'
 import { X, Send, MessageCircle, ChevronDown, ChevronUp, ArrowLeft, Mail, Phone, Bot, BotMessageSquare, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -15,9 +16,21 @@ interface Message {
   text: string
   timestamp: Date
   isLoading?: boolean
-  feedbackType?: 'product_request' | 'complaint' | 'question' | 'suggestion' | 'navigate_products' | 'navigate_categories' | 'navigate_shops' | 'navigate_models' | 'navigate_contact' | 'navigate_faq' | 'human_agent' | 'order_help' | 'car_advice' | 'car_information' | 'warranty' | 'product_search' | 'other'
+  feedbackType?: string
   saved?: boolean
   awaitingProductName?: boolean
+  quickReplies?: QuickReply[]
+  answers?: Answer[] // Added for multi-question support
+}
+
+interface Answer {
+  question: string
+  answer: string
+}
+
+interface QuickReply {
+  text: string
+  action: string
 }
 
 export function Chatbot() {
@@ -76,7 +89,12 @@ export function Chatbot() {
                   id: '1',
                   isBot: true,
                   text: welcomeText,
-                  timestamp: new Date()
+                  timestamp: new Date(),
+                  quickReplies: [
+                    { text: t('howToOrder'), action: t('howDoIOrderQuestion') },
+                    { text: t('trackOrder'), action: t('trackOrderQuestion') },
+                    { text: t('findPart'), action: t('findPartQuestion') }
+                  ]
                 }
               ]);
             } else {
@@ -85,7 +103,12 @@ export function Chatbot() {
                   id: '1',
                   isBot: true,
                   text: `👋 ${t('welcomeBack')}! ${t('enhancedWelcomeBackMessage')}`,
-                  timestamp: new Date()
+                  timestamp: new Date(),
+                  quickReplies: [
+                    { text: t('howToOrder'), action: t('howDoIOrderQuestion') },
+                    { text: t('trackOrder'), action: t('trackOrderQuestion') },
+                    { text: t('findPart'), action: t('findPartQuestion') }
+                  ]
                 }
               ]);
             }
@@ -95,7 +118,12 @@ export function Chatbot() {
                 id: '1',
                 isBot: true,
                 text: `👋 ${t('welcomeBack')}! ${t('enhancedWelcomeBackMessage')}`,
-                timestamp: new Date()
+                timestamp: new Date(),
+                quickReplies: [
+                  { text: t('howToOrder'), action: t('howDoIOrderQuestion') },
+                  { text: t('trackOrder'), action: t('trackOrderQuestion') },
+                  { text: t('findPart'), action: t('findPartQuestion') }
+                ]
               }
             ]);
           }
@@ -108,7 +136,12 @@ export function Chatbot() {
             id: '1',
             isBot: true,
             text: `👋 ${t('enhancedWelcomeMessage')}`,
-            timestamp: new Date()
+            timestamp: new Date(),
+            quickReplies: [
+              { text: t('howToOrder'), action: t('howDoIOrderQuestion') },
+              { text: t('trackOrder'), action: t('trackOrderQuestion') },
+              { text: t('findPart'), action: t('findPartQuestion') }
+            ]
           }
         ]);
       }
@@ -166,6 +199,32 @@ export function Chatbot() {
     }, 300)
   }
 
+  // Parse message for questions
+  const parseQuestionsFromMessage = (message: string): string[] => {
+    // Split the message into sentences
+    const sentences = message.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0)
+    // Filter sentences that appear to be questions
+    return sentences.filter(sentence => {
+      const trimmed = sentence.trim().toLowerCase()
+      return (
+        trimmed.includes('?') || 
+        trimmed.startsWith('what') || 
+        trimmed.startsWith('how') || 
+        trimmed.startsWith('where') || 
+        trimmed.startsWith('when') || 
+        trimmed.startsWith('why') || 
+        trimmed.startsWith('which') || 
+        trimmed.startsWith('who') ||
+        trimmed.startsWith('can') ||
+        trimmed.startsWith('do') ||
+        trimmed.startsWith('does') ||
+        trimmed.startsWith('is') ||
+        trimmed.startsWith('are') ||
+        trimmed.includes('tell me about')
+      )
+    })
+  }
+
   const handleNavigationIntent = (feedbackType: string, productName?: string) => {
     if (feedbackType === 'navigate_products') {
       navigate('/products')
@@ -183,6 +242,15 @@ export function Chatbot() {
         minimizeChat()
       }
       return true
+    }else if (feedbackType === 'navigate_orders') {
+        navigate('/orders')
+        if (isMobile) {
+          closeChat()
+        } else {
+          minimizeChat()
+        }
+        return true
+
     } else if (feedbackType === 'navigate_shops') {
       navigate('/shops')
       if (isMobile) {
@@ -245,10 +313,57 @@ export function Chatbot() {
           saved: true,
           productName: userMessage,
           carModel: data?.carModel || null,
-          category: data?.category || null
+          category: data?.category || null,
+          quickReplies: [
+            { text: t('browseProductCatalog'), action: t('showMeMoreProducts') },
+            { text: t('checkOrderStatus'), action: t('orderStatus') }
+          ]
         }
       }
+
+      // Parse multiple questions from user message
+      const questions = parseQuestionsFromMessage(userMessage);
       
+      // If multiple questions detected, process each one
+      if (questions.length > 1) {
+        const answers: Answer[] = [];
+        
+        // Process each question and collect answers
+        for (const question of questions) {
+          const { data, error } = await supabase.functions.invoke('chat-assistant', {
+            body: { 
+              message: question,
+              userId: user?.id || null,
+              email: contactEmail || user?.email || null,
+              phoneNumber: contactPhone || null
+            }
+          });
+          
+          if (error) throw error;
+          
+          answers.push({
+            question: question.trim(),
+            answer: data.response
+          });
+        }
+        
+        // Return combined response with multiple answers
+        return {
+          response: t('multipleQuestionsDetected'),
+          feedbackType: 'question',
+          saved: false,
+          productName: null,
+          carModel: null,
+          category: null,
+          answers: answers,
+          quickReplies: [
+            { text: t('moreHelp'), action: t('canYouHelpMeWithSomethingElse') },
+            { text: t('thankYou'), action: t('thanksForTheInformation') }
+          ]
+        };
+      }
+      
+      // Standard single question/comment processing
       const { data, error } = await supabase.functions.invoke('chat-assistant', {
         body: { 
           message: userMessage,
@@ -274,13 +389,43 @@ export function Chatbot() {
         }
       }
 
+      // Add appropriate quick replies based on the feedback type
+      let quickReplies: QuickReply[] = [];
+      
+      switch(data.feedbackType) {
+        case 'product_request':
+          quickReplies = [
+            { text: t('browseMoreProducts'), action: t('showMoreProducts') },
+            { text: t('findShopsNearMe'), action: t('whereCanIBuyThis') }
+          ];
+          break;
+        case 'order_help':
+          quickReplies = [
+            { text: t('paymentMethods'), action: t('whatPaymentMethodsAreAccepted') },
+            { text: t('shipping'), action: t('howLongDoesShippingTake') }
+          ];
+          break;
+        case 'question':
+          quickReplies = [
+            { text: t('returnPolicy'), action: t('whatIsReturnPolicy') },
+            { text: t('contactSupport'), action: t('speakToRepresentative') }
+          ];
+          break;
+        default:
+          quickReplies = [
+            { text: t('lookForParts'), action: t('iNeedToFindAPart') },
+            { text: t('askQuestion'), action: t('iHaveAnotherQuestion') }
+          ];
+      }
+
       return {
         response: data.response,
         feedbackType: data.feedbackType,
         saved: data.saved,
         productName: data.productName,
         carModel: data.carModel,
-        category: data.category
+        category: data.category,
+        quickReplies
       }
     } catch (error) {
       console.error('Error with NLP function:', error)
@@ -290,7 +435,11 @@ export function Chatbot() {
         saved: false,
         productName: null,
         carModel: null,
-        category: null
+        category: null,
+        quickReplies: [
+          { text: t('tryAgain'), action: t('canYouHelpMeAgain') },
+          { text: t('contactSupport'), action: t('connectToHuman') }
+        ]
       }
     }
   }
@@ -370,9 +519,11 @@ export function Chatbot() {
         isBot: true,
         text: nlpResult.response,
         timestamp: new Date(),
-        feedbackType: nlpResult.feedbackType as any,
+        feedbackType: nlpResult.feedbackType,
         saved: nlpResult.saved,
-        awaitingProductName: nlpResult.awaitingProductName
+        awaitingProductName: nlpResult.awaitingProductName,
+        quickReplies: nlpResult.quickReplies,
+        answers: nlpResult.answers
       }
       
       const quickBotMessage: Message = {
@@ -402,7 +553,11 @@ export function Chatbot() {
           id: (Date.now() + 2).toString(),
           isBot: true,
           text: t('chatbotError'),
-          timestamp: new Date()
+          timestamp: new Date(),
+          quickReplies: [
+            { text: t('tryAgain'), action: t('canYouHelpMeAgain') },
+            { text: t('contactSupport'), action: t('speakToHuman') }
+          ]
         }
       ])
     }
@@ -443,7 +598,11 @@ export function Chatbot() {
             id: Date.now().toString(),
             isBot: true,
             text: t('thankYouForContactInfo'),
-            timestamp: new Date()
+            timestamp: new Date(),
+            quickReplies: [
+              { text: t('browseProducts'), action: t('showMeAvailableProducts') },
+              { text: t('findShops'), action: t('whereCanIBuy') }
+            ]
           }
         ])
       }
@@ -459,11 +618,16 @@ export function Chatbot() {
   }
 
   const quickSuggestions = [
-    { label: t('productRequest'), action: () => handleSuggestedQuestion("I need a part for my vehicle") },
-    { label: t('orderHelp'), action: () => handleSuggestedQuestion("How do I order?") },
-    { label: t('findDealers'), action: () => handleSuggestedQuestion("Where can I find dealers?") },
+   
   
   ];
+
+  const handleQuickReplyClick = (reply: string) => {
+    setInputValue(reply);
+    setTimeout(() => {
+      sendMessage();
+    }, 100);
+  };
 
   const handleSuggestedQuestion = async (question: string) => {
     const userMessage: Message = {
@@ -504,9 +668,11 @@ export function Chatbot() {
         isBot: true,
         text: nlpResult.response,
         timestamp: new Date(),
-        feedbackType: nlpResult.feedbackType as any,
+        feedbackType: nlpResult.feedbackType,
         saved: nlpResult.saved,
-        awaitingProductName: nlpResult.awaitingProductName
+        awaitingProductName: nlpResult.awaitingProductName,
+        quickReplies: nlpResult.quickReplies,
+        answers: nlpResult.answers
       }
       
       const quickBotMessage: Message = {
@@ -683,6 +849,38 @@ export function Chatbot() {
                               </div>
                             )}
                             <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+
+                            {/* Multiple Answers Section */}
+                            {message.isBot && message.answers && message.answers.length > 0 && (
+                              <div className="mt-3 space-y-3">
+                                {message.answers.map((answer, idx) => (
+                                  <div key={`answer-${idx}`} className="p-3 bg-gray-50 rounded border border-gray-100">
+                                    <div className="font-medium text-sm text-indigo-700 mb-1">
+                                      {answer.question}
+                                    </div>
+                                    <div className="text-sm text-gray-700">
+                                      {answer.answer}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Quick Replies Section */}
+                            {message.isBot && message.quickReplies && message.quickReplies.length > 0 && !message.isLoading && (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {message.quickReplies.map((reply, index) => (
+                                  <button
+                                    key={`${message.id}-reply-${index}`}
+                                    onClick={() => handleQuickReplyClick(reply.action)}
+                                    className="py-1 px-3 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors"
+                                  >
+                                    {reply.text}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
                             <div className="flex justify-between items-center mt-1">
                               <p className="text-xs opacity-70">
                                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
