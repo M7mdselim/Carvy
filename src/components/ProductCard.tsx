@@ -18,19 +18,15 @@ export default function ProductCard({ product }: ProductCardProps) {
   const cartItem = items.find(item => item.product.id === product.id)
   const isRtl = language === 'ar'
   const isMobile = useIsMobile()
+  const isActive = product.status === 'active'
 
   const handleImageClick = () => {
     navigate(`/products/${product.id}`)
   }
 
   const handleAddToCart = () => {
-    if (product.stock <= 0) {
+    if (!isActive) {
       toast.error(t('outOfStock'))
-      return
-    }
-    
-    if (cartItem && cartItem.quantity >= product.stock) {
-      toast.error(`${t('maxStockReached')}: ${product.stock}`)
       return
     }
     
@@ -40,8 +36,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleIncreaseQuantity = () => {
     if (!cartItem) return
     
-    if (cartItem.quantity >= product.stock) {
-      toast.error(`${t('maxStockReached')}: ${product.stock}`)
+    if (!isActive) {
+      toast.error(t('outOfStock'))
       return
     }
     
@@ -51,18 +47,25 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-auto md:h-[420px]">
       <div 
-        className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer"
+        className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer relative"
         onClick={handleImageClick}
       >
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${!isActive ? 'opacity-70' : ''}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
             <ImageIcon className="h-16 w-16 text-gray-400" />
+          </div>
+        )}
+        
+        {/* Out of stock overlay */}
+        {!isActive && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+            {t('outOfStock')}
           </div>
         )}
       </div>
@@ -78,14 +81,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.price.toFixed(2)} EGP
           </span>
           {!isMobile && (
-            <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {product.stock > 0 ? `${product.stock} ${t('inStock')}` : t('outOfStock')}
+            <span className={`text-sm ${isActive ? 'text-green-600' : 'text-red-600'}`}>
+              {isActive ? t('inStock') : t('outOfStock')}
             </span>
           )}
         </div>
         
         <div className="mt-auto pt-2 md:pt-3">
-          {product.stock > 0 && (
+          {isActive ? (
             cartItem ? (
               <div className="flex items-center justify-between gap-1 w-full">
                 <button
@@ -118,6 +121,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                 {t('addToCart')}
               </button>
             )
+          ) : (
+            <div className="w-full text-center py-2 text-red-600 font-medium bg-red-50 rounded-md">
+              {t('outOfStock')}
+            </div>
           )}
         </div>
       </div>

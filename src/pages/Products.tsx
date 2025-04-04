@@ -5,12 +5,12 @@ import { useCategories } from '../hooks/useCategories'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useSearchParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination'
 import { Search, Filter, X, ArrowDownAZ, ArrowUpAZ, ArrowDownUp } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { ShopProductCard } from '../components/ShopProductCard'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import PaginationControls from '../components/home/PaginationControls'
 
 export default function Products() {
   const { t, language } = useLanguage();
@@ -26,8 +26,8 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [sortOption, setSortOption] = useState<string>('default');
-  const productsPerPage = 9;
   const [isRtl, setIsRtl] = useState(language === 'ar');
   const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string}>({});
 
@@ -114,11 +114,10 @@ export default function Products() {
       }
     });
 
-  // Paginate products
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredAndSortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
+  // Get visible products based on current page
+  const displayedProducts = filteredAndSortedProducts.slice(0, currentPage * itemsPerPage);
+  const hasMoreProducts = displayedProducts.length < filteredAndSortedProducts.length;
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
 
   // Reset page when filters change
   useEffect(() => {
@@ -127,9 +126,7 @@ export default function Products() {
 
   // Load more products
   const handleLoadMore = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    setCurrentPage(prevPage => prevPage + 1);
   };
   
   // Clear filters
@@ -246,57 +243,21 @@ export default function Products() {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {currentProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <ShopProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          <div className="mt-8 flex flex-col items-center">
-            {indexOfLastProduct < filteredAndSortedProducts.length && (
+          <div className="mt-8 flex justify-center">
+            {hasMoreProducts && (
               <Button 
                 onClick={handleLoadMore} 
-                className="mb-4"
                 variant="outline"
+                className="px-6"
               >
                 {t('loadMore')}
               </Button>
             )}
-
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className={`cursor-pointer ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
-                  />
-                </PaginationItem>
-                
-                {Array.from({ length: Math.min(totalPages, 5) }).map((_, index) => {
-                  const pageNumber = currentPage > 3 ? 
-                    currentPage - 3 + index + 1 : 
-                    index + 1;
-                    
-                  return pageNumber <= totalPages ? (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink 
-                        isActive={currentPage === pageNumber}
-                        onClick={() => setCurrentPage(pageNumber)}
-                        className="cursor-pointer"
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ) : null;
-                })}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className={`cursor-pointer ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
           </div>
         </>
       )}

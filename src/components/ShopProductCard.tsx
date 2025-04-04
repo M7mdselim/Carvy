@@ -1,3 +1,4 @@
+
 import { PlusIcon, MinusIcon, EyeIcon, Trash2Icon, ImageIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../types'
@@ -20,6 +21,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   const [shopName, setShopName] = useState<string>('')
   const isRtl = language === 'ar'
   const isMobile = useIsMobile()
+  const isActive = product.status === 'active'
 
   useEffect(() => {
     const fetchShopName = async () => {
@@ -47,13 +49,8 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   }
 
   const handleAddToCart = () => {
-    if (product.stock <= 0) {
+    if (!isActive) {
       toast.error(t('outOfStock'))
-      return
-    }
-    
-    if (cartItem && cartItem.quantity >= product.stock) {
-      toast.error(`${t('maxStockReached')}: ${product.stock}`)
       return
     }
     
@@ -63,8 +60,8 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   const handleIncreaseQuantity = () => {
     if (!cartItem) return
     
-    if (cartItem.quantity >= product.stock) {
-      toast.error(`${t('maxStockReached')}: ${product.stock}`)
+    if (!isActive) {
+      toast.error(t('outOfStock'))
       return
     }
     
@@ -81,7 +78,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${!isActive ? 'opacity-70' : ''}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -97,6 +94,13 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         >
           <EyeIcon className="h-3 w-3 md:h-4 md:w-4 text-gray-700" />
         </button>
+        
+        {/* Out of stock overlay */}
+        {!isActive && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+            {t('outOfStock')}
+          </div>
+        )}
       </div>
       <div className="p-3 md:p-4 flex flex-col flex-grow">
         <h3 className={`text-sm md:text-lg font-semibold text-gray-900 line-clamp-2 ${isMobile ? 'h-10' : 'h-14'}`}>
@@ -109,12 +113,12 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           <span className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900`}>
             {product.price.toFixed(2)} EGP
           </span>
-          <span className={`text-xs md:text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {product.stock > 0 ? `${isMobile ? '' : product.stock} ${t('inStock')}` : t('outOfStock')}
+          <span className={`text-xs md:text-sm ${isActive ? 'text-green-600' : 'text-red-600'}`}>
+            {isActive ? t('inStock') : t('outOfStock')}
           </span>
         </div>
         
-        {!isMobile && product.compatibility.length > 0 && (
+        {!isMobile && product.compatibility && product.compatibility.length > 0 && (
           <div className="mt-2 overflow-y-auto max-h-16 scrollbar-thin scrollbar-thumb-gray-300">
             <div className="flex flex-wrap gap-1">
               {product.compatibility.map((car) => (
@@ -131,7 +135,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         )}
         
         <div className="mt-auto pt-2 md:pt-3">
-          {product.stock > 0 && (
+          {isActive ? (
             cartItem ? (
               <div className="flex items-center justify-between gap-1 md:gap-2">
                 <button
@@ -164,6 +168,10 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
                 {t('addToCart')}
               </button>
             )
+          ) : (
+            <div className="w-full text-center py-2 text-red-600 font-medium bg-red-50 rounded-md">
+              {t('outOfStock')}
+            </div>
           )}
         </div>
       </div>

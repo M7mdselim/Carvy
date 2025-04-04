@@ -38,18 +38,15 @@ export const useCart = create<CartStore>()(
         const currentItems = get().items
         const existingItem = currentItems.find(item => item.product.id === product.id)
 
-        // Check if we're exceeding available stock
-        const currentQuantity = existingItem ? existingItem.quantity : 0
-        const requestedQuantity = currentQuantity + 1
-        
-        if (requestedQuantity > product.stock) {
-          toast.error(`Sorry, only ${product.stock} units available in stock`)
+        // Check if product is active
+        if (product.status !== 'active') {
+          toast.error('This product is currently out of stock')
           return
         }
 
         let updatedItems
         if (existingItem) {
-          // If item exists, increase the quantity
+          // If item exists, increase the quantity - no stock limit check
           updatedItems = currentItems.map(item =>
             item.product.id === product.id
               ? { ...item, quantity: item.quantity + 1 }
@@ -75,7 +72,7 @@ export const useCart = create<CartStore>()(
         })
       },
 
-      // Update Quantity of a Product
+      // Update Quantity of a Product - no stock limit check
       updateQuantity: (productId, quantity) => {
         if (quantity < 1) {
           get().removeItem(productId) // Use removeItem if quantity < 1
@@ -85,9 +82,9 @@ export const useCart = create<CartStore>()(
         const currentItems = get().items
         const item = currentItems.find(item => item.product.id === productId)
         
-        // Check if requested quantity exceeds stock
-        if (item && quantity > item.product.stock) {
-          toast.error(`Sorry, only ${item.product.stock} units available in stock`)
+        // Check if product is active
+        if (item && item.product.status !== 'active') {
+          toast.error('This product is currently out of stock')
           return
         }
 

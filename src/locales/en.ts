@@ -319,6 +319,7 @@ export const en = {
   "pageNotFound": "Page Not Found",
   "pageDoesntExist": "The page you're looking for doesn't exist or has been moved.",
   "featuredProducts":"Featured Products",
-  "featuredShops":"Featured Shops"
+  "featuredShops":"Featured Shops",
+  "enhancedWelcomeBackMessage":" \n How can i Help u Today??",
 };
 export default en;

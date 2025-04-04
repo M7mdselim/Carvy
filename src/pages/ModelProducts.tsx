@@ -8,7 +8,6 @@ import { Button } from '../components/ui/button'
 import { ChevronLeft, Filter, Search } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../components/ui/select'
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../components/ui/pagination'
 
 export default function ModelProducts() {
   const { modelId } = useParams<{ modelId: string }>()
@@ -32,7 +31,7 @@ export default function ModelProducts() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<string>('newest')
   const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 9
+  const [productsPerPage, setProductsPerPage] = useState(12)
   const isRtl = language === 'ar'
 
   useEffect(() => {
@@ -145,6 +144,7 @@ export default function ModelProducts() {
           return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
         }) || [],
         stock: product.stock,
+        status: product.status || 'active',
       }))
       
       setProducts(formattedProducts)
@@ -159,10 +159,13 @@ export default function ModelProducts() {
   }
 
   // Get current products for pagination
-  const indexOfLastProduct = currentPage * productsPerPage
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  const displayedProducts = filteredProducts.slice(0, currentPage * productsPerPage)
+  const hasMoreProducts = displayedProducts.length < filteredProducts.length
+
+  // Load more products
+  const handleLoadMore = () => {
+    setCurrentPage(prev => prev + 1)
+  }
 
   if (loading) {
     return (
@@ -292,50 +295,22 @@ export default function ModelProducts() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentProducts.map(product => (
+            {displayedProducts.map(product => (
               <ShopProductCard key={product.id} product={product} />
             ))}
           </div>
           
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      className={`cursor-pointer ${currentPage === 1 ? 'pointer-events-none opacity-50' : ''}`}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: Math.min(totalPages, 5) }).map((_, index) => {
-                    const pageNumber = currentPage > 3 ? 
-                      currentPage - 3 + index + 1 : 
-                      index + 1;
-                      
-                    return pageNumber <= totalPages ? (
-                      <PaginationItem key={pageNumber}>
-                        <PaginationLink 
-                          isActive={currentPage === pageNumber}
-                          onClick={() => setCurrentPage(pageNumber)}
-                          className="cursor-pointer"
-                        >
-                          {pageNumber}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ) : null;
-                  })}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      className={`cursor-pointer ${currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}`}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+          <div className="mt-8 flex justify-center">
+            {hasMoreProducts && (
+              <Button 
+                onClick={handleLoadMore} 
+                variant="outline"
+                className="px-6"
+              >
+                {t('loadMore')}
+              </Button>
+            )}
+          </div>
         </>
       )}
     </div>

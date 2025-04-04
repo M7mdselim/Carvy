@@ -55,6 +55,7 @@ export function useProducts() {
               return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
             }) || [],
             stock: product.stock,
+            status: product.status || 'active',
           }))
         )
       } catch (e) {

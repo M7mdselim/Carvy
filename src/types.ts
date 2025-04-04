@@ -1,4 +1,3 @@
-
 export interface Shop {
   id: string;
   name: string;
@@ -19,6 +18,7 @@ export interface Product {
   category: string;
   compatibility: string[];
   stock: number;
+  status?: string;
 }
 
 export interface ProductImage {

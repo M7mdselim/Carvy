@@ -30,6 +30,7 @@ import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import { Toaster } from 'sonner'
+import { Chatbot } from './components/Chatbot'
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -95,6 +96,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
+          <Chatbot />
           <Toaster position="top-right" richColors />
         </div>
       </Router>

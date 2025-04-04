@@ -154,6 +154,25 @@ export const useOrders = () => {
     setIsSubmitting(true);
     
     try {
+      // Check that all products are active before placing the order
+      const statusCheckPromises = items.map(async (item) => {
+        const { data, error } = await supabase
+          .from('products')
+          .select('status')
+          .eq('id', item.product.id)
+          .single();
+          
+        if (error) throw error;
+        
+        if (!data || data.status !== 'active') {
+          throw new Error(`The product "${item.product.name}" is not available for purchase.`);
+        }
+        
+        return true;
+      });
+      
+      await Promise.all(statusCheckPromises);
+      
       const subtotal = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
       let discount = 0;
       
@@ -236,17 +255,7 @@ export const useOrders = () => {
         throw new Error(t('orderItemsCreationFailed'));
       }
       
-      for (const item of items) {
-        const { error: stockError } = await supabase
-          .from('products')
-          .update({ stock: item.product.stock - item.quantity })
-          .eq('id', item.product.id)
-          .gt('stock', 0);
-        
-        if (stockError) {
-          console.error('Stock update error:', stockError);
-        }
-      }
+      // Remove stock update logic since we're no longer tracking stock for checkout
       
       if (couponData.couponId) {
         const { data: coupon, error: couponError } = await supabase

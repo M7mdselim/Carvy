@@ -143,6 +143,57 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_feedback: {
+        Row: {
+          car_model: string | null
+          category: string | null
+          created_at: string
+          email: string | null
+          feedback_type: string
+          id: string
+          message: string
+          notes: string | null
+          phone_number: string | null
+          priority: string | null
+          product_name: string | null
+          resolved: boolean | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          car_model?: string | null
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          feedback_type: string
+          id?: string
+          message: string
+          notes?: string | null
+          phone_number?: string | null
+          priority?: string | null
+          product_name?: string | null
+          resolved?: boolean | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          car_model?: string | null
+          category?: string | null
+          created_at?: string
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          message?: string
+          notes?: string | null
+          phone_number?: string | null
+          priority?: string | null
+          product_name?: string | null
+          resolved?: boolean | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           created_at: string

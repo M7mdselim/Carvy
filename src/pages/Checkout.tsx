@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
@@ -147,20 +146,19 @@ export default function Checkout() {
     setIsSubmitting(true);
     
     try {
-      const stockCheckPromises = items.map(async (item) => {
+      const statusCheckPromises = items.map(async (item) => {
         const { data, error } = await supabase
           .from('products')
-          .select('stock')
+          .select('status')
           .eq('id', item.product.id)
           .single();
         
         if (error) throw error;
         
-        if (!data || data.stock < item.quantity) {
+        if (!data || data.status !== 'active') {
           return {
             product: item.product.name,
-            available: data ? data.stock : 0,
-            requested: item.quantity,
+            status: data ? data.status : 'unknown',
             hasEnough: false
           };
         }
@@ -168,12 +166,12 @@ export default function Checkout() {
         return { hasEnough: true };
       });
       
-      const stockResults = await Promise.all(stockCheckPromises);
-      const insufficientStock = stockResults.filter(result => !result.hasEnough);
+      const statusResults = await Promise.all(statusCheckPromises);
+      const inactiveProducts = statusResults.filter(result => !result.hasEnough);
       
-      if (insufficientStock.length > 0) {
-        const firstItem = insufficientStock[0];
-        toast.error(`Not enough stock for "${firstItem.product}". Available: ${firstItem.available}, Requested: ${firstItem.requested}`);
+      if (inactiveProducts.length > 0) {
+        const firstItem = inactiveProducts[0];
+        toast.error(`"${firstItem.product}" is currently not available for purchase.`);
         setIsSubmitting(false);
         return;
       }
