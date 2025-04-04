@@ -462,7 +462,7 @@ export function Chatbot() {
     { label: t('productRequest'), action: () => handleSuggestedQuestion("I need a part for my vehicle") },
     { label: t('orderHelp'), action: () => handleSuggestedQuestion("How do I order?") },
     { label: t('findDealers'), action: () => handleSuggestedQuestion("Where can I find dealers?") },
-    { label: t('warrantyInfo'), action: () => handleSuggestedQuestion("Tell me about warranty") }
+  
   ];
 
   const handleSuggestedQuestion = async (question: string) => {
@@ -818,9 +818,9 @@ export function Chatbot() {
         return { width: 'w-full max-w-[320px]', height: 'h-[450px]', buttonSize: 'p-3' }
     }
   }
-
+  
   const { width, height, buttonSize } = getChatSize()
-
+  
   if (useSheetOnMobile) {
     return (
       <>
@@ -831,16 +831,21 @@ export function Chatbot() {
         >
           <BotMessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
-
+  
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetContent side="bottom" className="h-[80vh] p-0 rounded-t-xl bg-gray-50">
-            {renderChatContent()}
+          <SheetContent 
+            side="bottom" 
+            className="h-[80vh] p-0 rounded-t-xl bg-gray-50 flex flex-col"
+          >
+            <div className="flex-1 overflow-y-auto">
+              {renderChatContent()}
+            </div>
           </SheetContent>
         </Sheet>
       </>
     )
   }
-
+  
   if (!isOpen) {
     return (
       <button
@@ -852,9 +857,9 @@ export function Chatbot() {
       </button>
     )
   }
-
+  
   const mainChatPosition = isRtl ? 'left-4 sm:left-6 right-auto' : 'right-4 sm:right-6';
-
+  
   return (
     <div className={`fixed bottom-4 sm:bottom-6 z-50 ${mainChatPosition}`}>
       <div 
@@ -864,7 +869,9 @@ export function Chatbot() {
           height: isMinimized ? 'auto' : height
         }}
       >
-        {renderChatContent()}
+        <div className="flex-1 overflow-y-auto">
+          {renderChatContent()}
+        </div>
       </div>
     </div>
   )
