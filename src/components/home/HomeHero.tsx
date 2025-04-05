@@ -56,7 +56,7 @@ const HomeHero = () => {
             </p>
             <div className="mt-10 flex flex-wrap gap-4 justify-center lg:justify-start">
               <Button asChild size="lg" className="px-6 py-7 rounded-lg text-base shadow-lg hover-glow bg-gradient-to-r from-indigo-600 to-indigo-700">
-                <Link to="/categories">
+                <Link to="/products">
                   <ShoppingBag className="mr-2 h-5 w-5" />
                   {t('shopNow')} <ChevronRight className="ml-1 h-5 w-5" />
                 </Link>

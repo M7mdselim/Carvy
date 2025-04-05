@@ -321,6 +321,8 @@ export const en = {
   "featuredProducts":"Featured Products",
   "featuredShops":"Featured Shops",
   "enhancedWelcomeBackMessage":" \n How can i Help u Today??",
-  "enhancedWelcomeMessage":"\n How can i Help u Today?? "
+  "enhancedWelcomeMessage":"\n How can i Help u Today?? ",
+  "shopNow":"Shop Now",
+  "findShops":"Find a Shop"
 };
 export default en;
