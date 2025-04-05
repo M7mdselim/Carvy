@@ -65,5 +65,17 @@ export default {
   orderHelp: 'المساعدة في الطلب',
   findDealers: 'البحث عن موزعين',
   warrantyInfo: 'معلومات الضمان',
-  chatbotErrorTechnical: 'واجهت مشكلة تقنية. يرجى المحاولة مرة أخرى أو الاتصال بفريق الدعم لدينا على support@zabtt.com.'
+  chatbotErrorTechnical: 'واجهت مشكلة تقنية. يرجى المحاولة مرة أخرى أو الاتصال بفريق الدعم لدينا على support@zabtt.com.',
+  filters: 'الفلاتر',
+  adjustFiltersDescription: 'ضبط الفلاتر للعثور على المنتجات التي تحتاجها',
+  applyFilters: 'تطبيق الفلاتر',
+  popularCategories: 'الفئات الشائعة',
+  popularBrands: 'العلامات التجارية الشائعة',
+  popularProducts: 'المنتجات الشائعة',
+  category: 'الفئة',
+  productType: 'نوع المنتج',
+  oilFilter: 'فلتر الزيت',
+  brakeDiscs: 'أقراص الفرامل',
+  sparkPlugs: 'شمعات الإشعال',
+  airFilter: 'فلتر الهواء'
 };

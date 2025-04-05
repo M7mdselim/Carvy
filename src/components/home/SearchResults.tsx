@@ -100,7 +100,7 @@ const SearchResults = ({
           )}
           {searchQuery && (searchProducts.length > 3 || searchShops.length > 3 || searchCarModels.length > 3) && (
             <button
-              onClick={handleSearch}
+              onClick={(e) => handleSearch(e)}
               className="w-full p-3 text-center text-sm text-indigo-600 hover:bg-gray-50"
             >
               {t('viewAllResults')}

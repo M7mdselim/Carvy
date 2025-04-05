@@ -19,6 +19,8 @@ export interface Product {
   compatibility: string[];
   stock: number;
   status?: string;
+  type?: string;
+  productNumber?: string;
 }
 
 export interface ProductImage {

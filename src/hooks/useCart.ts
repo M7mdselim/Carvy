@@ -39,7 +39,7 @@ export const useCart = create<CartStore>()(
         const existingItem = currentItems.find(item => item.product.id === product.id)
 
         // Check if product is active
-        if (product.status !== 'active') {
+        if (product.status === 'inactive') {
           toast.error('This product is currently out of stock')
           return
         }
@@ -83,7 +83,7 @@ export const useCart = create<CartStore>()(
         const item = currentItems.find(item => item.product.id === productId)
         
         // Check if product is active
-        if (item && item.product.status !== 'active') {
+        if (item && item.product.status === 'inactive') {
           toast.error('This product is currently out of stock')
           return
         }

@@ -42,7 +42,7 @@ export function useProducts() {
         const shuffledProducts = [...productsData].sort(() => Math.random() - 0.5)
 
         setProducts(
-          shuffledProducts.map((product) => ({
+          shuffledProducts.map((product: any) => ({
             id: product.id,
             shopId: product.shop_id,
             name: product.name,
@@ -56,6 +56,8 @@ export function useProducts() {
             }) || [],
             stock: product.stock,
             status: product.status || 'active',
+            type: product.type || determineProductType(product.categories?.name || ''),
+            productNumber: product.product_number || generateProductNumber(product.id)
           }))
         )
       } catch (e) {
@@ -67,6 +69,29 @@ export function useProducts() {
 
     fetchProducts()
   }, [])
+
+  // Helper function to determine product type based on category
+  const determineProductType = (category: string): string => {
+    const categoryLower = category.toLowerCase();
+    if (categoryLower.includes('engine')) return 'Engine Parts';
+    if (categoryLower.includes('brake')) return 'Brake System';
+    if (categoryLower.includes('transmission')) return 'Transmission';
+    if (categoryLower.includes('oil') || categoryLower.includes('fluid')) return 'Oil & Fluids';
+    if (categoryLower.includes('tyre') || categoryLower.includes('tire')) return 'Tyres';
+    if (categoryLower.includes('electric')) return 'Electrical';
+    if (categoryLower.includes('body')) return 'Body Parts';
+    if (categoryLower.includes('interior')) return 'Interior';
+    if (categoryLower.includes('exhaust')) return 'Exhaust System';
+    return 'Other';
+  }
+
+  // Helper function to generate a mock product number
+  const generateProductNumber = (id: string): string => {
+    // Create a product number format: ABC-12345
+    const prefix = 'CP'; // CP for Car Parts
+    const numberId = id.replace(/[^0-9]/g, '').substring(0, 5).padStart(5, '0');
+    return `${prefix}-${numberId}`;
+  }
 
   return { products, loading, error }
 }

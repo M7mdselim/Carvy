@@ -110,6 +110,8 @@ export default function ProductDetails() {
           return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
         }) || [],
         stock: productData.stock,
+        status: productData.status,
+        productNumber: productData.product_number
       }
 
       setProduct(formattedProduct)
@@ -227,6 +229,8 @@ export default function ProductDetails() {
     )
   }
 
+  const isInactive = product?.status === 'inactive';
+
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
       <Button
@@ -239,12 +243,12 @@ export default function ProductDetails() {
       </Button>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <Card className="overflow-hidden border-0 shadow-lg">
-          <div className="aspect-square bg-white rounded-lg overflow-hidden relative">
+        <Card className="overflow-hidden border-0 shadow-lg h-[500px]">
+          <div className="aspect-square bg-white rounded-lg overflow-hidden relative h-full">
             {images.length > 0 ? (
               <img 
                 src={images[currentImageIndex]} 
-                alt={product.name} 
+                alt={product?.name} 
                 className="w-full h-full object-contain p-4"
               />
             ) : (
@@ -287,7 +291,7 @@ export default function ProductDetails() {
                 >
                   <img 
                     src={img} 
-                    alt={`${product.name} thumbnail ${index + 1}`}
+                    alt={`${product?.name} thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -301,12 +305,15 @@ export default function ProductDetails() {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <Badge variant="outline" className="bg-indigo-50 text-indigo-700 mb-2">
-                  {product.category}
+                  {product?.category}
                 </Badge>
-                <h1 className="text-3xl font-bold text-gray-900 break-words">{product.name}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 break-words">{product?.name}</h1>
+                {product?.productNumber && (
+                  <span className="text-sm text-gray-500 mt-1 block">#{product.productNumber}</span>
+                )}
                 <div className="flex items-center mt-2 mb-4">
                   <Link 
-                    to={`/shops/${product.shopId}`}
+                    to={`/shops/${product?.shopId}`}
                     className="text-indigo-600 hover:text-indigo-800 transition-colors text-sm font-medium"
                   >
                     {shopName}
@@ -341,19 +348,17 @@ export default function ProductDetails() {
             <div className="mb-4">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-indigo-600">
-                  {formatCurrency(product.price)}
+                  {formatCurrency(product?.price || 0)}
                 </span>
               </div>
               
               <div className="mt-1">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  product.stock > 10 
+                  !isInactive 
                     ? 'bg-green-100 text-green-800' 
-                    : product.stock > 0 
-                      ? 'bg-yellow-100 text-yellow-800' 
-                      : 'bg-red-100 text-red-800'
+                    : 'bg-red-100 text-red-800'
                 }`}>
-                  {product.stock > 0 
+                  {!isInactive 
                     ? t('inStock') 
                     : t('outOfStock')}
                 </span>
@@ -365,11 +370,11 @@ export default function ProductDetails() {
             <div className="mb-6">
               <h3 className="text-lg font-medium text-gray-900 mb-3">{t('description')}</h3>
               <p className="text-gray-600 whitespace-pre-line break-words overflow-hidden">
-                {product.description}
+                {product?.description}
               </p>
             </div>
             
-            {product.compatibility.length > 0 && (
+            {product?.compatibility && product.compatibility.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-3">{t('compatibleWith')}</h3>
                 <div className="flex flex-wrap gap-2">
@@ -389,12 +394,12 @@ export default function ProductDetails() {
           </div>
           
           <div className="mt-auto">
-            {product.stock > 0 ? (
+            {!isInactive ? (
               cartItem ? (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 h-12">
                   <div className="flex items-center border rounded-lg overflow-hidden bg-white shadow-sm">
                     <button
-                      onClick={() => updateQuantity(product.id, Math.max(0, cartItem.quantity - 1))}
+                      onClick={() => updateQuantity(product?.id || '', Math.max(0, cartItem.quantity - 1))}
                       className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 transition-colors"
                     >
                       <Minus className="h-4 w-4" />
@@ -403,7 +408,7 @@ export default function ProductDetails() {
                       {cartItem.quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
+                      onClick={() => updateQuantity(product?.id || '', cartItem.quantity + 1)}
                       className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 transition-colors"
                     >
                       <Plus className="h-4 w-4" />
@@ -412,7 +417,7 @@ export default function ProductDetails() {
                   
                   <Button
                     variant="outline"
-                    onClick={() => removeItem(product.id)}
+                    onClick={() => removeItem(product?.id || '')}
                     className="flex-1 h-12 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
                   >
                     {t('removeFromCart')}

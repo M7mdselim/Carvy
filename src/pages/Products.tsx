@@ -1,16 +1,24 @@
-
 import { useState, useEffect } from 'react'
 import { useProducts } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
 import { useLanguage } from '../contexts/LanguageContext'
 import { useSearchParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
-import { Search, Filter, X, ArrowDownAZ, ArrowUpAZ, ArrowDownUp } from 'lucide-react'
+import { Search, Filter, X, ArrowDownAZ, ArrowUpAZ, ArrowDownUp, SlidersHorizontal } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { ShopProductCard } from '../components/ShopProductCard'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import PaginationControls from '../components/home/PaginationControls'
+import { 
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter
+} from '../components/ui/sheet'
 
 export default function Products() {
   const { t, language } = useLanguage();
@@ -22,18 +30,21 @@ export default function Products() {
   const categoryParam = searchParams.get('category');
   const makeParam = searchParams.get('make');
   const modelParam = searchParams.get('model');
+  const typeParam = searchParams.get('type');
   
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam || '');
+  const [selectedType, setSelectedType] = useState<string>(typeParam || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [sortOption, setSortOption] = useState<string>('default');
   const [isRtl, setIsRtl] = useState(language === 'ar');
-  const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string}>({});
+  const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string, type?: string}>({});
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     // Set active filters from URL params
-    const filters: {category?: string, make?: string, model?: string} = {};
+    const filters: {category?: string, make?: string, model?: string, type?: string} = {};
     
     if (categoryParam) {
       filters.category = categoryParam;
@@ -47,13 +58,18 @@ export default function Products() {
     if (modelParam) {
       filters.model = modelParam;
     }
+
+    if (typeParam) {
+      filters.type = typeParam;
+      setSelectedType(typeParam);
+    }
     
     if (Object.keys(filters).length > 0) {
       setActiveFilters(filters);
     }
-  }, [categoryParam, makeParam, modelParam]);
+  }, [categoryParam, makeParam, modelParam, typeParam]);
 
-  // Update URL when category dropdown changes
+  // Update URL when filters change
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);
     
@@ -62,9 +78,15 @@ export default function Products() {
     } else {
       newParams.delete('category');
     }
+
+    if (selectedType) {
+      newParams.set('type', selectedType);
+    } else {
+      newParams.delete('type');
+    }
     
     setSearchParams(newParams);
-  }, [selectedCategory, setSearchParams]);
+  }, [selectedCategory, selectedType, setSearchParams]);
 
   useEffect(() => {
     setIsRtl(language === 'ar');
@@ -77,9 +99,11 @@ export default function Products() {
   // Filter and sort products
   const filteredAndSortedProducts = products
     .filter(product => !selectedCategory || product.category === selectedCategory)
+    .filter(product => !selectedType || product.type === selectedType)
     .filter(product => 
       !searchQuery || 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.productNumber && product.productNumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .filter(product => {
@@ -129,10 +153,16 @@ export default function Products() {
     setCurrentPage(prevPage => prevPage + 1);
   };
   
+  // Apply filters from the sheet
+  const applyFilters = () => {
+    setIsFilterOpen(false);
+  };
+  
   // Clear filters
   const clearFilters = () => {
     setActiveFilters({});
     setSelectedCategory('');
+    setSelectedType('');
     setSortOption('default');
     setSearchParams({});
   };
@@ -141,6 +171,7 @@ export default function Products() {
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : ''}`}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
         <h1 className="text-3xl font-bold text-gray-900">{t('products')}</h1>
+        
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative">
             <Input
@@ -152,28 +183,82 @@ export default function Products() {
             />
             <Search className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400`} />
           </div>
-          <div className="relative flex items-center">
-            <Filter className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400`} />
-            <select
-              id="category"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className={`rounded-md border-gray-300 py-2 ${isRtl ? 'pr-10 pl-3 text-right' : 'pl-10 pr-3'} text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 w-full`}
-            >
-              <option value="">{t('allCategories')}</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          
+          {/* Filter button */}
+          <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                {t('filters')}
+                {(selectedCategory || selectedType) && (
+                  <Badge className="ml-2 h-5 w-5 p-0 flex items-center justify-center bg-indigo-600">
+                    {[selectedCategory, selectedType].filter(Boolean).length}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-white">
+              <SheetHeader>
+                <SheetTitle>{t('filters')}</SheetTitle>
+                <SheetDescription>
+                  {t('adjustFiltersDescription')}
+                </SheetDescription>
+              </SheetHeader>
+              
+              <div className="py-6 space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">{t('category')}</h3>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder={t('allCategories')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="_all">{t('allCategories')}</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">{t('productType')}</h3>
+                  <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder={t('allTypes')} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="_all">{t('allTypes')}</SelectItem>
+                      {['Engine Parts', 'Brake System', 'Transmission', 'Oil & Fluids', 'Tyres', 'Electrical', 'Body Parts', 'Interior', 'Exhaust System', 'Other'].map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <SheetFooter>
+                <Button variant="outline" onClick={clearFilters}>
+                  {t('clearFilters')}
+                </Button>
+                <Button onClick={applyFilters}>
+                  {t('applyFilters')}
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+          
+          {/* Separate sort-by dropdown */}
           <Select value={sortOption} onValueChange={setSortOption}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="bg-white w-full sm:w-48">
               <SelectValue placeholder={t('sortBy')} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">{t('Sort by')}</SelectItem>
+            <SelectContent className="bg-white">
+              <SelectItem value="default">{t('default')}</SelectItem>
               <SelectItem value="priceAsc">{t('priceLowToHigh')}</SelectItem>
               <SelectItem value="priceDesc">{t('priceHighToLow')}</SelectItem>
               <SelectItem value="nameAsc">{t('nameAToZ')}</SelectItem>
@@ -184,20 +269,36 @@ export default function Products() {
       </div>
       
       {/* Show active filters if any */}
-      {(activeFilters.category || activeFilters.make || activeFilters.model || sortOption !== 'default') && (
+      {(activeFilters.category || activeFilters.make || activeFilters.model || activeFilters.type || sortOption !== 'default') && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-gray-700">{t('activeFilters')}:</span>
           {activeFilters.category && (
             <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
               {activeFilters.category}
+              <button onClick={() => {setSelectedCategory(''); setActiveFilters({...activeFilters, category: undefined})}} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {activeFilters.type && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {activeFilters.type}
+              <button onClick={() => {setSelectedType(''); setActiveFilters({...activeFilters, type: undefined})}} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {activeFilters.make && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {activeFilters.make}
               <button onClick={clearFilters} className="ml-1">
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
-          {(activeFilters.make || activeFilters.model) && (
+          {activeFilters.model && (
             <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
-              {activeFilters.make && `${activeFilters.make}`} {activeFilters.model && `${activeFilters.model}`}
+              {activeFilters.model}
               <button onClick={clearFilters} className="ml-1">
                 <X className="h-3 w-3" />
               </button>

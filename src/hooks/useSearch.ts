@@ -51,7 +51,7 @@ export function useSearch(query: string): SearchResults {
       setResults(prev => ({ ...prev, loading: true, error: null }))
 
       try {
-        // Search products - only search by name, not description
+        // Search products - by name, product number, or description
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select(`
@@ -66,7 +66,7 @@ export function useSearch(query: string): SearchResults {
               )
             )
           `)
-          .ilike('name', `%${query}%`)
+          .or(`name.ilike.%${query}%,product_number.ilike.%${query}%`)
           .eq('status', 'active')
           .order('name')
           .limit(5)
@@ -100,7 +100,7 @@ export function useSearch(query: string): SearchResults {
         if (carModelsError) throw carModelsError
 
         setResults({
-          products: productsData.map(product => ({
+          products: productsData.map((product: any) => ({
             id: product.id,
             shopId: product.shop_id,
             name: product.name,
@@ -113,8 +113,11 @@ export function useSearch(query: string): SearchResults {
               return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
             }) || [],
             stock: product.stock,
+            type: product.type || 'Other',
+            productNumber: product.product_number || `CP-${product.id.substring(0, 5)}`,
+            status: product.status || 'active',
           })),
-          shops: shopsData.map(shop => ({
+          shops: shopsData.map((shop: any) => ({
             id: shop.id,
             name: shop.name,
             description: shop.description || '',
@@ -125,7 +128,7 @@ export function useSearch(query: string): SearchResults {
             rating: shop.rating || 0,
             reviewCount: shop.review_count || 0,
           })),
-          carModels: carModelsData.map(carModel => ({
+          carModels: carModelsData.map((carModel: any) => ({
             id: carModel.id,
             make: carModel.make,
             model: carModel.model,

@@ -101,11 +101,11 @@ export default function ShopDetails() {
             />
           </div>
           <Select value={sortOption} onValueChange={setSortOption}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 bg-white">
               <SelectValue placeholder={t('sortBy')} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">{t('Sort by')}</SelectItem>
+            <SelectContent className="bg-white">
+              <SelectItem value="default">{t('sortBy')}</SelectItem>
               <SelectItem value="priceAsc">{t('priceLowToHigh')}</SelectItem>
               <SelectItem value="priceDesc">{t('priceHighToLow')}</SelectItem>
               <SelectItem value="nameAsc">{t('nameAToZ')}</SelectItem>

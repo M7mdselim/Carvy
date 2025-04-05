@@ -599,9 +599,11 @@ export type Database = {
           image: string | null
           name: string
           price: number
+          product_number: string | null
           shop_id: string
           status: string
           stock: number
+          type: string | null
         }
         Insert: {
           category_id?: string | null
@@ -611,9 +613,11 @@ export type Database = {
           image?: string | null
           name: string
           price: number
+          product_number?: string | null
           shop_id: string
           status?: string
           stock?: number
+          type?: string | null
         }
         Update: {
           category_id?: string | null
@@ -623,9 +627,11 @@ export type Database = {
           image?: string | null
           name?: string
           price?: number
+          product_number?: string | null
           shop_id?: string
           status?: string
           stock?: number
+          type?: string | null
         }
         Relationships: [
           {

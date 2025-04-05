@@ -21,7 +21,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   const [shopName, setShopName] = useState<string>('')
   const isRtl = language === 'ar'
   const isMobile = useIsMobile()
-  const isActive = product.status === 'active'
+  const isInactive = product.status === 'inactive'
 
   useEffect(() => {
     const fetchShopName = async () => {
@@ -49,7 +49,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   }
 
   const handleAddToCart = () => {
-    if (!isActive) {
+    if (isInactive) {
       toast.error(t('outOfStock'))
       return
     }
@@ -60,7 +60,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
   const handleIncreaseQuantity = () => {
     if (!cartItem) return
     
-    if (!isActive) {
+    if (isInactive) {
       toast.error(t('outOfStock'))
       return
     }
@@ -78,7 +78,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           <img
             src={product.image}
             alt={product.name}
-            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${!isActive ? 'opacity-70' : ''}`}
+            className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isInactive ? 'opacity-70' : ''}`}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -96,7 +96,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         </button>
         
         {/* Out of stock overlay */}
-        {!isActive && (
+        {isInactive && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
             {t('outOfStock')}
           </div>
@@ -113,8 +113,8 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           <span className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-900`}>
             {product.price.toFixed(2)} EGP
           </span>
-          <span className={`text-xs md:text-sm ${isActive ? 'text-green-600' : 'text-red-600'}`}>
-            {isActive ? t('inStock') : t('outOfStock')}
+          <span className={`text-xs md:text-sm ${!isInactive ? 'text-green-600' : 'text-red-600'}`}>
+            {!isInactive ? t('inStock') : t('outOfStock')}
           </span>
         </div>
         
@@ -135,7 +135,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         )}
         
         <div className="mt-auto pt-2 md:pt-3">
-          {isActive ? (
+          {!isInactive ? (
             cartItem ? (
               <div className="flex items-center justify-between gap-1 md:gap-2">
                 <button
