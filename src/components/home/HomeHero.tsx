@@ -73,9 +73,9 @@ const HomeHero = () => {
           {/* Right side image */}
           <div className={`hidden lg:flex justify-end ${isImagesLoaded ? 'slide-in-right' : 'opacity-0'}`}>
             <img 
-              src="https://images.unsplash.com/photo-1617704548623-340376564e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+              src="https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos//ZABTT.png"
               alt="Car dashboard"
-              className="rounded-2xl shadow-2xl max-w-md object-cover h-96 border-4 border-white animate-float hover-lift"
+              className="rounded-2xl shadow-2xl max-w-md object-cover h-196 border-4 border-white animate-float hover-lift"
             />
           </div>
         </div>

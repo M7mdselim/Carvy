@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 import './styles/animations.css'
+import './styles/rtl.css' // Import RTL styles
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
