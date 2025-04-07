@@ -107,10 +107,10 @@ export default function Cart() {
         <div className="bg-white rounded-lg shadow p-6 h-fit">
           <h2 className="text-lg font-semibold mb-4 border-b pb-2">{t('orderSummary')}</h2>
           <div className="space-y-3">
-            <div className="flex justify-between text-base">
+            {/* <div className="flex justify-between text-base">
               <p>{t('subtotal')}</p>
               <p>{formatCurrency(total)}</p>
-            </div>
+            </div> */}
             <div className="flex justify-between text-lg font-semibold pt-3 border-t mt-3">
               <p>{t('total')}</p>
               <p>{formatCurrency(total)}</p>
