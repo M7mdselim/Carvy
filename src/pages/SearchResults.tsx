@@ -51,20 +51,20 @@ export default function SearchResults() {
       {carModels.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('carModels')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {carModels.map((carModel) => (
               <div 
                 key={carModel.id}
                 onClick={() => handleCarModelClick(carModel.make, carModel.model)}
-                className="flex flex-col items-center p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow bg-white cursor-pointer"
+                className="flex flex-col items-center p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow bg-white cursor-pointer"
               >
-                <div className="rounded-full p-4 bg-indigo-100 mb-4">
-                  <CarIcon className="h-8 w-8 text-indigo-600" />
+                <div className="rounded-full p-3 sm:p-4 bg-indigo-100 mb-3 sm:mb-4">
+                  <CarIcon className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 text-center">
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 text-center">
                   {carModel.make} {carModel.model}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {carModel.yearStart}
                   {carModel.yearEnd ? ` - ${carModel.yearEnd}` : '+'}
                 </p>
@@ -77,7 +77,7 @@ export default function SearchResults() {
       {shops.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('shops')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
             {shops.map((shop) => (
               <ShopCard key={shop.id} shop={shop} />
             ))}
@@ -88,7 +88,7 @@ export default function SearchResults() {
       {products.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('products')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

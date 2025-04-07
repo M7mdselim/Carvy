@@ -22,7 +22,6 @@ const ShopsSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10">
           <div className="mb-4 sm:mb-0">
             <h2 className="text-3xl font-bold text-gray-900">{t('featuredShops')}</h2>
-            {/* <p className="mt-2 text-lg text-gray-600">{t('discoverTopShops')}</p> */}
           </div>
           <Button 
             variant="outline"
@@ -35,22 +34,22 @@ const ShopsSection = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 md:gap-8">
             {[...Array(6)].map((_, index) => (
               <div 
                 key={index} 
-                className="bg-gray-100 rounded-lg animate-pulse h-64"
+                className="bg-gray-100 rounded-lg animate-pulse h-48 sm:h-64"
               >
-                <div className="h-32 bg-gray-200"></div>
-                <div className="p-4">
+                <div className="h-24 sm:h-32 bg-gray-200"></div>
+                <div className="p-3 sm:p-4">
                   <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 md:gap-8">
             {featuredShops.map(shop => (
               <ShopCard key={shop.id} shop={shop} />
             ))}

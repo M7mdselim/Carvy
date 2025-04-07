@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,6 +10,18 @@ import { toast } from 'sonner';
 import { AddressCard } from '../components/addresses/AddressCard';
 import { EmptyAddressList } from '../components/addresses/EmptyAddressList';
 import { AddAddressDialog, EditAddressDialog, DeleteAddressDialog } from '../components/addresses/AddressDialogs';
+import { supabase } from '../lib/supabase';
+
+// Define types for city and area names for display purposes
+interface CityData {
+  id: string;
+  name: string;
+}
+
+interface AreaData {
+  id: string;
+  name: string;
+}
 
 export default function SavedAddresses() {
   const { t, language } = useLanguage();
@@ -28,10 +40,45 @@ export default function SavedAddresses() {
     city: '',
     state: '',
     zip_code: '',
-    country: 'Egypt',
-    phone_number: '',
     is_default: false
   });
+  
+  // Store city and area data for display purposes
+  const [citiesMap, setCitiesMap] = useState<Record<string, string>>({});
+  const [areasMap, setAreasMap] = useState<Record<string, string>>({});
+  
+  // Fetch cities and areas for display names
+  useEffect(() => {
+    const fetchLocationData = async () => {
+      // Fetch cities
+      const { data: cities } = await supabase
+        .from('cities')
+        .select('id, name');
+      
+      if (cities) {
+        const cityMap: Record<string, string> = {};
+        cities.forEach((city: CityData) => {
+          cityMap[city.id] = city.name;
+        });
+        setCitiesMap(cityMap);
+      }
+      
+      // Fetch areas
+      const { data: areas } = await supabase
+        .from('areas')
+        .select('id, name');
+      
+      if (areas) {
+        const areaMap: Record<string, string> = {};
+        areas.forEach((area: AreaData) => {
+          areaMap[area.id] = area.name;
+        });
+        setAreasMap(areaMap);
+      }
+    };
+    
+    fetchLocationData();
+  }, []);
 
   // Check if the user is logged in
   if (!user) {
@@ -47,8 +94,6 @@ export default function SavedAddresses() {
       city: '',
       state: '',
       zip_code: '',
-      country: 'Egypt',
-      phone_number: '',
       is_default: false
     });
   };
@@ -67,8 +112,6 @@ export default function SavedAddresses() {
       city: address.city,
       state: address.state || '',
       zip_code: address.zip_code || '',
-      country: address.country,
-      phone_number: address.phone_number || '',
       is_default: address.is_default
     });
     setIsEditDialogOpen(true);
@@ -85,6 +128,22 @@ export default function SavedAddresses() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+  
+  // Handle select changes
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // If city changes, reset the area/state
+    if (field === 'city') {
+      setFormData(prev => ({
+        ...prev,
+        state: ''
+      }));
+    }
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -144,6 +203,18 @@ export default function SavedAddresses() {
 
   const isRtl = language === 'ar';
 
+  // Helper function to get display names from maps
+  const getDisplayAddress = (address: SavedAddress) => {
+    const cityName = citiesMap[address.city] || address.city;
+    const areaName = areasMap[address.state] || address.state;
+    
+    return {
+      ...address,
+      cityDisplay: cityName,
+      areaDisplay: areaName
+    };
+  };
+
   return (
     <div className={`min-h-screen bg-gray-50 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,7 +233,7 @@ export default function SavedAddresses() {
             {addresses.map((address) => (
               <AddressCard 
                 key={address.id}
-                address={address}
+                address={getDisplayAddress(address)}
                 onEdit={handleEditDialogOpen}
                 onDelete={handleDeleteDialogOpen}
                 onSetDefault={handleSetDefaultAddress}
@@ -178,6 +249,7 @@ export default function SavedAddresses() {
         onOpenChange={setIsAddDialogOpen}
         formData={formData}
         onInputChange={handleInputChange}
+        onSelectChange={handleSelectChange}
         onCheckboxChange={handleCheckboxChange}
         onSubmit={handleAddAddress}
       />
@@ -187,6 +259,7 @@ export default function SavedAddresses() {
         onOpenChange={setIsEditDialogOpen}
         formData={formData}
         onInputChange={handleInputChange}
+        onSelectChange={handleSelectChange}
         onCheckboxChange={handleCheckboxChange}
         onSubmit={handleUpdateAddress}
         isDefaultAddress={currentAddress?.is_default || false}

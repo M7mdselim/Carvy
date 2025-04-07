@@ -1,9 +1,29 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { supabase } from '../../lib/supabase';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+
+// Define types for cities and areas
+interface City {
+  id: string;
+  name: string;
+}
+
+interface Area {
+  id: string;
+  name: string;
+  city_id: string;
+}
 
 interface AddressFormData {
   name: string;
@@ -12,14 +32,13 @@ interface AddressFormData {
   city: string;
   state: string;
   zip_code: string;
-  country: string;
-  phone_number: string;
   is_default: boolean;
 }
 
 interface AddressFormProps {
   formData: AddressFormData;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelectChange: (field: string, value: string) => void;
   onCheckboxChange: (checked: boolean) => void;
   isEditMode?: boolean;
   isDefaultDisabled?: boolean;
@@ -27,13 +46,67 @@ interface AddressFormProps {
 
 export function AddressForm({ 
   formData, 
-  onChange, 
+  onChange,
+  onSelectChange,
   onCheckboxChange, 
   isEditMode = false,
   isDefaultDisabled = false
 }: AddressFormProps) {
   const { t } = useLanguage();
   const prefix = isEditMode ? 'edit_' : '';
+  
+  const [cities, setCities] = useState<City[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+  const [filteredAreas, setFilteredAreas] = useState<Area[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Fetch cities and areas
+  useEffect(() => {
+    const fetchLocations = async () => {
+      setLoading(true);
+      
+      // Fetch cities
+      const { data: citiesData, error: citiesError } = await supabase
+        .from('cities')
+        .select('*')
+        .order('name');
+      
+      if (citiesError) {
+        console.error('Error fetching cities:', citiesError);
+      } else {
+        setCities(citiesData || []);
+      }
+      
+      // Fetch areas
+      const { data: areasData, error: areasError } = await supabase
+        .from('areas')
+        .select('*')
+        .order('name');
+      
+      if (areasError) {
+        console.error('Error fetching areas:', areasError);
+      } else {
+        setAreas(areasData || []);
+      }
+      
+      setLoading(false);
+    };
+    
+    fetchLocations();
+  }, []);
+  
+  // Filter areas based on selected city
+  useEffect(() => {
+    if (formData.city) {
+      const cityObj = cities.find(c => c.id === formData.city);
+      if (cityObj) {
+        const filtered = areas.filter(area => area.city_id === cityObj.id);
+        setFilteredAreas(filtered);
+      }
+    } else {
+      setFilteredAreas([]);
+    }
+  }, [formData.city, cities, areas]);
 
   return (
     <div className="grid gap-4 py-4">
@@ -72,57 +145,51 @@ export function AddressForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor={`${prefix}city`}>{t('city')}</Label>
-          <Input
-            id={`${prefix}city`}
-            name="city"
+          <Select
             value={formData.city}
-            onChange={onChange}
-            placeholder={t('city')}
-            required
-          />
+            onValueChange={(value) => onSelectChange('city', value)}
+            disabled={loading}
+          >
+            <SelectTrigger id={`${prefix}city`}>
+              <SelectValue placeholder={t('selectCity')} />
+            </SelectTrigger>
+            <SelectContent>
+              {cities.map((city) => (
+                <SelectItem key={city.id} value={city.id}>
+                  {city.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="grid gap-2">
-          <Label htmlFor={`${prefix}state`}>{t('state')}</Label>
-          <Input
-            id={`${prefix}state`}
-            name="state"
+          <Label htmlFor={`${prefix}state`}>{t('area')}</Label>
+          <Select
             value={formData.state}
-            onChange={onChange}
-            placeholder={t('state')}
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor={`${prefix}zip_code`}>{t('zipCode')}</Label>
-          <Input
-            id={`${prefix}zip_code`}
-            name="zip_code"
-            value={formData.zip_code}
-            onChange={onChange}
-            placeholder={t('zipCode')}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor={`${prefix}country`}>{t('country')}</Label>
-          <Input
-            id={`${prefix}country`}
-            name="country"
-            value={formData.country}
-            onChange={onChange}
-            placeholder={t('country')}
-            required
-          />
+            onValueChange={(value) => onSelectChange('state', value)}
+            disabled={loading || !formData.city}
+          >
+            <SelectTrigger id={`${prefix}state`}>
+              <SelectValue placeholder={t('selectArea')} />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredAreas.map((area) => (
+                <SelectItem key={area.id} value={area.id}>
+                  {area.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="grid gap-2">
-        <Label htmlFor={`${prefix}phone_number`}>{t('phoneNumber')}</Label>
+        <Label htmlFor={`${prefix}zip_code`}>{t('zipCode')}</Label>
         <Input
-          id={`${prefix}phone_number`}
-          name="phone_number"
-          value={formData.phone_number}
+          id={`${prefix}zip_code`}
+          name="zip_code"
+          value={formData.zip_code}
           onChange={onChange}
-          placeholder={t('phoneNumber')}
+          placeholder={t('zipCode')}
         />
       </div>
       <div className="flex items-center space-x-2 pt-2">

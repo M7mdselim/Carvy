@@ -13,8 +13,6 @@ export interface SavedAddress {
   city: string;
   state?: string;
   zip_code?: string;
-  country: string;
-  phone_number?: string;
   is_default: boolean;
   created_at: string;
 }
@@ -55,8 +53,6 @@ export function useSavedAddresses() {
         city: addr.city,
         state: addr.district,
         zip_code: addr.postal_code,
-        country: 'Egypt', // Default to Egypt as country
-        phone_number: addr.phone,
         is_default: addr.is_default,
         created_at: addr.created_at
       }));
@@ -80,14 +76,15 @@ export function useSavedAddresses() {
         recipient_name: address.name,
         street: address.street_address,
         apartment: address.apartment,
-        city: address.city,
-        district: address.state,
+        city: address.city, // Now city ID
+        district: address.state, // Now area ID
         postal_code: address.zip_code,
-        phone: address.phone_number,
+        // Required fields for the database
+        building: 'Main',
+        floor: '1',
         is_default: address.is_default || addresses.length === 0,
-        // Add the required 'building' field with a default value if not provided
-        building: 'Main',  // Using a default value for the required field
-        floor: null        // Optional field
+        // Add phone field with a default value
+        phone: '0000000000' // Adding default phone value since it's required
       };
 
       // If this is the first address or marked as default, ensure it's the only default
@@ -132,7 +129,6 @@ export function useSavedAddresses() {
       if (address.city !== undefined) updatedFields.city = address.city;
       if (address.state !== undefined) updatedFields.district = address.state;
       if (address.zip_code !== undefined) updatedFields.postal_code = address.zip_code;
-      if (address.phone_number !== undefined) updatedFields.phone = address.phone_number;
       if (address.is_default !== undefined) updatedFields.is_default = address.is_default;
 
       // If setting as default, first remove default status from all other addresses

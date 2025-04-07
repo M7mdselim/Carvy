@@ -20,12 +20,21 @@ export default function ShopDetails() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOption, setSortOption] = useState<string>('default');
   const [ratingHover, setRatingHover] = useState<number | null>(null);
+  const [localRating, setLocalRating] = useState<number | null>(null);
+  
+  // Track if shop has ratings
+  const hasRatings = shop?.reviewCount && shop.reviewCount > 0;
 
   useEffect(() => {
     if (user && shopId) {
       fetchUserRating(shopId);
     }
   }, [user, shopId]);
+  
+  // Set local rating when user rating changes
+  useEffect(() => {
+    setLocalRating(userRating);
+  }, [userRating]);
 
   const sortedProducts = useMemo(() => {
     const filtered = products?.filter(product => {
@@ -55,7 +64,8 @@ export default function ShopDetails() {
 
   const handleRatingClick = async (rating: number) => {
     if (shopId && await rateShop(shopId, rating)) {
-      // No need to refresh here as the hook manages the state
+      // Update local rating immediately for better UX
+      setLocalRating(rating);
       toast.success(t('thankYouForRatingShop'));
     }
   };
@@ -103,17 +113,27 @@ export default function ShopDetails() {
                   >
                     <Star 
                       className={`h-5 w-5 ${
-                        (ratingHover ? star <= ratingHover : userRating ? star <= userRating : star <= Math.round(shop.rating || 0)) 
+                        (ratingHover ? star <= ratingHover : localRating ? star <= localRating : hasRatings && star <= Math.round(shop.rating || 0)) 
                           ? 'text-yellow-400 fill-yellow-400' 
                           : 'text-gray-300'
                       } transition-colors`} 
                     />
                   </button>
                 ))}
-                <span className="ml-2 text-gray-700 font-medium">{shop.rating?.toFixed(1) || '0.0'}</span>
-                <span className="ml-2 text-gray-500">
-                  ({shop.reviewCount || 0}) {t('ratings')}
-                </span>
+                {hasRatings && (
+                  <>
+                    <span className="ml-2 text-gray-700 font-medium">{shop.rating?.toFixed(1) || '0.0'}</span>
+                    <span className="ml-2 text-gray-500">
+                      ({shop.reviewCount || 0}) {t('ratings')}
+                    </span>
+                  </>
+                )}
+                {!hasRatings && !localRating && (
+                  <span className="ml-2 text-gray-500">{t('noRatingsYet')}</span>
+                )}
+                {!hasRatings && localRating && (
+                  <span className="ml-2 text-gray-500">{t('yourRating')}: {localRating}</span>
+                )}
               </div>
             </div>
             

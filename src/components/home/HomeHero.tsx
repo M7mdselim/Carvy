@@ -37,24 +37,20 @@ const HomeHero = () => {
       <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply opacity-10 animate-float"></div>
       <div className="absolute bottom-1/3 left-1/4 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply opacity-10 animate-float" style={{ animationDelay: '1s' }}></div>
       
-      {/* Search bar moved to the top */}
-     
-      
       {/* Hero content */}
       <div className="relative pt-6 pb-24 md:pt-10 md:pb-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Text content */}
           <div className={`text-center lg:text-left ${isImagesLoaded ? 'slide-in-left' : 'opacity-0'}`}>
-  <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6">
-    {t('findPerfectParts')}
-    <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 leading-tight">
-      {t('forYourCar')}
-    </span>
-  </h1>
-  <p className="mt-4 text-lg leading-8 text-gray-600 max-w-lg mx-auto lg:mx-0">
-    {t('browseThousands')}
-  </p>
-
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6">
+              {t('findPerfectParts')}
+              <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600 leading-tight">
+                {t('forYourCar')}
+              </span>
+            </h1>
+            <p className="mt-4 text-lg leading-8 text-gray-600 max-w-lg mx-auto lg:mx-0">
+              {t('browseThousands')}
+            </p>
 
             <div className="mt-10 flex flex-wrap gap-4 justify-center lg:justify-start">
               <Button asChild size="lg" className="px-6 py-7 rounded-lg text-base shadow-lg hover-glow bg-gradient-to-r from-indigo-600 to-indigo-700">
@@ -69,7 +65,6 @@ const HomeHero = () => {
                   {t('findShops')}
                 </Link>
               </Button>
-              
             </div>
             
           </div>
@@ -84,12 +79,16 @@ const HomeHero = () => {
           </div>
         </div>
 
-        <div className={`relative z-50 px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`}>
-        <SearchBar />
-      </div>
+        {/* Search bar - Enhanced positioning and z-index */}
+        <div className={`relative z-50 mt-8 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`}>
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-md rounded-xl -z-10"></div>
+          <div className="relative z-50">
+            <SearchBar />
+          </div>
+        </div>
 
         {/* Quick search options */}
-        <div className={`mt-12 lg:mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isImagesLoaded ? 'fade-in' : 'opacity-0'}`}>
+        <div className={`mt-24 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isImagesLoaded ? 'fade-in' : 'opacity-0'}`}>
           {['Engine Parts', 'Brake System', 'Transmission', 'Electrical'].map((category, index) => (
             <Link 
               key={category} 

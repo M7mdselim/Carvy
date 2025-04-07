@@ -10,6 +10,7 @@ interface ShopCardProps {
 
 export default function ShopCard({ shop }: ShopCardProps) {
   const isMobile = useIsMobile()
+  const hasRatings = (shop.reviewCount ?? 0) > 0
 
   return (
     <Link
@@ -32,7 +33,7 @@ export default function ShopCard({ shop }: ShopCardProps) {
       <div className="p-3 md:p-4">
         <div className="flex items-center justify-between mb-1 md:mb-2">
           <h3 className="text-sm md:text-lg font-semibold text-gray-900 line-clamp-1">{shop.name}</h3>
-          {!isMobile && (shop.rating ?? 0) > 0 && (
+          {!isMobile && hasRatings && (
             <div className="flex items-center">
               <span className="text-yellow-400">★</span>
               <span className="ml-1 text-sm text-gray-600">

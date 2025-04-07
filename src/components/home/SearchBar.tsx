@@ -80,7 +80,7 @@ const SearchBar = () => {
   }, [])
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto relative">
       <form onSubmit={handleSearch} className="relative">
         <div className={`flex items-center bg-white rounded-xl border-2 transition-all duration-300 shadow-lg hover:shadow-xl ${isFocused ? 'border-indigo-400 ring-4 ring-indigo-100' : 'border-indigo-100'}`}>
           <div className="pl-5">
@@ -116,9 +116,7 @@ const SearchBar = () => {
           </button>
         </div>
         
-        
-        
-        <div className="absolute w-full z-[200] mt-1">
+        <div className="absolute w-full z-50">
           <SearchResults 
             searchQuery={searchQuery}
             searchLoading={searchLoading}
