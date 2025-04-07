@@ -217,7 +217,7 @@ export default function Products() {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            onClick={handleBackClick}
+            onClick={() => navigate('/', { replace: true })} 
             className="flex items-center gap-2 hover:bg-gray-100 mr-2"
             aria-label={t('back')}
           >
