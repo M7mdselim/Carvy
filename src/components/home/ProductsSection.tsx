@@ -22,7 +22,7 @@ const ProductsSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10">
           <div className="mb-4 sm:mb-0">
             <h2 className="text-3xl font-bold text-gray-900">{t('featuredProducts')}</h2>
-            <p className="mt-2 text-lg text-gray-600">{t('topSellingParts')}</p>
+            {/* <p className="mt-2 text-lg text-gray-600">{t('topSellingParts')}</p> */}
           </div>
           <Button 
             variant="outline"

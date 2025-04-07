@@ -77,5 +77,16 @@ export default {
   oilFilter: 'فلتر الزيت',
   brakeDiscs: 'أقراص الفرامل',
   sparkPlugs: 'شمعات الإشعال',
-  airFilter: 'فلتر الهواء'
+  airFilter: 'فلتر الهواء',
+  buyItNow: 'اشتر الآن',
+  thankYouForRating: 'شكرًا على تقييمك!',
+  pleaseLoginToRate: 'يرجى تسجيل الدخول لتقييم هذا المنتج',
+  ratings: 'تقييمات',
+  errorRatingProduct: 'خطأ في تقييم المنتج',
+  thankYouForRatingShop: 'شكرًا على تقييم هذا المتجر!',
+  errorRatingShop: 'خطأ في تقييم المتجر',
+  viewAllResults: 'عرض كل النتائج',
+  searching: 'جاري البحث...',
+  noResultsFound: 'لم يتم العثور على نتائج',
+  searchPlaceholder: 'ابحث عن المنتجات أو المتاجر أو موديلات السيارات...'
 };

@@ -17,14 +17,17 @@ const BrandsCarousel = () => {
   
   // Sample car brands - in a real app, these would come from an API
   const brands = [
-    { id: 1, name: 'Toyota', logo: 'https://www.carlogos.org/car-logos/toyota-logo-2019-1350x1500.png' },
-    { id: 2, name: 'BMW', logo: 'https://www.carlogos.org/car-logos/bmw-logo-2020-gray-1500x1500.png' },
-    { id: 3, name: 'Mercedes', logo: 'https://www.carlogos.org/car-logos/mercedes-benz-logo-2011-1500x1500.png' },
-    { id: 4, name: 'Ford', logo: 'https://www.carlogos.org/car-logos/ford-logo-2017-1500x1500.png' },
-    { id: 5, name: 'Honda', logo: 'https://www.carlogos.org/car-logos/honda-logo-2000-full-1500x1500.png' },
-    { id: 6, name: 'Hyundai', logo: 'https://www.carlogos.org/car-logos/hyundai-logo-2011-1500x1500.png' },
-    { id: 7, name: 'Volkswagen', logo: 'https://www.carlogos.org/car-logos/volkswagen-logo-2019-1500x1500.png' },
-    { id: 8, name: 'Audi', logo: 'https://www.carlogos.org/car-logos/audi-logo-2016-1500x1500.png' },
+    { id: 1, name: 'Toyota', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/cf8ycrxezas_1742816342123.jpeg' },
+    {id: 2, name: 'Hyundai', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/sign/Categories%20Photos/Hyundai.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJDYXRlZ29yaWVzIFBob3Rvcy9IeXVuZGFpLnBuZyIsImlhdCI6MTczOTQwODc1NSwiZXhwIjoxNzcwOTQ0NzU1fQ.1gr5AU5uDvxZkS6Htl_d6atk2BAzAi5_MTfTVgNAmzI' },
+    { id: 3, name: 'BMW', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/sign/Categories%20Photos/BMW-Logo.wine.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJDYXRlZ29yaWVzIFBob3Rvcy9CTVctTG9nby53aW5lLnBuZyIsImlhdCI6MTc0MDI1MTU4MiwiZXhwIjoxODk3OTMxNTgyfQ.XFsARDmo9aIdmi_hfQqIbcuGBDgMZCdhrQwfaRkwt0w' },
+    { id: 4, name: 'Mercedes', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/24fp91d3j0a_1742816457792.png' },
+    { id: 5, name: 'Skoda', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/q5g7a8a0aak_1742816502599.jpeg' },
+    { id: 6, name: 'Volkswagen', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/hd49pj2b46o_1742816383774.png' },
+    { id: 7, name: 'Audi', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/6c7glgl9rkf_1742816420944.jpeg' },
+    { id: 8, name: 'Fiat', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/rmc2tvjvqo8_1742816301290.jpeg' },
+    
+    
+    
   ]
 
   return (

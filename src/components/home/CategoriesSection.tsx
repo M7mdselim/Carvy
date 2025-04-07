@@ -51,7 +51,7 @@ const CategoriesSection = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
           <div className="mb-6 md:mb-0">
             <h2 className="text-3xl font-bold text-gray-900">{t('browseModels')}</h2>
-            <p className="mt-2 text-lg text-gray-600">{t('findPartsForYourCar')}</p>
+            {/* <p className="mt-2 text-lg text-gray-600">{t('findPartsForYourCar')}</p> */}
           </div>
           
           <div className="flex flex-col md:flex-row items-center gap-4">

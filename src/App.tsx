@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Navbar from './components/navbar'
@@ -30,7 +29,7 @@ import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import { Toaster } from 'sonner'
-import { Chatbot } from './components/Chatbot'
+import { Chatbot } from "./components/Chatbot"
 
 function ScrollToTop() {
   const { pathname } = useLocation();

@@ -16,11 +16,15 @@ export interface Product {
   price: number;
   image: string;
   category: string;
-  compatibility: string[];
-  stock: number;
+  compatibility?: string[];
+  stock?: number;
   status?: string;
-  type?: string;
   productNumber?: string;
+  rating?: number;
+  reviewCount?: number;
+  type?: string;
+  specifications?: Record<string, string | number>;
+  compare_at_price?: number;
 }
 
 export interface ProductImage {

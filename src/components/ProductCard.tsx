@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-auto md:h-[420px]">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
       <div 
         className="aspect-square w-full overflow-hidden bg-gray-200 cursor-pointer relative"
         onClick={handleImageClick}

@@ -69,5 +69,16 @@ export default {
   oilFilter: 'Oil Filter',
   brakeDiscs: 'Brake Discs',
   sparkPlugs: 'Spark Plugs',
-  airFilter: 'Air Filter'
+  airFilter: 'Air Filter',
+  buyItNow: 'Buy It Now',
+  thankYouForRating: 'Thank you for your rating!',
+  pleaseLoginToRate: 'Please log in to rate this product',
+  ratings: 'ratings',
+  errorRatingProduct: 'Error rating product',
+  thankYouForRatingShop: 'Thank you for rating this shop!',
+  errorRatingShop: 'Error rating shop',
+  viewAllResults: 'View All Results',
+  searching: 'Searching...',
+  noResultsFound: 'No results found',
+  searchPlaceholder: 'Search for products, shops, or car models...'
 }

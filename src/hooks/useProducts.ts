@@ -14,6 +14,7 @@ interface ProductCarModel {
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -41,25 +42,32 @@ export function useProducts() {
         // Shuffle the array to get random ordering
         const shuffledProducts = [...productsData].sort(() => Math.random() - 0.5)
 
-        setProducts(
-          shuffledProducts.map((product: any) => ({
-            id: product.id,
-            shopId: product.shop_id,
-            name: product.name,
-            description: product.description || '',
-            price: product.price,
-            image: product.image || '', // Empty string if no image is set
-            category: product.categories?.name || 'Uncategorized',
-            compatibility: product.product_car_models?.map((pcm: ProductCarModel) => {
-              const car = pcm.car_models
-              return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
-            }) || [],
-            stock: product.stock,
-            status: product.status || 'active',
-            type: product.type || determineProductType(product.categories?.name || ''),
-            productNumber: product.product_number || generateProductNumber(product.id)
-          }))
-        )
+        const formattedProducts: Product[] = shuffledProducts.map((product: any) => ({
+          id: product.id,
+          shopId: product.shop_id,
+          name: product.name,
+          description: product.description || '',
+          price: product.price,
+          image: product.image || '', // Empty string if no image is set
+          category: product.categories?.name || 'Uncategorized',
+          compatibility: product.product_car_models?.map((pcm: ProductCarModel) => {
+            const car = pcm.car_models
+            return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
+          }) || [],
+          stock: product.stock,
+          status: product.status || 'active',
+          type: product.type || determineProductType(product.categories?.name || ''),
+          productNumber: product.product_number || generateProductNumber(product.id),
+          specifications: {}
+        }));
+
+        setProducts(formattedProducts);
+
+        // Extract unique categories from products
+        const uniqueCategories = Array.from(
+          new Set(formattedProducts.map((product) => product.category))
+        );
+        setCategories(uniqueCategories);
       } catch (e) {
         setError(e instanceof Error ? e : new Error('Failed to fetch products'))
       } finally {
@@ -93,5 +101,5 @@ export function useProducts() {
     return `${prefix}-${numberId}`;
   }
 
-  return { products, loading, error }
+  return { products, categories, loading, error }
 }

@@ -590,6 +590,41 @@ export type Database = {
           },
         ]
       }
+      product_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          product_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          product_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ratings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string | null
@@ -600,6 +635,8 @@ export type Database = {
           name: string
           price: number
           product_number: string | null
+          rating: number | null
+          review_count: number | null
           shop_id: string
           status: string
           stock: number
@@ -614,6 +651,8 @@ export type Database = {
           name: string
           price: number
           product_number?: string | null
+          rating?: number | null
+          review_count?: number | null
           shop_id: string
           status?: string
           stock?: number
@@ -628,6 +667,8 @@ export type Database = {
           name?: string
           price?: number
           product_number?: string | null
+          rating?: number | null
+          review_count?: number | null
           shop_id?: string
           status?: string
           stock?: number
@@ -744,6 +785,41 @@ export type Database = {
           },
           {
             foreignKeyName: "shop_categories_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          rating: number
+          shop_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating: number
+          shop_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          rating?: number
+          shop_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_ratings_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"

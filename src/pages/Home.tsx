@@ -31,9 +31,9 @@ export default function Home() {
       </div>
 
       {/* Promotion Cards */}
-      <div className="mt-8 lg:mt-12 reveal-on-scroll">
+      {/* <div className="mt-8 lg:mt-12 reveal-on-scroll">
         <PromotionCards />
-      </div>
+      </div> */}
       
       {/* Categories Section */}
       <div className="mt-16 lg:mt-24 relative z-10 reveal-on-scroll">

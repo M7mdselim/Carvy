@@ -2,18 +2,30 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useShopDetails } from '../hooks/useShopDetails'
-import { Search, ImageIcon, ArrowUpDown } from 'lucide-react'
+import { useShopRatings } from '../hooks/useRatings'
+import { Search, ImageIcon, Star } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import { useLanguage } from '../contexts/LanguageContext'
+import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import { toast } from 'sonner'
 
 export default function ShopDetails() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const { shopId } = useParams<{ shopId: string }>();
   const { shop, products, loading } = useShopDetails(shopId!);
+  const { userRating, rateShop, fetchUserRating } = useShopRatings();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOption, setSortOption] = useState<string>('default');
+  const [ratingHover, setRatingHover] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (user && shopId) {
+      fetchUserRating(shopId);
+    }
+  }, [user, shopId]);
 
   const sortedProducts = useMemo(() => {
     const filtered = products?.filter(product => {
@@ -40,6 +52,13 @@ export default function ShopDetails() {
         return filtered;
     }
   }, [products, searchQuery, sortOption]);
+
+  const handleRatingClick = async (rating: number) => {
+    if (shopId && await rateShop(shopId, rating)) {
+      // No need to refresh here as the hook manages the state
+      toast.success(t('thankYouForRatingShop'));
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-12">{t('loadingShops')}</div>;
@@ -69,6 +88,35 @@ export default function ShopDetails() {
             {shop.description && (
               <p className="text-gray-600 mt-2">{shop.description}</p>
             )}
+            
+            {/* Shop Rating */}
+            <div className="flex items-center mt-3">
+              <div className="flex items-center product-rating-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button 
+                    key={star}
+                    onClick={() => handleRatingClick(star)}
+                    onMouseEnter={() => setRatingHover(star)}
+                    onMouseLeave={() => setRatingHover(null)}
+                    className="focus:outline-none"
+                    aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
+                  >
+                    <Star 
+                      className={`h-5 w-5 ${
+                        (ratingHover ? star <= ratingHover : userRating ? star <= userRating : star <= Math.round(shop.rating || 0)) 
+                          ? 'text-yellow-400 fill-yellow-400' 
+                          : 'text-gray-300'
+                      } transition-colors`} 
+                    />
+                  </button>
+                ))}
+                <span className="ml-2 text-gray-700 font-medium">{shop.rating?.toFixed(1) || '0.0'}</span>
+                <span className="ml-2 text-gray-500">
+                  ({shop.reviewCount || 0}) {t('ratings')}
+                </span>
+              </div>
+            </div>
+            
             {shop.categories && shop.categories.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
                 {shop.categories.map((category) => (
@@ -124,7 +172,7 @@ export default function ShopDetails() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {sortedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

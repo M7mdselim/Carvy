@@ -177,7 +177,15 @@ export const ar = {
   "maxStockReached": "تم الوصول إلى الحد الأقصى للمخزون",
   "brandName": "ظبَّط",
   "models": "الموديلات",
-  "searchPlaceholder": "ابحث عن قطع الغيار أو المتاجر...",
+    "searchPlaceholder": "ابحث عن قطع غيار، متاجر، موديل أو رقم المنتج...",
+    "youMayAlsoLike": "يتم طلبها معًا بشكل متكرر",
+    "productType": "النوع",
+    "topBrands": "أفضل العلامات التجارية",
+    "findPartsByBrand": "ابحث عن قطعتك",
+    "forYourCar": "لسيارتك",
+    "back": "رجوع",
+    "shopNow": "تسوق الآن",
+    "findShops": "ابحث عن المتاجر", 
   "searching": "جاري البحث...",
   "viewAllResults": "عرض جميع النتائج",
   "noResults": "لم يتم العثور على نتائج لـ",
@@ -195,7 +203,7 @@ export const ar = {
   "noOrders": "لا يوجد طلبات حتى الآن",
   "selectOrderToViewDetails": "حدد طلبًا لعرض التفاصيل",
   "reorder": "إعادة الطلب",
-  "findPerfectParts": "اعثر على القطع المثالية لسيارتك",
+  "findPerfectParts": "اعثر على القطع المثالية ",
   "browseThousands": "تصفح آلاف قطع غيار السيارات من متاجر موثوقة.",
   "reorderSuccess": "تمت إضافة جميع العناصر من طلبك السابق إلى سلة التسوق",
   "reorderPartial": "تمت إضافة بعض العناصر من طلبك إلى سلة التسوق. البعض الآخر غير متوفر حاليًا.",
@@ -318,7 +326,7 @@ export const ar = {
   "pageNotFound": "الصفحة غير موجودة",
   "pageDoesntExist": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
   "featuredProducts":"قطع غيار",
-  "featuredShops":"محلات"
+  "featuredShops":"متاجر"
 };
 
 
