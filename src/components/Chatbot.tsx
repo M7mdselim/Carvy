@@ -1709,7 +1709,7 @@ export function Chatbot() {
         return { width: "w-[350px]", height: "h-[500px]", buttonSize: "p-3" }
       case "mobile":
       default:
-        return { width: "w-full max-w-[320px]", height: "h-[450px]", buttonSize: "p-3" }
+        return { width: "w-full max-w-[320px]", height: "h-[250px]", buttonSize: "p-3" }
     }
   }
 
