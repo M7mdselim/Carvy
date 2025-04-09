@@ -104,7 +104,7 @@ export function Chatbot() {
 
   useEffect(() => {
     if (breakpoint === "mobile") {
-      setUseSheetOnMobile(true)
+      setUseSheetOnMobile(false)
     } else {
       setUseSheetOnMobile(false)
       if (isOpen) {
