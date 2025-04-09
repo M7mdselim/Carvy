@@ -40,7 +40,7 @@ export function AddAddressDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white ">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>{t('addNewAddress')}</DialogTitle>
@@ -55,10 +55,10 @@ export function AddAddressDialog({
             onCheckboxChange={onCheckboxChange}
           />
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
+            <Button  variant="outline" type="button" onClick={() => onOpenChange(false)}>
               {t('cancel')}
             </Button>
-            <Button type="submit">{t('save')}</Button>
+            <Button variant="outline" type="submit" >{t('save')}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

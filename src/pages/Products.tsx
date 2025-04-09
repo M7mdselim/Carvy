@@ -93,23 +93,27 @@ export default function Products() {
   }, [categoryParam, makeParam, modelParam, typeParam]);
 
   // Update URL when filters change
-  useEffect(() => {
-    const newParams = new URLSearchParams(searchParams);
-    
-    if (selectedCategories.length === 1) {
-      newParams.set('category', selectedCategories[0]);
-    } else if (selectedCategories.length === 0) {
-      newParams.delete('category');
-    }
+ // Replace the URL parameter update effect with:
+useEffect(() => {
+  const newParams = new URLSearchParams(searchParams);
+  
+  if (selectedCategories.length === 1) {
+    newParams.set('category', selectedCategories[0]);
+  } else if (selectedCategories.length === 0) {
+    newParams.delete('category');
+  }
 
-    if (selectedTypes.length === 1) {
-      newParams.set('type', selectedTypes[0]);
-    } else if (selectedTypes.length === 0) {
-      newParams.delete('type');
-    }
-    
-    setSearchParams(newParams);
-  }, [selectedCategories, selectedTypes, searchParams, setSearchParams]);
+  if (selectedTypes.length === 1) {
+    newParams.set('type', selectedTypes[0]);
+  } else if (selectedTypes.length === 0) {
+    newParams.delete('type');
+  }
+  
+  // Use replace instead of default push to avoid creating history entries
+  setSearchParams(newParams, { replace: true });
+}, [selectedCategories, selectedTypes, searchParams, setSearchParams]);
+
+
 
   useEffect(() => {
     setIsRtl(language === 'ar');
@@ -217,7 +221,7 @@ export default function Products() {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            onClick={() => navigate('/', { replace: true })} 
+            onClick={handleBackClick} 
             className="flex items-center gap-2 hover:bg-gray-100 mr-2"
             aria-label={t('back')}
           >
