@@ -25,18 +25,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section with Search */}
-      <div className="relative z-20">
+      <div className="relative" style={{ position: 'relative', zIndex: 20 }}>
         <HomeHero />
       </div>
 
-      {/* Promotion Cards */}
-      {/* <div className="mt-8 lg:mt-12 reveal-on-scroll">
-        <PromotionCards />
-      </div> */}
-      
-      {/* Categories Section */}
-      <div className="mt-16 lg:mt-24 relative z-10 reveal-on-scroll">
+      {/* Categories Section - explicitly lower z-index */}
+      <div className="mt-16 lg:mt-24 relative" style={{ zIndex: 10 }}>
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-blue-50 -z-10 skew-y-3 transform origin-bottom-right"></div>
         <CategoriesSection />
       </div>

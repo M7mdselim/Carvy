@@ -1413,28 +1413,7 @@ export function Chatbot() {
                     </div>
                   </ScrollArea>
 
-                  {suggestedQuestions.length > 0 && (
-                    <div className="p-2 border-t border-gray-200 bg-gray-50">
-                      <p className="text-xs text-gray-500 mb-2">{t("suggestedQuestions")}</p>
-                      <div className="flex flex-wrap gap-1 md:gap-2">
-                        {suggestedQuestions.map((suggestion, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleSuggestedQuestion(suggestion.text)}
-                            className="text-xs bg-white border border-gray-200 hover:bg-gray-100 text-gray-800 px-2 py-1 rounded-full shadow-sm transition-colors flex items-center gap-1"
-                          >
-                            <span>{suggestion.text}</span>
-                            {suggestion.category && (
-                              <Badge variant="secondary" className="text-[10px] py-0 px-1">
-                                {suggestion.category}
-                              </Badge>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
+                 
                   <div className="p-3 border-t border-gray-200 flex items-center gap-2 bg-white">
                     {selectedAttachments.length > 0 && (
                       <div className="absolute -top-10 left-0 right-0 bg-white p-2 border-t border-gray-200 flex items-center gap-2 overflow-x-auto">
@@ -1700,6 +1679,11 @@ export function Chatbot() {
   )
 
   const getChatSize = () => {
+    // Check if mobile device and keyboard is likely open
+    const isMobileKeyboardOpen = 
+      breakpoint === "mobile" && 
+      window.innerHeight < window.outerHeight * 0.7; // Detect keyboard by viewport height reduction
+  
     switch (breakpoint) {
       case "largeDesktop":
         return { width: "w-[420px]", height: "h-[600px]", buttonSize: "p-4" }
@@ -1709,7 +1693,18 @@ export function Chatbot() {
         return { width: "w-[350px]", height: "h-[500px]", buttonSize: "p-3" }
       case "mobile":
       default:
-        return { width: "w-full max-w-[320px]", height: "h-[250px]", buttonSize: "p-3" }
+        return isMobileKeyboardOpen
+          ? { 
+              width: "w-full max-w-[320px]", 
+              height: "h-[180px]", // Reduced height when keyboard is open
+              buttonSize: "p-2",   // Smaller button padding
+              position: "fixed bottom-0" // Optional: stick to bottom
+            }
+          : { 
+              width: "w-full max-w-[320px]", 
+              height: "h-[250px]", 
+              buttonSize: "p-3" 
+            }
     }
   }
 

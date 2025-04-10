@@ -4,7 +4,8 @@ import { useSearch } from '../hooks/useSearch'
 import ProductCard from '../components/ProductCard'
 import ShopCard from '../components/ShopCard'
 import { useLanguage } from '../contexts/LanguageContext'
-import { CarIcon } from 'lucide-react'
+import { ArrowLeft, CarIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export default function SearchResults() {
   const { t, language } = useLanguage();
@@ -36,8 +37,27 @@ export default function SearchResults() {
   const hasResults = products.length > 0 || shops.length > 0 || carModels.length > 0;
   const isRtl = language === 'ar';
 
+
+  const handleBackClick = () => {
+    navigate(-1) // Go back in history
+  }
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${isRtl ? 'rtl' : 'ltr'}`}>
+
+<div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            onClick={handleBackClick} 
+            className="flex items-center gap-2 hover:bg-gray-100 mr-2"
+            aria-label={t('back')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t('back')}
+          </Button>
+          
+        </div>
+
+
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
         {t('searchResults')} "{query}"
       </h1>

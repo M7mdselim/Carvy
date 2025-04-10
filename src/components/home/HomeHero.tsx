@@ -26,7 +26,7 @@ const HomeHero = () => {
   }, [])
 
   return (
-    <div className="relative isolate overflow-hidden">
+    <div className="relative isolate overflow-visible" style={{ position: 'static' }}>
       {/* Background elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-blue-50 to-indigo-50 -z-10"></div>
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
@@ -79,11 +79,11 @@ const HomeHero = () => {
           </div>
         </div>
 
-        {/* Search bar - Enhanced positioning and z-index */}
-         {/* Search bar moved to the top */}
-      <div className={`relative z-50 px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`}>
-        <SearchBar />
-      </div>
+        {/* Search bar with highest z-index */}
+        <div className={`relative px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`} 
+          style={{ position: 'relative', zIndex: 99999999 }}>
+          <SearchBar />
+        </div>
 
         {/* Quick search options */}
         <div className={`mt-24 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isImagesLoaded ? 'fade-in' : 'opacity-0'}`}>
