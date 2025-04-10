@@ -209,6 +209,23 @@ export const useOrders = () => {
         ? lastName
         : address.recipient_name.split(' ').slice(1).join(' ') || '';
       
+      // Construct a detailed address string with all non-null components
+      const addressParts = [];
+      if (address.building) addressParts.push(address.building);
+      if (address.street) addressParts.push(address.street);
+      if (address.apartment) addressParts.push(`Apt: ${address.apartment}`);
+      if (address.floor) addressParts.push(`Floor: ${address.floor}`);
+      if (address.district) addressParts.push(address.district);
+      
+      const fullAddressString = addressParts.join(', ');
+
+      // Get city and area information for the order
+      let cityName = address.city;
+      let areaName = address.area || '';
+
+      // Prepare combined city/area string for the city field
+      const cityAreaString = areaName ? `${cityName} - ${areaName}` : cityName;
+      
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -226,8 +243,8 @@ export const useOrders = () => {
           last_name: lastNameToUse,
           email: user.email || '',
           phone: phoneNumber,
-          address: `${address.building} ${address.street}, ${address.apartment || ''}`,
-          city: address.city,
+          address: fullAddressString,
+          city: cityAreaString,
           postal_code: address.postal_code || ''
         })
         .select('id')

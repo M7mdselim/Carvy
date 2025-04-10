@@ -108,6 +108,16 @@ export function AddressForm({
     }
   }, [formData.city, cities, areas]);
 
+  // Handle value change with city name
+  const handleCityChange = (value: string) => {
+    onSelectChange('city', value);
+  };
+
+  // Handle area change
+  const handleAreaChange = (value: string) => {
+    onSelectChange('state', value);
+  };
+
   return (
     <div className="grid gap-4 py-4">
       <div className="grid gap-2">
@@ -147,7 +157,7 @@ export function AddressForm({
           <Label htmlFor={`${prefix}city`}>{t('city')}</Label>
           <Select
             value={formData.city}
-            onValueChange={(value) => onSelectChange('city', value)}
+            onValueChange={handleCityChange}
             disabled={loading}
           >
             <SelectTrigger id={`${prefix}city`}>
@@ -166,7 +176,7 @@ export function AddressForm({
           <Label htmlFor={`${prefix}state`}>{t('area')}</Label>
           <Select
             value={formData.state}
-            onValueChange={(value) => onSelectChange('state', value)}
+            onValueChange={handleAreaChange}
             disabled={loading || !formData.city}
           >
             <SelectTrigger id={`${prefix}state`}>

@@ -6,6 +6,7 @@ import ShopsSection from '../components/home/ShopsSection'
 import ProductsSection from '../components/home/ProductsSection'
 import BrandsCarousel from '../components/home/BrandsCarousel'
 import PromotionCards from '../components/home/PromotionCards'
+import ServiceSection from '../components/home/ServiceSection'
 import { useEffect } from 'react'
 import { observeElements } from '../utils/animations'
 
@@ -38,6 +39,11 @@ export default function Home() {
       {/* Featured Products Section */}
       <div className="mt-20 lg:mt-28 reveal-on-scroll">
         <ProductsSection />
+      </div>
+
+      {/* Services Section */}
+      <div className="mt-20 lg:mt-28 reveal-on-scroll">
+        <ServiceSection />
       </div>
 
       {/* Brands Carousel */}

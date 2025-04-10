@@ -70,14 +70,48 @@ export function useSavedAddresses() {
     if (!user) return null;
 
     try {
+      // If we have a city ID, get the city name before saving
+      let cityName = address.city;
+      
+      // Check if the city is an ID (UUID format)
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(address.city)) {
+        // Fetch the city name from the ID
+        const { data: cityData, error: cityError } = await supabase
+          .from('cities')
+          .select('name')
+          .eq('id', address.city)
+          .single();
+          
+        if (!cityError && cityData) {
+          cityName = cityData.name;
+        }
+      }
+      
+      // Get area name if it's an ID
+      let areaName = '';
+      if (address.state && uuidPattern.test(address.state)) {
+        // Fetch the area name from the ID
+        const { data: areaData, error: areaError } = await supabase
+          .from('areas')
+          .select('name')
+          .eq('id', address.state)
+          .single();
+          
+        if (!areaError && areaData) {
+          areaName = areaData.name;
+        }
+      }
+      
       // Convert SavedAddress to the format expected by the addresses table
       const newAddress = {
         user_id: user.id,
         recipient_name: address.name,
         street: address.street_address,
         apartment: address.apartment,
-        city: address.city, // Now city ID
-        district: address.state, // Now area ID
+        city: cityName, // Use city name instead of ID
+        district: address.street_address, // Set district to street address temporarily
+        area: areaName || address.state || '', // Use area name or ID for the area field
         postal_code: address.zip_code,
         // Required fields for the database
         building: 'Main',
@@ -126,8 +160,49 @@ export function useSavedAddresses() {
       if (address.name !== undefined) updatedFields.recipient_name = address.name;
       if (address.street_address !== undefined) updatedFields.street = address.street_address;
       if (address.apartment !== undefined) updatedFields.apartment = address.apartment;
-      if (address.city !== undefined) updatedFields.city = address.city;
-      if (address.state !== undefined) updatedFields.district = address.state;
+      
+      // Check if the city is an ID (UUID format)
+      if (address.city !== undefined) {
+        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidPattern.test(address.city)) {
+          // Fetch the city name from the ID
+          const { data: cityData, error: cityError } = await supabase
+            .from('cities')
+            .select('name')
+            .eq('id', address.city)
+            .single();
+            
+          if (!cityError && cityData) {
+            updatedFields.city = cityData.name;
+          } else {
+            updatedFields.city = address.city;
+          }
+        } else {
+          updatedFields.city = address.city;
+        }
+      }
+      
+      // Handle area field - store in area column instead of district
+      if (address.state !== undefined) {
+        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidPattern.test(address.state)) {
+          // Fetch the area name from the ID
+          const { data: areaData, error: areaError } = await supabase
+            .from('areas')
+            .select('name')
+            .eq('id', address.state)
+            .single();
+            
+          if (!areaError && areaData) {
+            updatedFields.area = areaData.name;
+          } else {
+            updatedFields.area = address.state;
+          }
+        } else {
+          updatedFields.area = address.state;
+        }
+      }
+      
       if (address.zip_code !== undefined) updatedFields.postal_code = address.zip_code;
       if (address.is_default !== undefined) updatedFields.is_default = address.is_default;
 

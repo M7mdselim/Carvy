@@ -84,7 +84,7 @@ export function EditAddressDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white ">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>{t('editAddress')}</DialogTitle>
@@ -131,7 +131,7 @@ export function DeleteAddressDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-[400px] bg-white ">
         <DialogHeader>
           <DialogTitle>{t('deleteAddress')}</DialogTitle>
           <DialogDescription>
