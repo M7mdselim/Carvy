@@ -1414,6 +1414,7 @@ export function Chatbot() {
                   </ScrollArea>
 
                  
+
                   <div className="p-3 border-t border-gray-200 flex items-center gap-2 bg-white">
                     {selectedAttachments.length > 0 && (
                       <div className="absolute -top-10 left-0 right-0 bg-white p-2 border-t border-gray-200 flex items-center gap-2 overflow-x-auto">
@@ -1679,11 +1680,6 @@ export function Chatbot() {
   )
 
   const getChatSize = () => {
-    // Check if mobile device and keyboard is likely open
-    const isMobileKeyboardOpen = 
-      breakpoint === "mobile" && 
-      window.innerHeight < window.outerHeight * 0.7; // Detect keyboard by viewport height reduction
-  
     switch (breakpoint) {
       case "largeDesktop":
         return { width: "w-[420px]", height: "h-[600px]", buttonSize: "p-4" }
@@ -1693,18 +1689,7 @@ export function Chatbot() {
         return { width: "w-[350px]", height: "h-[500px]", buttonSize: "p-3" }
       case "mobile":
       default:
-        return isMobileKeyboardOpen
-          ? { 
-              width: "w-full max-w-[320px]", 
-              height: "h-[180px]", // Reduced height when keyboard is open
-              buttonSize: "p-2",   // Smaller button padding
-              position: "fixed bottom-0" // Optional: stick to bottom
-            }
-          : { 
-              width: "w-full max-w-[320px]", 
-              height: "h-[250px]", 
-              buttonSize: "p-3" 
-            }
+        return { width: "w-full max-w-[320px]", height: "h-[250px]", buttonSize: "p-3" }
     }
   }
 
