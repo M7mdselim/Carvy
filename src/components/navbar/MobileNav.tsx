@@ -37,18 +37,7 @@ export default function MobileNav({ navigation, isCurrentPath, user, signOut }: 
       </div>
       {user ? (
         <div className="border-t border-gray-200 pb-3 pt-4">
-          <div className="flex items-center px-4">
-            <div className="flex-shrink-0">
-              <img
-                className="h-10 w-10 rounded-full"
-                src={`https://ui-avatars.com/api/?name=${user.email}&background=random`}
-                alt=""
-              />
-            </div>
-            <div className="ml-3">
-              <div className="text-base font-medium text-gray-800">{user.email}</div>
-            </div>
-          </div>
+          
           <div className="mt-3 space-y-1">
             <Disclosure.Button
               as={Link}
