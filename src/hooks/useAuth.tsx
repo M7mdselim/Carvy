@@ -4,8 +4,11 @@ import { supabase, initializeAuth, resetPassword, signInWithProvider } from '../
 import type { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { ProfileData } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthState {
+
+  
   user: User | null;
   session: Session | null;
   loading: boolean;
@@ -17,7 +20,8 @@ interface AuthState {
       phone_number?: string;
     }
   }) => Promise<void>;
-  signOut: () => Promise<void>;
+  signOut: (navigate: (path: string) => void) => Promise<void>; // ✅ updated here
+ 
   initialize: () => Promise<void>;
   getUserProfile: () => ProfileData | null;
   cleanup: () => void;
@@ -25,11 +29,16 @@ interface AuthState {
   signInWithSocial: (provider: 'google' | 'facebook') => Promise<void>;
 }
 
+
+
 export const useAuth = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   loading: true,
   
+
+  
+
   signIn: async (email: string, password: string) => {
     try {
       const { error, data } = await supabase.auth.signInWithPassword({
@@ -78,25 +87,29 @@ export const useAuth = create<AuthState>((set, get) => ({
     }
   },
   
-  signOut: async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) throw error;
-      
-      set({ 
-        user: null, 
-        session: null 
-      });
-      
-      toast.success("Signed out successfully");
-    } catch (error: any) {
-      console.error('Sign out error:', error);
-      toast.error(error.message || 'Failed to sign out');
-      throw error;
-    }
-  },
   
+  signOut: async (navigate: (path: string) => void) => {
+    try {
+      // Attempt to sign out from Supabase
+      await supabase.auth.signOut(); // If session is missing, it will still throw — we’ll catch it
+    } catch (error: any) {
+      if (error.name === 'AuthSessionMissingError') {
+        console.warn('Session already missing. Forcing client sign-out.');
+      } else {
+        console.error('Sign out error:', error);
+        toast.error(error.message || 'Failed to sign out');
+        throw error;
+      }
+    } finally {
+      // Always clear local state and redirect
+      set({ user: null, session: null });
+      toast.success("Signed out successfully");
+      navigate('/login');
+    }
+  }
+  ,
+  
+ 
   initialize: async () => {
     try {
       set({ loading: true });
@@ -106,7 +119,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       
       // If we have a session, set the user and session
       if (session) {
-        console.log("Session found during initialization:", session.user.id);
+        console.log("Session found during initialization:");
         set({ 
           user: session.user, 
           session: session 
@@ -122,7 +135,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       // Then set up the auth state listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         (event, session) => {
-          console.log("Auth state changed:", event, session?.user?.id);
+          console.log("Auth state changed:");
           set({ 
             user: session?.user || null, 
             session: session 
