@@ -41,10 +41,10 @@ export default function Home() {
         <ProductsSection />
       </div>
 
-      {/* Services Section */}
+      {/* Services Section
       <div className="mt-20 lg:mt-28 reveal-on-scroll">
         <ServiceSection />
-      </div>
+      </div> */}
 
       {/* Brands Carousel */}
       <div className="mt-20 lg:mt-28 py-12 bg-gradient-to-r from-gray-50 to-indigo-50 reveal-on-scroll">

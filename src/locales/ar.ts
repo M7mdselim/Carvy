@@ -326,7 +326,11 @@ export const ar = {
   "pageNotFound": "الصفحة غير موجودة",
   "pageDoesntExist": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
   "featuredProducts":"قطع غيار",
-  "featuredShops":"متاجر"
+  "featuredShops":"متاجر",
+  "findParts":"بحث عن قطع",
+  "selectBrand": "اختر نوع ",
+  "selectModel": "اختر موديل ",
+  "selectYear":"اختر سنه الصنع"
 };
 
 

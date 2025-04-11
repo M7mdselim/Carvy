@@ -329,6 +329,10 @@ export const en = {
   "enhancedWelcomeBackMessage":" \n How can i Help u Today??",
   "enhancedWelcomeMessage":"\n How can i Help u Today?? ",
   "shopNow":"Shop Now",
-  "findShops":"Find a Shop"
+  "findShops":"Find a Shop",
+  "findParts":"Find a Part",
+  "selectBrand": "Select Brand",
+  "selectModel": "Select Model",
+  "selectYear":"Select Year"
 };
 export default en;
