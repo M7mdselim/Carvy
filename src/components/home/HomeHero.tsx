@@ -1,6 +1,7 @@
 
 import { useLanguage } from '../../contexts/LanguageContext'
 import SearchBar from './SearchBar'
+import BrandModelSearch from './BrandModelSearch'
 import { Button } from '../ui/button'
 import { ChevronRight, Search, Car, ShoppingBag } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -83,6 +84,11 @@ const HomeHero = () => {
         <div className={`relative px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`} 
           style={{ position: 'relative', zIndex: 99999999 }}>
           <SearchBar />
+          
+          {/* Add the Brand and Model search component */}
+          <div className="max-w-4xl mx-auto">
+            <BrandModelSearch />
+          </div>
         </div>
 
         {/* Quick search options */}

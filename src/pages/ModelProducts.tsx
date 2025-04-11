@@ -5,9 +5,10 @@ import { Product } from '../types'
 import { ShopProductCard } from '../components/ShopProductCard'
 import { useLanguage } from '../contexts/LanguageContext'
 import { Button } from '../components/ui/button'
-import { ChevronLeft, Filter, Search } from 'lucide-react'
+import { ChevronLeft, Filter, Search, Calendar } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../components/ui/select'
+import { isYearInRange } from '../lib/utils'
 
 export default function ModelProducts() {
   const { modelId } = useParams<{ modelId: string }>()
@@ -32,22 +33,42 @@ export default function ModelProducts() {
   const [sortBy, setSortBy] = useState<string>('newest')
   const [currentPage, setCurrentPage] = useState(1)
   const [productsPerPage, setProductsPerPage] = useState(12)
+  const [availableYears, setAvailableYears] = useState<number[]>([])
+  const [selectedYear, setSelectedYear] = useState<string>('')
   const isRtl = language === 'ar'
 
   useEffect(() => {
     fetchCarModelAndProducts()
   }, [modelId])
+  
+  useEffect(() => {
+    if (carModel) {
+      const years: number[] = [];
+      const startYear = carModel.year_start;
+      const endYear = carModel.year_end || new Date().getFullYear();
+      
+      for (let year = startYear; year <= endYear; year++) {
+        years.push(year);
+      }
+      
+      setAvailableYears(years.sort((a, b) => b - a));
+    }
+  }, [carModel]);
 
   useEffect(() => {
-    // Filter and sort products whenever filters change
     let result = [...products]
     
-    // Apply category filter
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       result = result.filter(product => product.category === selectedCategory)
     }
     
-    // Apply search filter
+    if (selectedYear && selectedYear !== 'all') {
+      const year = parseInt(selectedYear);
+      result = result.filter(product => {
+        return product.compatibility.some(compatStr => isYearInRange(compatStr, year));
+      });
+    }
+    
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       result = result.filter(
@@ -57,7 +78,6 @@ export default function ModelProducts() {
       )
     }
     
-    // Apply sorting
     switch (sortBy) {
       case 'price-low-high':
         result.sort((a, b) => a.price - b.price)
@@ -66,24 +86,20 @@ export default function ModelProducts() {
         result.sort((a, b) => b.price - a.price)
         break
       case 'oldest':
-        // Since we don't have a created_at field in our Product interface,
-        // we'll keep the original order which should be by created_at
         break
       case 'newest':
       default:
-        // This is the default order from the API
         break
     }
     
     setFilteredProducts(result)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [products, selectedCategory, searchQuery, sortBy])
+    setCurrentPage(1)
+  }, [products, selectedCategory, searchQuery, sortBy, selectedYear])
 
   async function fetchCarModelAndProducts() {
     try {
       setLoading(true)
       
-      // Fetch car model
       const { data: carModelData, error: carModelError } = await supabase
         .from('car_models')
         .select('*')
@@ -94,7 +110,6 @@ export default function ModelProducts() {
       
       setCarModel(carModelData)
       
-      // Fetch products compatible with this car model
       const { data: productsData, error: productsError } = await supabase
         .from('product_car_models')
         .select(`
@@ -116,7 +131,6 @@ export default function ModelProducts() {
       
       if (productsError) throw productsError
       
-      // Process products data
       const uniqueProducts = new Map<string, any>()
       const uniqueCategories = new Set<string>()
       
@@ -124,7 +138,6 @@ export default function ModelProducts() {
         if (item.products && !uniqueProducts.has(item.products.id)) {
           uniqueProducts.set(item.products.id, item.products)
           
-          // Collect unique categories
           if (item.products.categories?.name) {
             uniqueCategories.add(item.products.categories.name)
           }
@@ -158,11 +171,9 @@ export default function ModelProducts() {
     }
   }
 
-  // Get current products for pagination
   const displayedProducts = filteredProducts.slice(0, currentPage * productsPerPage)
   const hasMoreProducts = displayedProducts.length < filteredProducts.length
 
-  // Load more products
   const handleLoadMore = () => {
     setCurrentPage(prev => prev + 1)
   }
@@ -223,7 +234,7 @@ export default function ModelProducts() {
       </div>
       
       <div className="mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
             <Input
               type="text"
@@ -245,10 +256,30 @@ export default function ModelProducts() {
                 <SelectValue placeholder={t('allCategories')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('allCategories')}</SelectItem>
+                <SelectItem value="all">{t('allCategories')}</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="relative flex items-center">
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Select
+              value={selectedYear}
+              onValueChange={setSelectedYear}
+            >
+              <SelectTrigger className="pl-10">
+                <SelectValue placeholder={t('selectYear')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('allYears')}</SelectItem>
+                {availableYears.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -286,6 +317,7 @@ export default function ModelProducts() {
             onClick={() => {
               setSelectedCategory('')
               setSearchQuery('')
+              setSelectedYear('')
               setSortBy('newest')
             }}
           >

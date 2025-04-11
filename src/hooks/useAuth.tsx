@@ -1,14 +1,10 @@
-
 import { create } from 'zustand';
 import { supabase, initializeAuth, resetPassword, signInWithProvider } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { ProfileData } from '../types';
-import { useNavigate } from 'react-router-dom';
 
-interface AuthState {
-
-  
+interface AuthState {  
   user: User | null;
   session: Session | null;
   loading: boolean;
@@ -20,8 +16,7 @@ interface AuthState {
       phone_number?: string;
     }
   }) => Promise<void>;
-  signOut: (navigate: (path: string) => void) => Promise<void>; // ✅ updated here
- 
+  signOut: () => Promise<void>;
   initialize: () => Promise<void>;
   getUserProfile: () => ProfileData | null;
   cleanup: () => void;
@@ -29,15 +24,10 @@ interface AuthState {
   signInWithSocial: (provider: 'google' | 'facebook') => Promise<void>;
 }
 
-
-
 export const useAuth = create<AuthState>((set, get) => ({
   user: null,
   session: null,
   loading: true,
-  
-
-  
 
   signIn: async (email: string, password: string) => {
     try {
@@ -87,11 +77,10 @@ export const useAuth = create<AuthState>((set, get) => ({
     }
   },
   
-  
-  signOut: async (navigate: (path: string) => void) => {
+  signOut: async () => {
     try {
       // Attempt to sign out from Supabase
-      await supabase.auth.signOut(); // If session is missing, it will still throw — we’ll catch it
+      await supabase.auth.signOut(); // If session is missing, it will still throw — we'll catch it
     } catch (error: any) {
       if (error.name === 'AuthSessionMissingError') {
         console.warn('Session already missing. Forcing client sign-out.');
@@ -104,12 +93,10 @@ export const useAuth = create<AuthState>((set, get) => ({
       // Always clear local state and redirect
       set({ user: null, session: null });
       toast.success("Signed out successfully");
-      navigate('/login');
+      window.location.href = '/Carvy/login';
     }
-  }
-  ,
+  },
   
- 
   initialize: async () => {
     try {
       set({ loading: true });

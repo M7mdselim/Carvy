@@ -80,5 +80,8 @@ export default {
   viewAllResults: 'View All Results',
   searching: 'Searching...',
   noResultsFound: 'No results found',
-  searchPlaceholder: 'Search for products, shops, or car models...'
+  searchPlaceholder: 'Search for products, shops, or car models...',
+  allYears: 'All Years',
+  noResults: 'No results found for',
+  allCategories: 'All Categories'
 }

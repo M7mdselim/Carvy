@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -63,4 +64,35 @@ export function extractQuestionsFromText(message: string): string[] {
       lowerSentence.includes('tell me about')
     );
   });
+}
+
+/**
+ * Check if a year falls within a compatibility year range
+ * @param yearStr The compatibility year string (e.g., "2005-2010", "2005+", "2005", "2005-Present")
+ * @param selectedYear The year to check
+ * @returns Boolean indicating if the year is compatible
+ */
+export function isYearInRange(yearStr: string, selectedYear: number): boolean {
+  // Handle various formats including "Present" as the end year
+  const yearRegex = /\((\d{4})(?:[-+](\d{4}|\+|Present))?\)/i;
+  const yearMatch = yearStr.match(yearRegex);
+  
+  if (!yearMatch) return false;
+  
+  const startYear = parseInt(yearMatch[1]);
+  const endPart = yearMatch[2]; // This could be a year, '+', 'Present', or undefined
+  
+  // Case 1: Single year format - e.g., "(2005)"
+  if (!endPart) {
+    return selectedYear === startYear;
+  }
+  
+  // Case 2: Open-ended range - e.g., "(2005+)" or "(2005-Present)"
+  if (endPart === '+' || endPart.toLowerCase() === 'present') {
+    return selectedYear >= startYear;
+  }
+  
+  // Case 3: Specific range - e.g., "(2005-2010)"
+  const endYear = parseInt(endPart);
+  return selectedYear >= startYear && selectedYear <= endYear;
 }

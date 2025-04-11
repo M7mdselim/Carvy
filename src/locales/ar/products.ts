@@ -1,4 +1,3 @@
-
 export default {
   browseModels: 'تصفح الموديلات',
   searchCategories: 'البحث عن موديل',
@@ -88,5 +87,9 @@ export default {
   viewAllResults: 'عرض كل النتائج',
   searching: 'جاري البحث...',
   noResultsFound: 'لم يتم العثور على نتائج',
-  searchPlaceholder: 'ابحث عن المنتجات أو المتاجر أو موديلات السيارات...'
+  searchPlaceholder: 'ابحث عن المنتجات أو المتاجر أو موديلات السيارات...',
+  allYears: 'جميع السنوات',
+  noResults: 'لا توجد نتائج لـ',
+  allCategories: 'جميع الفئات',
+  selectYear: 'اختر السنة'
 };

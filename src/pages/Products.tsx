@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import { useProducts } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
@@ -10,6 +9,7 @@ import { Input } from '../components/ui/input'
 import { ShopProductCard } from '../components/ShopProductCard'
 import { Badge } from '../components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import { isYearInRange } from '../lib/utils'
 import { 
   Popover,
   PopoverContent,
@@ -35,11 +35,11 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  // Get parameters from URL
   const categoryParam = searchParams.get('category');
   const makeParam = searchParams.get('make');
   const modelParam = searchParams.get('model');
   const typeParam = searchParams.get('type');
+  const yearParam = searchParams.get('year');
   
   const [selectedCategories, setSelectedCategories] = useState<string[]>(categoryParam ? [categoryParam] : []);
   const [selectedTypes, setSelectedTypes] = useState<string[]>(typeParam ? [typeParam] : []);
@@ -48,10 +48,15 @@ export default function Products() {
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [sortOption, setSortOption] = useState<string>('default');
   const [isRtl, setIsRtl] = useState(language === 'ar');
-  const [activeFilters, setActiveFilters] = useState<{category?: string, make?: string, model?: string, type?: string}>({});
+  const [activeFilters, setActiveFilters] = useState<{
+    category?: string, 
+    make?: string, 
+    model?: string, 
+    type?: string,
+    year?: string
+  }>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Product type options
   const productTypes = [
     'Engine Parts', 
     'Brake System', 
@@ -66,8 +71,13 @@ export default function Products() {
   ];
 
   useEffect(() => {
-    // Set active filters from URL params
-    const filters: {category?: string, make?: string, model?: string, type?: string} = {};
+    const filters: {
+      category?: string, 
+      make?: string, 
+      model?: string, 
+      type?: string,
+      year?: string
+    } = {};
     
     if (categoryParam && categoryParam !== 'all') {
       filters.category = categoryParam;
@@ -87,33 +97,32 @@ export default function Products() {
       setSelectedTypes([typeParam]);
     }
     
+    if (yearParam) {
+      filters.year = yearParam;
+    }
+    
     if (Object.keys(filters).length > 0) {
       setActiveFilters(filters);
     }
-  }, [categoryParam, makeParam, modelParam, typeParam]);
+  }, [categoryParam, makeParam, modelParam, typeParam, yearParam]);
 
-  // Update URL when filters change
- // Replace the URL parameter update effect with:
-useEffect(() => {
-  const newParams = new URLSearchParams(searchParams);
-  
-  if (selectedCategories.length === 1) {
-    newParams.set('category', selectedCategories[0]);
-  } else if (selectedCategories.length === 0) {
-    newParams.delete('category');
-  }
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    if (selectedCategories.length === 1) {
+      newParams.set('category', selectedCategories[0]);
+    } else if (selectedCategories.length === 0) {
+      newParams.delete('category');
+    }
 
-  if (selectedTypes.length === 1) {
-    newParams.set('type', selectedTypes[0]);
-  } else if (selectedTypes.length === 0) {
-    newParams.delete('type');
-  }
-  
-  // Use replace instead of default push to avoid creating history entries
-  setSearchParams(newParams, { replace: true });
-}, [selectedCategories, selectedTypes, searchParams, setSearchParams]);
-
-
+    if (selectedTypes.length === 1) {
+      newParams.set('type', selectedTypes[0]);
+    } else if (selectedTypes.length === 0) {
+      newParams.delete('type');
+    }
+    
+    setSearchParams(newParams, { replace: true });
+  }, [selectedCategories, selectedTypes, searchParams, setSearchParams]);
 
   useEffect(() => {
     setIsRtl(language === 'ar');
@@ -123,7 +132,6 @@ useEffect(() => {
     };
   }, [language]);
 
-  // Toggle category selection
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
@@ -134,7 +142,6 @@ useEffect(() => {
     });
   };
 
-  // Toggle type selection
   const toggleType = (type: string) => {
     setSelectedTypes(prev => {
       if (prev.includes(type)) {
@@ -145,7 +152,6 @@ useEffect(() => {
     });
   };
 
-  // Filter and sort products
   const filteredAndSortedProducts = products
     .filter(product => selectedCategories.length === 0 || selectedCategories.includes(product.category))
     .filter(product => selectedTypes.length === 0 || selectedTypes.includes(product.type || ''))
@@ -156,21 +162,30 @@ useEffect(() => {
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .filter(product => {
-      if (!activeFilters.make && !activeFilters.model) return true;
+      if (!activeFilters.make && !activeFilters.model && !activeFilters.year) return true;
       
-      // Check if the product is compatible with the specified make and model
-      return product.compatibility && product.compatibility.some(compatStr => {
-        // Simple string check - not the most robust solution but works for demo
-        if (activeFilters.make && activeFilters.model) {
-          return compatStr.toLowerCase().includes(activeFilters.make.toLowerCase()) && 
-                 compatStr.toLowerCase().includes(activeFilters.model.toLowerCase());
-        } else if (activeFilters.make) {
-          return compatStr.toLowerCase().includes(activeFilters.make.toLowerCase());
-        } else if (activeFilters.model) {
-          return compatStr.toLowerCase().includes(activeFilters.model.toLowerCase());
-        }
-        return true;
-      });
+      if (product.compatibility && product.compatibility.length > 0) {
+        return product.compatibility.some(compatStr => {
+          let isCompatible = true;
+          
+          if (activeFilters.make) {
+            isCompatible = isCompatible && compatStr.toLowerCase().includes(activeFilters.make.toLowerCase());
+          }
+          
+          if (activeFilters.model) {
+            isCompatible = isCompatible && compatStr.toLowerCase().includes(activeFilters.model.toLowerCase());
+          }
+          
+          if (activeFilters.year) {
+            const selectedYear = parseInt(activeFilters.year);
+            isCompatible = isCompatible && isYearInRange(compatStr, selectedYear);
+          }
+          
+          return isCompatible;
+        });
+      }
+      
+      return false;
     })
     .sort((a, b) => {
       switch(sortOption) {
@@ -183,25 +198,21 @@ useEffect(() => {
         case 'nameDesc':
           return b.name.localeCompare(a.name);
         default:
-          return 0; // Keep original order
+          return 0;
       }
     });
 
-  // Get visible products based on current page
   const displayedProducts = filteredAndSortedProducts.slice(0, currentPage * itemsPerPage);
   const hasMoreProducts = displayedProducts.length < filteredAndSortedProducts.length;
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategories, selectedTypes, searchQuery, activeFilters, sortOption]);
 
-  // Load more products
   const handleLoadMore = () => {
     setCurrentPage(prevPage => prevPage + 1);
   };
-  
-  // Clear filters
+
   const clearFilters = () => {
     setActiveFilters({});
     setSelectedCategories([]);
@@ -210,7 +221,6 @@ useEffect(() => {
     setSearchParams({});
   };
 
-  // Handle back button click
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -243,7 +253,6 @@ useEffect(() => {
             <Search className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400`} />
           </div>
           
-          {/* Filter dropdown */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
@@ -257,7 +266,6 @@ useEffect(() => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 bg-white shadow-lg rounded-lg">
-
               <div className="space-y-4">
                 <div>
                   <h3 className="font-medium mb-2">{t('category')}</h3>
@@ -309,7 +317,6 @@ useEffect(() => {
             </PopoverContent>
           </Popover>
           
-          {/* Separate sort-by dropdown */}
           <Select value={sortOption} onValueChange={setSortOption}>
             <SelectTrigger className="bg-white w-full sm:w-48">
               <SelectValue placeholder={t('sortBy')} />
@@ -325,8 +332,8 @@ useEffect(() => {
         </div>
       </div>
       
-      {/* Show active filters if any */}
-      {(selectedCategories.length > 0 || selectedTypes.length > 0 || sortOption !== 'default') && (
+      {(selectedCategories.length > 0 || selectedTypes.length > 0 || sortOption !== 'default' || 
+        activeFilters.make || activeFilters.model || activeFilters.year) && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-gray-700">{t('activeFilters')}:</span>
           
@@ -351,7 +358,12 @@ useEffect(() => {
           {activeFilters.make && (
             <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
               {activeFilters.make}
-              <button onClick={clearFilters} className="ml-1">
+              <button onClick={() => {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('make');
+                setSearchParams(newParams);
+                setActiveFilters(prev => ({...prev, make: undefined}));
+              }} className="ml-1">
                 <X className="h-3 w-3" />
               </button>
             </Badge>
@@ -360,7 +372,26 @@ useEffect(() => {
           {activeFilters.model && (
             <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
               {activeFilters.model}
-              <button onClick={clearFilters} className="ml-1">
+              <button onClick={() => {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('model');
+                setSearchParams(newParams);
+                setActiveFilters(prev => ({...prev, model: undefined}));
+              }} className="ml-1">
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          
+          {activeFilters.year && (
+            <Badge className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 flex items-center gap-1">
+              {t('year')}: {activeFilters.year}
+              <button onClick={() => {
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('year');
+                setSearchParams(newParams);
+                setActiveFilters(prev => ({...prev, year: undefined}));
+              }} className="ml-1">
                 <X className="h-3 w-3" />
               </button>
             </Badge>
@@ -377,6 +408,15 @@ useEffect(() => {
               </button>
             </Badge>
           )}
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs"
+            onClick={clearFilters}
+          >
+            {t('clearFilters')}
+          </Button>
         </div>
       )}
 
@@ -391,9 +431,9 @@ useEffect(() => {
           <h3 className="text-xl font-medium text-gray-700 mb-2">{t('noProductsFound')}</h3>
           <p className="text-gray-500">
             {selectedCategories.length > 0 && `${t('for')} ${selectedCategories.join(', ')}`}
-            {(activeFilters.make || activeFilters.model) && ` ${t('matching')} ${activeFilters.make || ''} ${activeFilters.model || ''}`}
+            {(activeFilters.make || activeFilters.model || activeFilters.year) && ` ${t('matching')} ${activeFilters.make || ''} ${activeFilters.model || ''} ${activeFilters.year ? `(${activeFilters.year})` : ''}`}
           </p>
-          {(selectedCategories.length > 0 || selectedTypes.length > 0 || activeFilters.make || activeFilters.model || sortOption !== 'default') && (
+          {(selectedCategories.length > 0 || selectedTypes.length > 0 || activeFilters.make || activeFilters.model || activeFilters.year || sortOption !== 'default') && (
             <Button 
               onClick={clearFilters}
               variant="outline" 
@@ -425,5 +465,5 @@ useEffect(() => {
         </>
       )}
     </div>
-  );
+  )
 }

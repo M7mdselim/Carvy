@@ -57,6 +57,13 @@ export default {
   loadingProducts: 'Loading products...',
   noCategoriesFound: 'No categories found',
   noProductsFound: 'No products found',
+  // Car search
+  selectBrand: 'Select Brand',
+  selectModel: 'Select Model',
+  selectYear: 'Select Year',
+  allYears: 'All Years',
+  findParts: 'Find Parts',
+  carModels: 'Car Models',
   // Footer translations
   quickLinks: 'Quick Links',
   customerService: 'Customer Service',
