@@ -11,7 +11,7 @@ interface LanguageContextType {
 }
 
 const defaultValue: LanguageContextType = {
-  language: 'en',
+  language: 'ar',
   t: (key: TranslationKey | string) => key.toString(),
   changeLanguage: () => {},
 };
@@ -29,7 +29,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   // Try to get stored language preference or default to English
   const getInitialLanguage = (): Language => {
     const savedLanguage = localStorage.getItem('language');
-    return (savedLanguage as Language) || 'en';
+    return (savedLanguage as Language) || 'ar';
   };
 
   const [language, setLanguage] = useState<Language>(getInitialLanguage);

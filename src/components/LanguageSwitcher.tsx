@@ -11,7 +11,7 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
 
   const toggleLanguage = () => {
     // Ensure that the changeLanguage function receives a valid Language type ('en' | 'ar')
-    const newLanguage: 'en' | 'ar' = language === 'en' ? 'ar' : 'en';  // Correct type assignment
+    const newLanguage: 'ar' | 'en' = language === 'ar' ? 'en' : 'ar';  // Correct type assignment
     changeLanguage(newLanguage); // Now passing the correct type
     localStorage.setItem('language', newLanguage); // Store the preference in localStorage
   };
@@ -19,13 +19,18 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
   // Check if a language is already saved in localStorage, otherwise set Arabic as default
   useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
+  
     if (!storedLanguage) {
-      changeLanguage('ar'); // Set Arabic as the default language on initial load
-      localStorage.setItem('language', 'ar'); // Store Arabic in localStorage
-    } else if (storedLanguage !== language) {
-      changeLanguage(storedLanguage as 'en' | 'ar'); // Explicitly casting the stored language value
+      // If there's no stored language, default to Arabic
+      const defaultLang: 'ar' = 'ar';
+      changeLanguage(defaultLang);
+      localStorage.setItem('language', defaultLang);
+    } else {
+      // Set the stored language (no need to compare with current language)
+      changeLanguage(storedLanguage as 'ar' | 'en');
     }
-  }, [language, changeLanguage]);
+  }, []); // ✅ Only run on first render
+  
 
   return (
     <button
