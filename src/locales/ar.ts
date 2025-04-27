@@ -335,7 +335,8 @@ export const ar = {
   "Brake System": "نظام الفرامل",
   "Transmission": "نظام النقل",
   "Electrical": "نظام الكهرباء",
-  "brand":"النوع"
+  "brand":"النوع",
+  "notReturnable": "غير قابل للاسترجاع"
   
 };
 

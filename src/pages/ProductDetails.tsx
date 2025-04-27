@@ -282,10 +282,10 @@ export default function ProductDetails() {
         {t('back')}
       </Button>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-        <div className="lg:sticky lg:top-24 space-y-4 max-w-xl mx-auto md:max-w-none">
-          <div className="relative overflow-hidden rounded-lg mb-4 border border-gray-200 bg-white shadow-md w-full">
-            <AspectRatio ratio={1/1} className="bg-white w-full max-w-[500px] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="lg:sticky lg:top-24">
+          <div className="relative overflow-hidden rounded-lg mb-4 border border-gray-200 bg-white shadow-md">
+            <AspectRatio ratio={1/1} className="bg-white">
               {images.length > 0 ? (
                 <img 
                   src={images[currentImageIndex]} 
@@ -417,10 +417,15 @@ export default function ProductDetails() {
               <span className="ml-2 text-gray-800 font-medium">{isInactive ? t('unavailable') : t('new')}</span>
             </div>
 
-            {isReturnable && (
+            {isReturnable ? (
               <div className="mt-2 flex items-center text-sm text-green-600">
                 <RefreshCw className="h-4 w-4 mr-1" />
                 {t('acceptedWithin')} 7 {t('days')}
+              </div>
+            ) : (
+              <div className="mt-2 flex items-center text-sm text-red-600">
+                <RefreshCw className="h-4 w-4 mr-1" />
+                {t('notReturnable')}
               </div>
             )}
           </div>
