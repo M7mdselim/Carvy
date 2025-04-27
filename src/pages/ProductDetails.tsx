@@ -418,12 +418,13 @@ export default function ProductDetails() {
           <div className="space-y-3">
             {!isInactive ? (
               <>
-                <Button
-                  onClick={handleBuyNow}
-                  className="w-full h-10 sm:h-12 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg"
-                >
-                  {t('buyItNow')}
-                </Button>
+              <Button
+  onClick={handleBuyNow}
+  className="w-full h-10 sm:h-12 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white"
+>
+  {t('buyItNow')}
+</Button>
+
                 
                 {cartItem ? (
                   <div className="flex items-center border rounded-lg bg-gray-50 p-2">

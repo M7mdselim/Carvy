@@ -12,6 +12,9 @@ const HomeHero = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [isImagesLoaded, setIsImagesLoaded] = useState(false)
 
+
+  const categories = ['Engine Parts', 'Brake System', 'Transmission', 'Electrical'];
+
   useEffect(() => {
     // Show the search bar immediately
     setIsSearchVisible(true)
@@ -91,19 +94,18 @@ const HomeHero = () => {
           </div>
         </div>
 
-        {/* Quick search options */}
         <div className={`mt-24 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isImagesLoaded ? 'fade-in' : 'opacity-0'}`}>
-          {['Engine Parts', 'Brake System', 'Transmission', 'Electrical'].map((category, index) => (
-            <Link 
-              key={category} 
-              to={`/products?type=${encodeURIComponent(category)}`}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-sm hover-lift hover:bg-white text-gray-700 font-medium"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {category}
-            </Link>
-          ))}
-        </div>
+      {categories.map((category, index) => (
+        <Link 
+          key={category}
+          to={`/products?type=${encodeURIComponent(category)}`}
+          className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-sm hover-lift hover:bg-white text-gray-700 font-medium"
+          style={{ animationDelay: `${index * 0.1}s` }}
+        >
+          {t(category)}
+        </Link>
+      ))}
+    </div>
       </div>
       
       {/* Bottom gradient */}
