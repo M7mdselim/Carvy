@@ -57,7 +57,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
         return language === 'en' ? 'Est. delivery' : 'التسليم المقدر';
       }
       if (key === 'acceptedWithin' && !translations[language]['acceptedWithin']) {
-        return language === 'en' ? 'Accepted within' : 'مقبول خلال';
+        return language === 'en' ? 'Returns Accepted within' : 'استرجاع مقبول خلال';
       }
       if (key === 'days' && !translations[language]['days']) {
         return language === 'en' ? 'days' : 'أيام';
