@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { GlobeIcon } from 'lucide-react';
@@ -14,6 +15,16 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
     const newLanguage: 'ar' | 'en' = language === 'ar' ? 'en' : 'ar';  // Correct type assignment
     changeLanguage(newLanguage); // Now passing the correct type
     localStorage.setItem('language', newLanguage); // Store the preference in localStorage
+    
+    // Apply always-ltr class to all navbar elements on all pages
+    applyNavbarLtrStyles();
+  };
+  
+  // Helper function to apply LTR styles to navbar
+  const applyNavbarLtrStyles = () => {
+    document.querySelectorAll('.navbar-container').forEach(element => {
+      element.classList.add('always-ltr');
+    });
   };
 
   // Check if a language is already saved in localStorage, otherwise set Arabic as default
@@ -29,8 +40,21 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
       // Set the stored language (no need to compare with current language)
       changeLanguage(storedLanguage as 'ar' | 'en');
     }
-  }, []); // ✅ Only run on first render
-  
+    
+    // Ensure navbar stays LTR regardless of language on ALL pages
+    applyNavbarLtrStyles();
+    
+    // Also apply the LTR styles whenever route changes or component re-renders
+    const observer = new MutationObserver(() => {
+      applyNavbarLtrStyles();
+    });
+    
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Clean up observer on component unmount
+    return () => observer.disconnect();
+  }, []); // ✅ Only run effect on first render
 
   return (
     <button

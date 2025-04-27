@@ -57,6 +57,7 @@ export function useShopDetails(shopId: string) {
           categories: uniqueCategories,
           rating: shopData.rating || 0,
           reviewCount: shopData.review_count || 0,
+          // Don't try to access returnable from shopData as it doesn't exist in the shops table
         })
 
         // Fetch shop's products
@@ -94,6 +95,7 @@ export function useShopDetails(shopId: string) {
               return `${car.make} ${car.model} (${car.year_start}${car.year_end ? `-${car.year_end}` : '+'})`
             }) || [],
             stock: product.stock,
+            returnable: product.returnable || false, // Keep product returnable property
           }))
         )
       } catch (e) {

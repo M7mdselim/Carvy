@@ -564,6 +564,7 @@ export type Database = {
           id: string
           image_url: string
           is_primary: boolean | null
+          original_name: string | null
           product_id: string
         }
         Insert: {
@@ -571,6 +572,7 @@ export type Database = {
           id?: string
           image_url: string
           is_primary?: boolean | null
+          original_name?: string | null
           product_id: string
         }
         Update: {
@@ -578,6 +580,7 @@ export type Database = {
           id?: string
           image_url?: string
           is_primary?: boolean | null
+          original_name?: string | null
           product_id?: string
         }
         Relationships: [
@@ -636,6 +639,7 @@ export type Database = {
           price: number
           product_number: string | null
           rating: number | null
+          returnable: boolean | null
           review_count: number | null
           shop_id: string
           status: string
@@ -652,6 +656,7 @@ export type Database = {
           price: number
           product_number?: string | null
           rating?: number | null
+          returnable?: boolean | null
           review_count?: number | null
           shop_id: string
           status?: string
@@ -668,6 +673,7 @@ export type Database = {
           price?: number
           product_number?: string | null
           rating?: number | null
+          returnable?: boolean | null
           review_count?: number | null
           shop_id?: string
           status?: string
@@ -891,7 +897,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      image_usage_status: {
+        Row: {
+          created_at: string | null
+          image_url: string | null
+          is_used: boolean | null
+          original_name: string | null
+          source_table: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          image_url?: string | null
+          is_used?: never
+          original_name?: string | null
+          source_table?: never
+        }
+        Update: {
+          created_at?: string | null
+          image_url?: string | null
+          is_used?: never
+          original_name?: string | null
+          source_table?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_owner_benefit: {
