@@ -5,7 +5,7 @@ import path from 'path'
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  base: "/Carvy/",
+  base: "/Zabtt/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),  // 👈 Ensure `@` maps to `/src`

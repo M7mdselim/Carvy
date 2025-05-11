@@ -104,8 +104,8 @@ const ui = {
   learnMore: "Learn More",
   customerFeedback: "Customer Feedback",
   customerFeedbackDescription: "See what our customers are saying about their experiences",
-  testimonial1: "I found the perfect parts for my BMW on Carvy. The quality is excellent and delivery was faster than expected!",
-  testimonial2: "I highly recommend using Carvy. I saved a lot compared to dealership prices and got genuine parts.",
+  testimonial1: "I found the perfect parts for my BMW on Zabtt. The quality is excellent and delivery was faster than expected!",
+  testimonial2: "I highly recommend using Zabtt. I saved a lot compared to dealership prices and got genuine parts.",
   testimonial3: "The website is easy to use and customer service is excellent. Will definitely shop here again."
 };
 

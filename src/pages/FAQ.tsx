@@ -112,7 +112,7 @@ export default function FAQ() {
             {t('contactUsMessage')}
           </p>
           <a 
-            href="/Carvy/contact" 
+            href="/Zabtt/contact" 
             className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
             {t('contactUs')}

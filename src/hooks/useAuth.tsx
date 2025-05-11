@@ -93,7 +93,7 @@ export const useAuth = create<AuthState>((set, get) => ({
       // Always clear local state and redirect
       set({ user: null, session: null });
       toast.success("Signed out successfully");
-      window.location.href = '/Carvy/login';
+      window.location.href = '/Zabtt/login';
     }
   },
   

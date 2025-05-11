@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://m7mdselim.github.io/Carvy/",
+  "homepage": "https://m7mdselim.github.io/Zabtt/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/m7mdselim/Carvy.git"
+    "url": "https://github.com/m7mdselim/Zabtt.git"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

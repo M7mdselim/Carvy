@@ -60,7 +60,7 @@ function RedirectAfterLogin() {
 function App() {
   return (
     <LanguageProvider>
-      <Router basename="/Carvy/">
+      <Router basename="/Zabtt/">
         <div className="min-h-screen flex flex-col bg-gray-50">
           <Navbar />
           <ScrollToTop />

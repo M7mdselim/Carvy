@@ -11,14 +11,14 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, 
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    storageKey: 'carvy-auth-storage',
+    storageKey: 'Zabtt-auth-storage',
   },
   global: {
     fetch: (url, options) => {
       return fetch(url, options);
     },
     headers: {
-      'X-Client-Info': 'carvy-web-client'
+      'X-Client-Info': 'Zabtt-web-client'
     }
   },
   // Add some retrying capability
@@ -74,7 +74,7 @@ export function handleSupabaseError(error: any): string {
 export async function resetPassword(email: string) {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/Carvy/reset-password',
+      redirectTo: window.location.origin + '/Zabtt/reset-password',
     });
     
     if (error) throw error;
@@ -91,7 +91,7 @@ export async function signInWithProvider(provider: 'google' | 'facebook') {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: window.location.origin + '/Carvy/',
+        redirectTo: window.location.origin + '/Zabtt/',
       },
     });
     
