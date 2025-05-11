@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Navbar from './components/navbar'
@@ -30,6 +31,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import { Toaster } from 'sonner'
 import { Chatbot } from "./components/Chatbot"
+import ProductRequestForm from './components/ProductRequestForm'
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -96,6 +98,7 @@ function App() {
           </Routes>
           <Footer />
           <Chatbot />
+          <ProductRequestForm />
           <Toaster position="top-right" richColors />
         </div>
       </Router>

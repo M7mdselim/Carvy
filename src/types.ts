@@ -25,7 +25,6 @@ export interface Product {
   type?: string;
   specifications?: Record<string, string | number>;
   compare_at_price?: number;
-  returnable?: boolean;
 }
 
 export interface ProductImage {

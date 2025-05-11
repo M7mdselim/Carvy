@@ -1,73 +1,55 @@
 
+import common from './common';
+import auth from './auth';
+import products from './products';
+import orders from './orders';
+import checkout from './checkout';
+import profile from './profile';
+import ui from './ui';
+import navigation from './navigation';
+import faq from './faq';
+
+// Add new translations
+const chatbot = {
+  multipleQuestionsDetected: "لقد وجدت عدة أسئلة في رسالتك. إليك الإجابات:",
+  moreHelp: "هل تحتاج مساعدة أخرى؟",
+  thankYou: "شكراً لك"
+};
+
+// Product request translations
+const productRequest = {
+  requestProduct: 'طلب منتج',
+  requestProductTitle: 'طلب منتج',
+  requestProductDescription: 'لم تجد ما تبحث عنه؟ أخبرنا وسنحاول توفيره لك.',
+  carMake: 'نوع السيارة',
+  carModel: 'موديل السيارة',
+  selectCarMake: 'اختر نوع السيارة',
+  selectCarModel: 'اختر موديل السيارة',
+  productName: 'اسم المنتج',
+  enterProductName: 'أدخل اسم المنتج',
+  phoneNumber: 'رقم الهاتف',
+  enterPhoneNumber: 'أدخل رقم هاتفك',
+  submitting: 'جاري الإرسال...',
+  submitRequest: 'إرسال الطلب',
+  productRequestSuccess: 'تم تقديم طلب المنتج بنجاح!',
+  productRequestError: 'حدث خطأ أثناء تقديم طلبك. يرجى المحاولة مرة أخرى.',
+  productNameRequired: 'اسم المنتج مطلوب',
+  phoneNumberRequired: 'رقم الهاتف مطلوب',
+  invalidPhoneNumber: 'تنسيق رقم الهاتف غير صالح',
+  notReturnable: 'غير قابل للإرجاع'
+};
+
+// Export all translation objects to maintain the flat structure for lookups
 export default {
-  appName: 'ظبط',
-  success: 'نجاح',
-  error: 'خطأ',
-  validationError: 'خطأ في التحقق',
-  submit: 'إرسال',
-  update: 'تحديث',
-  cancel: 'إلغاء',
-  edit: 'تعديل',
-  delete: 'حذف',
-  confirm: 'تأكيد',
-  areYouSure: 'هل أنت متأكد؟',
-  deleteConfirmation: 'هل أنت متأكد من رغبتك في حذف هذا؟',
-  yes: 'نعم',
-  no: 'لا',
-  select: 'اختر',
-  total: 'المجموع',
-  days: 'أيام',
-  hours: 'ساعات',
-  minutes: 'دقائق',
-  seconds: 'ثواني',
-  ago: 'مضت',
-  left: 'متبقي',
-  continueShopping: 'متابعة التسوق',
-  noResultsFound: 'لم يتم العثور على نتائج',
-  clearSearch: 'مسح البحث',
-  all: 'الكل',
-  address: 'العنوان',
-  save: 'حفظ',
-  refresh: 'تحديث',
-  apply: 'تطبيق',
-  // ترجمات العلامة التجارية والترجمات العامة
-  brandName: 'ظبط',
-  carDescription: 'متجرك الشامل لقطع غيار وإكسسوارات السيارات الأصلية.',
-  signIn: 'تسجيل الدخول',
-  createAccount: 'إنشاء حساب',
-  models: 'الموديلات',
-  contactUs: 'تواصل معنا',
-  termsAndConditions: 'الشروط والأحكام',
-  activeFilters: 'الفلاتر النشطة',
-  for: 'ل',
-  matching: 'مطابق',
-  clearFilters: 'مسح الفلاتر',
-  loadMore: 'تحميل المزيد',
-  allCategories: 'جميع الفئات',
-  searchProducts: 'البحث عن المنتجات',
-  // ترجمات الصفحة الرئيسية
-  findPerfectParts: 'ابحث عن القطع المثالية لسيارتك',
-  browseThousands: 'تصفح آلاف قطع غيار وإكسسوارات السيارات عالية الجودة من موردين موثوقين.',
-  browseModels: 'تصفح موديلات السيارات',
-  browseProducts: 'المنتجات المميزة',
-  searchCategories: 'البحث في الموديلات',
-  searchPlaceholder: 'ابحث عن قطع غيار وإكسسوارات وموديلات والمزيد...',
-  viewAll: 'عرض الكل',
-  loadingShops: 'جاري تحميل المتاجر...',
-  loadingProducts: 'جاري تحميل المنتجات...',
-  noCategoriesFound: 'لم يتم العثور على فئات',
-  noProductsFound: 'لم يتم العثور على منتجات',
-  // بحث السيارة
-  selectBrand: 'اختر الماركة',
-  selectModel: 'اختر الموديل',
-  findParts: 'ابحث عن القطع',
-  // ترجمات التذييل
-  quickLinks: 'روابط سريعة',
-  customerService: 'خدمة العملاء',
-  connectWithUs: 'تواصل معنا',
-  allRightsReserved: 'جميع الحقوق محفوظة',
-  faq: 'الأسئلة الشائعة',
-  home: 'الرئيسية',
-  shops: 'المتاجر',
-  wishlist: 'المفضلة'
+  ...common,
+  ...auth,
+  ...products,
+  ...orders,
+  ...checkout,
+  ...profile,
+  ...ui,
+  ...navigation,
+  ...faq,
+  ...chatbot,
+  ...productRequest
 };

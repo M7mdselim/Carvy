@@ -72,5 +72,25 @@ export default {
   faq: 'FAQ',
   home: 'Home',
   shops: 'Shops',
-  wishlist: 'Wishlist'
+  wishlist: 'Wishlist',
+  // Product request form
+  requestProduct: 'Request Product',
+  requestProductTitle: 'Request a Product',
+  requestProductDescription: 'Can\'t find what you\'re looking for? Let us know and we\'ll try to source it for you.',
+  carMake: 'Car Make',
+  carModel: 'Car Model',
+  selectCarMake: 'Select a car make',
+  selectCarModel: 'Select a car model',
+  productName: 'Product Name',
+  enterProductName: 'Enter the product name',
+  phoneNumber: 'Phone Number',
+  enterPhoneNumber: 'Enter your phone number',
+  submitting: 'Submitting...',
+  submitRequest: 'Submit Request',
+  productRequestSuccess: 'Your product request has been submitted successfully!',
+  productRequestError: 'There was an error submitting your request. Please try again.',
+  productNameRequired: 'Product name is required',
+  phoneNumberRequired: 'Phone number is required',
+  invalidPhoneNumber: 'Invalid phone number format',
+  notReturnable: 'Not Returnable'
 };

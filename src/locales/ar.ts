@@ -179,7 +179,7 @@ export const ar = {
   "models": "الموديلات",
     "searchPlaceholder": "ابحث عن قطع غيار، متاجر، موديل أو رقم المنتج...",
     "youMayAlsoLike": "يتم طلبها معًا بشكل متكرر",
-    "productType": "رقم المنتج",
+    "productType": "النوع",
     "topBrands": "أفضل العلامات التجارية",
     "findPartsByBrand": "ابحث عن قطعتك",
     "forYourCar": "لسيارتك",
@@ -330,14 +330,7 @@ export const ar = {
   "findParts":"بحث عن قطع",
   "selectBrand": "اختر نوع ",
   "selectModel": "اختر موديل ",
-  "selectYear":"اختر سنه الصنع",
- "Engine Parts": "قطع المحرك",
-  "Brake System": "نظام الفرامل",
-  "Transmission": "نظام النقل",
-  "Electrical": "نظام الكهرباء",
-  "brand":"النوع",
-  "notReturnable": "غير قابل للاسترجاع"
-  
+  "selectYear":"اختر سنه الصنع"
 };
 
 

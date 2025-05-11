@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -9,8 +10,7 @@ import { useProductRatings } from '../hooks/useRatings'
 import { Button } from '../components/ui/button'
 import { 
   Heart, Share2, Plus, Minus, ArrowLeft, 
-  ShoppingCart, ImageIcon, Star, Trash2,
-  RefreshCw
+  ShoppingCart, ImageIcon, Star, Trash2
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Separator } from '../components/ui/separator'
@@ -41,7 +41,6 @@ export default function ProductDetails() {
   const [shopId, setShopId] = useState<string | null>(null)
   const [shopFeedback, setShopFeedback] = useState<number | null>(null)
   const [ratingHover, setRatingHover] = useState<number | null>(null)
-  const [isReturnable, setIsReturnable] = useState<boolean>(false)
   const cartItem = items.find(item => item.product.id === productId)
   const isRtl = language === 'ar'
 
@@ -112,11 +111,11 @@ export default function ProductDetails() {
       setShopId(shopData.id)
       setShopRating(shopData.rating || 0)
       
-      setIsReturnable(productData.returnable || false)
-      
+      // Calculate shop feedback percentage based on actual review count if available
       if (shopData.review_count && shopData.review_count > 0) {
         setShopFeedback(Math.round((shopData.review_count / (shopData.review_count + 5)) * 100))
       } else {
+        // If no reviews, don't display any feedback percentage
         setShopFeedback(null)
       }
       
@@ -141,8 +140,7 @@ export default function ProductDetails() {
         reviewCount: productData.review_count || 0,
         type: productData.type || 'Other',
         specifications: {},
-        compare_at_price: null,
-        returnable: productData.returnable || false
+        compare_at_price: null
       }
 
       setProduct(formattedProduct)
@@ -222,6 +220,7 @@ export default function ProductDetails() {
 
   const handleRatingClick = async (rating: number) => {
     if (await rateProduct(productId || '', rating)) {
+      // Refresh product details to get the updated rating
       fetchProductDetails();
     }
   };
@@ -290,7 +289,7 @@ export default function ProductDetails() {
                 <img 
                   src={images[currentImageIndex]} 
                   alt={product?.name} 
-                  className="w-full h-full object-contain p-4"
+                  className="w-full h-full object-contain p-6"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -313,33 +312,31 @@ export default function ProductDetails() {
             </AspectRatio>
           </div>
           
-          {images.length > 1 && (
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 max-w-[500px] mx-auto">
-              {images.map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`relative rounded-md overflow-hidden transition-all duration-200 ${
-                    currentImageIndex === index 
-                      ? 'border-2 border-indigo-600 shadow-md' 
-                      : 'border border-gray-200 hover:border-indigo-300'
-                  }`}
-                >
-                  <AspectRatio ratio={1/1}>
-                    <img 
-                      src={img} 
-                      alt={`${product?.name} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </AspectRatio>
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+            {images.map((img, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                className={`relative rounded-md overflow-hidden transition-all duration-200 ${
+                  currentImageIndex === index 
+                    ? 'border-2 border-indigo-600 shadow-md' 
+                    : 'border border-gray-200 hover:border-indigo-300'
+                }`}
+              >
+                <AspectRatio ratio={1/1}>
+                  <img 
+                    src={img} 
+                    alt={`${product?.name} thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </AspectRatio>
+              </button>
+            ))}
+          </div>
           
           <Button
             variant="outline"
-            className="w-full hidden sm:flex justify-center items-center gap-2 max-w-[500px] mx-auto"
+            className="mt-4 w-full hidden sm:flex justify-center items-center gap-2"
             onClick={shareProduct}
           >
             <Share2 className="h-4 w-4" />
@@ -404,7 +401,7 @@ export default function ProductDetails() {
           
           <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <div className="text-2xl sm:text-3xl font-bold text-gray-900 product-price">
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                 {formatCurrency(product?.price || 0)}
               </div>
               <div className="text-sm px-3 py-1 rounded-full bg-gray-200 text-gray-700">
@@ -416,18 +413,6 @@ export default function ProductDetails() {
               <span className="text-gray-600 text-sm">{t('condition')}:</span>
               <span className="ml-2 text-gray-800 font-medium">{isInactive ? t('unavailable') : t('new')}</span>
             </div>
-
-            {isReturnable ? (
-              <div className="mt-2 flex items-center text-sm text-green-600">
-                <RefreshCw className="h-4 w-4 mr-1" />
-                {t('acceptedWithin')} 7 {t('days')}
-              </div>
-            ) : (
-              <div className="mt-2 flex items-center text-sm text-red-600">
-                <RefreshCw className="h-4 w-4 mr-1" />
-                {t('notReturnable')}
-              </div>
-            )}
           </div>
           
           <div className="space-y-3">
@@ -435,37 +420,35 @@ export default function ProductDetails() {
               <>
                 <Button
                   onClick={handleBuyNow}
-                  className="w-full h-10 sm:h-12 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white"
+                  className="w-full h-10 sm:h-12 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg"
                 >
                   {t('buyItNow')}
                 </Button>
                 
                 {cartItem ? (
-                  <div className="flex items-center justify-between border rounded-lg bg-gray-50 p-2">
-                    <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => updateQuantity(product.id, Math.max(0, cartItem.quantity - 1))}
-                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="mx-3 sm:mx-4 font-medium text-base sm:text-lg">{cartItem.quantity}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
-                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  <div className="flex items-center border rounded-lg bg-gray-50 p-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => updateQuantity(product.id, Math.max(0, cartItem.quantity - 1))}
+                      className="h-9 w-9 sm:h-10 sm:w-10 rounded-full"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="mx-3 sm:mx-4 font-medium text-base sm:text-lg">{cartItem.quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
+                      className="h-9 w-9 sm:h-10 sm:w-10 rounded-full"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => removeItem(product?.id || '')}
-                      className="h-9 w-9 sm:h-10 sm:w-10 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="h-9 w-9 sm:h-10 sm:w-10 rounded-full ml-auto text-red-500 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -560,8 +543,8 @@ export default function ProductDetails() {
         <div className="mt-10 sm:mt-16">
           <SimilarProducts 
             productId={productId} 
-            categoryId={categoryId || ''}
-            shopId={shopId || ''}
+            categoryId={categoryId} 
+            shopId={product.shopId} 
           />
         </div>
       )}

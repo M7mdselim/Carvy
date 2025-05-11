@@ -333,8 +333,6 @@ export const en = {
   "findParts":"Find a Part",
   "selectBrand": "Select Brand",
   "selectModel": "Select Model",
-  "selectYear":"Select Year",
-  "notReturnable": "Not Returnable"
-
+  "selectYear":"Select Year"
 };
 export default en;

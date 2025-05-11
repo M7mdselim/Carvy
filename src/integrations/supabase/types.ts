@@ -628,6 +628,39 @@ export type Database = {
           },
         ]
       }
+      product_requests: {
+        Row: {
+          car_make: string | null
+          car_model: string | null
+          created_at: string
+          id: string
+          phone_number: string
+          product_name: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          car_make?: string | null
+          car_model?: string | null
+          created_at?: string
+          id?: string
+          phone_number: string
+          product_name: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          car_make?: string | null
+          car_model?: string | null
+          created_at?: string
+          id?: string
+          phone_number?: string
+          product_name?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category_id: string | null
