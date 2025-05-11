@@ -17,14 +17,14 @@ const BrandsCarousel = () => {
   
   // Sample car brands - in a real app, these would come from an API
   const brands = [
-    { id: 1, name: 'Toyota', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/cf8ycrxezas_1742816342123.jpeg' },
-    {id: 2, name: 'Hyundai', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/sign/Categories%20Photos/Hyundai.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJDYXRlZ29yaWVzIFBob3Rvcy9IeXVuZGFpLnBuZyIsImlhdCI6MTczOTQwODc1NSwiZXhwIjoxNzcwOTQ0NzU1fQ.1gr5AU5uDvxZkS6Htl_d6atk2BAzAi5_MTfTVgNAmzI' },
-    { id: 3, name: 'BMW', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/sign/Categories%20Photos/BMW-Logo.wine.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJDYXRlZ29yaWVzIFBob3Rvcy9CTVctTG9nby53aW5lLnBuZyIsImlhdCI6MTc0MDI1MTU4MiwiZXhwIjoxODk3OTMxNTgyfQ.XFsARDmo9aIdmi_hfQqIbcuGBDgMZCdhrQwfaRkwt0w' },
-    { id: 4, name: 'Mercedes', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/24fp91d3j0a_1742816457792.png' },
-    { id: 5, name: 'Skoda', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/q5g7a8a0aak_1742816502599.jpeg' },
-    { id: 6, name: 'Volkswagen', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/hd49pj2b46o_1742816383774.png' },
-    { id: 7, name: 'Audi', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/6c7glgl9rkf_1742816420944.jpeg' },
-    { id: 8, name: 'Fiat', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/rmc2tvjvqo8_1742816301290.jpeg' },
+    { id: 1, name: 'Toyota', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/sgt6uigih6c_1744577155856.jpeg' },
+    {id: 2, name: 'Hyundai', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v…%20Photos/categories/hqe72irn6g_1744576888124.png' },
+    { id: 3, name: 'BMW', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/7nymadvktyl_1744576897914.jpeg' },
+    { id: 4, name: 'Mercedes', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/idoekuut1ob_1744576963059.png' },
+    { id: 5, name: 'Skoda', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/rsn625ohakc_1744419709399.jpeg' },
+    { id: 6, name: 'Volkswagen', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/4njjdmhyqpw_1744577171140.png' },
+    { id: 7, name: 'Audi', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/48yvj7hia8x_1744489573933.jpeg' },
+    { id: 8, name: 'Fiat', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/t15pi5q36wf_1744576804362.jpeg' },
     
     
     
