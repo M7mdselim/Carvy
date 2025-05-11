@@ -330,7 +330,25 @@ export const ar = {
   "findParts":"بحث عن قطع",
   "selectBrand": "اختر نوع ",
   "selectModel": "اختر موديل ",
-  "selectYear":"اختر سنه الصنع"
+  "selectYear":"اختر سنه الصنع",
+  "requestProductTitle": "طلب منتج",
+  "requestProductDescription": "املأ هذا النموذج لطلب منتج لا يمكنك العثور عليه.",
+  "carMake": "ماركة السيارة",
+  "carModel": "طراز السيارة",
+  "selectCarMake": "اختر ماركة السيارة",
+  "selectCarModel": "اختر طراز السيارة",
+
+  "enterProductName": "أدخل اسم المنتج",
+
+  "enterPhoneNumber": "أدخل رقم هاتفك",
+  "productNameRequired": "اسم المنتج مطلوب",
+  "phoneNumberRequired": "رقم الهاتف مطلوب",
+  "invalidPhoneNumber": "يرجى إدخال رقم هاتف صالح",
+
+  "submitRequest": "إرسال الطلب",
+  "submitting": "جاري الإرسال...",
+  "productRequestSuccess": "تم إرسال طلب المنتج بنجاح!",
+  "productRequestError": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى."
 };
 
 

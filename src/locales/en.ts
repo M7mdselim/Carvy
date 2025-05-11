@@ -333,6 +333,24 @@ export const en = {
   "findParts":"Find a Part",
   "selectBrand": "Select Brand",
   "selectModel": "Select Model",
-  "selectYear":"Select Year"
+  "selectYear":"Select Year",
+  "requestProductTitle": "Request Product",
+    "requestProductDescription": "Fill out this form to request a product that you can't find.",
+    "carMake": "Car Make",
+    "carModel": "Car Model",
+    "selectCarMake": "Select car make",
+    "selectCarModel": "Select car model",
+  
+    "enterProductName": "Enter product name",
+    
+    "enterPhoneNumber":"Enter your phone number",
+    "productNameRequired": "Product name is required",
+    "phoneNumberRequired": "Phone number is required",
+    "invalidPhoneNumber": "Please enter a valid phone number",
+    
+    "submitRequest": "Submit Request",
+    "submitting": "Submitting...",
+    "productRequestSuccess": "Your product request has been submitted successfully!",
+    "productRequestError": "There was an error submitting your request. Please try again.",
 };
 export default en;
