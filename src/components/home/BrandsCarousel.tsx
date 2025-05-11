@@ -18,7 +18,7 @@ const BrandsCarousel = () => {
   // Sample car brands - in a real app, these would come from an API
   const brands = [
     { id: 1, name: 'Toyota', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/sgt6uigih6c_1744577155856.jpeg' },
-    {id: 2, name: 'Hyundai', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v…%20Photos/categories/hqe72irn6g_1744576888124.png' },
+    {id: 2, name: 'Hyundai', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/hqe72irn6g_1744576888124.png'},
     { id: 3, name: 'BMW', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/7nymadvktyl_1744576897914.jpeg' },
     { id: 4, name: 'Mercedes', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/idoekuut1ob_1744576963059.png' },
     { id: 5, name: 'Skoda', logo: 'https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos/categories/rsn625ohakc_1744419709399.jpeg' },
