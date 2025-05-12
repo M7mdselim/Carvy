@@ -12,6 +12,9 @@ const HomeHero = () => {
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [isImagesLoaded, setIsImagesLoaded] = useState(false)
 
+  const categories = ['Engine Parts', 'Brake System', 'Transmission', 'Electrical'];
+
+
   useEffect(() => {
     // Show the search bar immediately
     setIsSearchVisible(true)
@@ -33,11 +36,11 @@ const HomeHero = () => {
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
       </div>
-      
+
       {/* Animated circles */}
       <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply opacity-10 animate-float"></div>
       <div className="absolute bottom-1/3 left-1/4 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply opacity-10 animate-float" style={{ animationDelay: '1s' }}></div>
-      
+
       {/* Hero content */}
       <div className="relative pt-6 pb-24 md:pt-10 md:pb-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -67,12 +70,12 @@ const HomeHero = () => {
                 </Link>
               </Button>
             </div>
-            
+
           </div>
-          
+
           {/* Right side image */}
           <div className={`hidden lg:flex justify-end ${isImagesLoaded ? 'slide-in-right' : 'opacity-0'}`}>
-            <img 
+            <img
               src="https://gcejhxrwyftlzbztngug.supabase.co/storage/v1/object/public/Shops%20Photos//ZABTT.png"
               alt="Car dashboard"
               className="rounded-2xl shadow-2xl max-w-md object-cover h-196 border-4 border-white animate-float hover-lift"
@@ -81,10 +84,10 @@ const HomeHero = () => {
         </div>
 
         {/* Search bar with highest z-index */}
-        <div className={`relative px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`} 
+        <div className={`relative px-4 pt-8 pb-6 transition-all duration-500 ease-in-out ${isSearchVisible ? 'fade-in' : 'opacity-0 translate-y-10'}`}
           style={{ position: 'relative', zIndex: 99999999 }}>
           <SearchBar />
-          
+
           {/* Add the Brand and Model search component */}
           <div className="max-w-4xl mx-auto">
             <BrandModelSearch />
@@ -93,19 +96,20 @@ const HomeHero = () => {
 
         {/* Quick search options */}
         <div className={`mt-24 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isImagesLoaded ? 'fade-in' : 'opacity-0'}`}>
-          {['Engine Parts', 'Brake System', 'Transmission', 'Electrical'].map((category, index) => (
-            <Link 
-              key={category} 
+          {categories.map((category, index) => (
+            <Link
+              key={category}
               to={`/products?type=${encodeURIComponent(category)}`}
               className="bg-white/80 backdrop-blur-sm rounded-xl p-4 text-center shadow-sm hover-lift hover:bg-white text-gray-700 font-medium"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              {category}
+              {t(`${category}`)}
             </Link>
           ))}
         </div>
+
       </div>
-      
+
       {/* Bottom gradient */}
       <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">
         <div className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"></div>

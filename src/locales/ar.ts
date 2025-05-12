@@ -348,7 +348,15 @@ export const ar = {
   "submitRequest": "إرسال الطلب",
   "submitting": "جاري الإرسال...",
   "productRequestSuccess": "تم إرسال طلب المنتج بنجاح!",
-  "productRequestError": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى."
+  "productRequestError": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.",
+
+
+ 
+    "Engine Parts": "قطع المحرك",
+    "Brake System": "نظام الفرامل",
+    "Transmission": "نظام النقل",
+    "Electrical": "النظام الكهربائي"
+  
 };
 
 

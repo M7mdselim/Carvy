@@ -14,6 +14,18 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
     const newLanguage: 'ar' | 'en' = language === 'ar' ? 'en' : 'ar';  // Correct type assignment
     changeLanguage(newLanguage); // Now passing the correct type
     localStorage.setItem('language', newLanguage); // Store the preference in localStorage
+    
+    // Apply RTL/LTR to the content area only, not the navbar
+    const contentElements = document.querySelectorAll('.content-area');
+    contentElements.forEach(element => {
+      element.setAttribute('dir', newLanguage === 'ar' ? 'rtl' : 'ltr');
+    });
+    
+    // Don't change the direction of the navbar
+    const navbarElements = document.querySelectorAll('.navbar-container');
+    navbarElements.forEach(element => {
+      element.setAttribute('dir', 'ltr'); // Always keep navbar LTR
+    });
   };
 
   // Check if a language is already saved in localStorage, otherwise set Arabic as default
@@ -29,6 +41,21 @@ export const LanguageSwitcher = ({ className = '' }: LanguageSwitcherProps) => {
       // Set the stored language (no need to compare with current language)
       changeLanguage(storedLanguage as 'ar' | 'en');
     }
+    
+    // Initialize direction attributes on first render
+    const currentLang = storedLanguage || 'ar';
+    
+    // Apply RTL/LTR to content areas
+    const contentElements = document.querySelectorAll('.content-area');
+    contentElements.forEach(element => {
+      element.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    });
+    
+    // Keep navbar LTR regardless of language
+    const navbarElements = document.querySelectorAll('.navbar-container');
+    navbarElements.forEach(element => {
+      element.setAttribute('dir', 'ltr');
+    });
   }, []); // ✅ Only run on first render
   
 

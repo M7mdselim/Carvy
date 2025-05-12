@@ -352,5 +352,14 @@ export const en = {
     "submitting": "Submitting...",
     "productRequestSuccess": "Your product request has been submitted successfully!",
     "productRequestError": "There was an error submitting your request. Please try again.",
+
+   
+    "Engine Parts": "Engine Parts",
+    "Brake System": "Brake System",
+    "Transmission": "Transmission",
+    "Electrical": "Electrical"
+  
+
+    
 };
 export default en;
